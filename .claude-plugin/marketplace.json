@@ -1,15 +1,19 @@
 {
-  "name": "wilbeibi-toolkit",
+  "name": "Hongyi Shen",
+  "owner": "wilbeibi",
   "description": "Personal workspace utilities for Obsidian, Dayflow, and macOS.",
-  "plugins": {
-    "obsidian": {
+  "plugins": [
+    {
+      "name": "obsidian",
       "path": "plugins/obsidian"
     },
-    "dayflow": {
+    {
+      "name": "dayflow",
       "path": "plugins/dayflow"
     },
-    "m-cli": {
+    {
+      "name": "m-cli",
       "path": "plugins/m-cli"
     }
-  }
+  ]
 }
