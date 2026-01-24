@@ -1,19 +1,41 @@
 {
-  "name": "Hongyi Shen",
-  "owner": "wilbeibi",
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "hongyi-shen-toolkit",
   "description": "Personal workspace utilities for Obsidian, Dayflow, and macOS.",
+  "owner": {
+    "name": "Hongyi Shen",
+    "email": "wilbeibi@gmail.com"
+  },
   "plugins": [
     {
       "name": "obsidian",
-      "path": "plugins/obsidian"
+      "description": "Obsidian note-taking integration",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/obsidian"
     },
     {
       "name": "dayflow",
-      "path": "plugins/dayflow"
+      "description": "Dayflow journaling integration",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/dayflow"
     },
     {
       "name": "m-cli",
-      "path": "plugins/m-cli"
+      "description": "Swiss Army Knife for macOS - control system functions via CLI",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/m-cli"
     }
   ]
 }
