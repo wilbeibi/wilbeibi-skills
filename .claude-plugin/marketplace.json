@@ -36,6 +36,26 @@
         "email": "wilbeibi@gmail.com"
       },
       "source": "./plugins/m-cli"
+    },
+    {
+      "name": "code-review",
+      "description": "Code review guidance based on Russ Cox's philosophy of simplicity and maintainability",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/code-review"
+    },
+    {
+      "name": "testing",
+      "description": "Guidance on writing effective, maintainable tests",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/testing"
     }
   ]
 }
