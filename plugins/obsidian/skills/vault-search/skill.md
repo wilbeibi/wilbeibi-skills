@@ -16,7 +16,7 @@ rg "^- \[ \].*📅 2026-01-27" --glob '*.md'      # tasks due today
 # Only for what regex can't do:
 "recent week" → datetime.now() - timedelta(7)
 "overdue" → filter(date < today)
-"找3-2-1技巧" → Chinese patterns
+"找3-2-1技巧" → Chinese term extraction
 ```
 
 ### Layer 3: AI agent (orchestration)
@@ -46,13 +46,11 @@ rg "^- \[ \].*📅 2026-01-27" --glob '*.md'      # tasks due today
 | Language-specific | Pattern variants |
 | Fallback dates | File system mtime |
 
-## Language-Aware Patterns
+## Language-Aware Term Extraction
 
-**English query → English patterns:**
-- 3-2-1 → ["3-2-1", "three-two-one", "321"]
-
-**Chinese query → Chinese patterns:**
-- 3-2-1 → ["3-2-1技巧", "321技巧", "三二一"]
+- Chinese queries → extract contiguous CJK terms for rg
+- English queries → extract alnum tokens (3+ chars)
+- Synonym expansion is handled by the agent, not this script
 
 ## Date Field Patterns
 
