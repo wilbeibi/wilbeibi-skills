@@ -1,0 +1,56 @@
+name: vault-search
+description: |
+  Search vault using natural language. Use when:
+  - Finding notes ("recent week about X", "tagged Y", "找关于X的笔记")
+  - Finding tasks ("due today", "overdue", "high priority")
+  - Temporal queries with created date ("yesterday", "last month")
+
+  Direct ripgrep for 80% queries, Python for date math & language detection.
+
+keywords:
+  # Note search
+  - find notes
+  - search vault
+  - recent week
+  - last month
+  - yesterday
+  - created date
+  # Task search
+  - tasks
+  - todos
+  - due today
+  - overdue
+  - high priority
+  # Topics
+  - 3-2-1
+  - psychology
+  - communication
+  - memory
+  - agent
+  # Chinese
+  - 找笔记
+  - 搜索
+
+trigger_phrases:
+  - "find notes about"
+  - "search for"
+  - "I wrote about"
+  - "notes from"
+  - "show tasks"
+  - "what's due"
+  - "overdue"
+  - "找"
+  - "搜索"
+
+usage_examples:
+  - input: "recent week about psychology"
+    expected_behavior: "Date range (last 7 days) + content search"
+
+  - input: "tasks due today"
+    expected_behavior: "Regex: ^- [ ].*📅 2026-01-27"
+
+  - input: "找3-2-1技巧"
+    expected_behavior: "Chinese patterns: 3-2-1技巧, 321技巧, 三二一"
+
+  - input: "overdue tasks"
+    expected_behavior: "Get all dated tasks, filter by date < today"
