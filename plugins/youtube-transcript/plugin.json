@@ -1,0 +1,8 @@
+{
+  "name": "youtube-transcript",
+  "version": "0.1.0",
+  "description": "Transform YouTube video transcripts into comprehensive Obsidian-formatted notes with timestamps, callouts, and structured analysis.",
+  "skills": [
+    "SKILL.md"
+  ]
+}
