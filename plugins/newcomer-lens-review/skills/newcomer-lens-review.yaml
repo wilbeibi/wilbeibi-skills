@@ -1,0 +1,36 @@
+name: newcomer-lens-review
+description: |
+  Code review framework from the perspective of a competent engineer who just joined the team.
+  Identifies documentation gaps, missing context, undocumented constraints, and implicit assumptions
+  that impede newcomer onboarding. Focuses on what a new team member needs to understand the code,
+  not on style or convention.
+
+keywords:
+  - code review
+  - documentation gaps
+  - context
+  - onboarding
+  - tribal knowledge
+  - design rationale
+
+trigger_phrases:
+  - "review this code as a newcomer"
+  - "newcomer lens review"
+  - "what would a new engineer not understand"
+  - "identify context gaps"
+  - "review with fresh eyes"
+  - "document missing context"
+
+usage_examples:
+  - input: "review this code as a newcomer would - what context are we missing?"
+    expected_behavior: "Identifies unstated assumptions, design decisions, domain concepts, and constraints that aren't self-evident from the code"
+  - input: "Apply the newcomer lens to help me document this system"
+    expected_behavior: "Highlights what tribal knowledge exists, what needs documentation, and what questions a new engineer would ask"
+  - input: "What context gaps would prevent a newcomer from understanding this?"
+    expected_behavior: "Categorizes gaps into design decisions, domain knowledge, historical context, and system constraints"
+
+context:
+  - Designed for distributed systems and complex codebases
+  - Helps distinguish between standard patterns (obvious to experts) and project-specific decisions
+  - Improves onboarding documentation and team knowledge transfer
+  - Useful for code reviews targeting knowledge preservation, not just correctness

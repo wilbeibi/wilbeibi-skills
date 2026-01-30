@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hongyi-shen-toolkit",
-  "description": "Personal workspace utilities for Obsidian, Dayflow, and macOS.",
+  "description": "Personal workspace utilities for code review, Obsidian, Dayflow, and macOS.",
   "owner": {
     "name": "Hongyi Shen",
     "email": "wilbeibi@gmail.com"
@@ -66,6 +66,16 @@
         "email": "wilbeibi@gmail.com"
       },
       "source": "./plugins/youtube-transcript"
+    },
+    {
+      "name": "newcomer-lens-review",
+      "description": "Code review from the perspective of a competent engineer without project context - identifies documentation gaps and missing context",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/newcomer-lens-review"
     }
   ]
 }
