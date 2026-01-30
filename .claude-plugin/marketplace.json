@@ -56,6 +56,16 @@
         "email": "wilbeibi@gmail.com"
       },
       "source": "./plugins/testing"
+    },
+    {
+      "name": "youtube-transcript",
+      "description": "YouTube transcript extraction and analysis",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hongyi Shen",
+        "email": "wilbeibi@gmail.com"
+      },
+      "source": "./plugins/youtube-transcript"
     }
   ]
 }
