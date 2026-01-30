@@ -2,10 +2,10 @@
 
 My junk drawer of non-deterministic scripts:
 
-- **[Obsidian](https://obsidian.md/)**: Search your vault using natural language queries with date/tag/content filters (uses ripgrep on local files).
+- **[Obsidian](plugins/obsidian/skills/vault-search/skill.md)**: Search your [Obsidian](https://obsidian.md/) vault using natural language queries with date/tag/content filters (uses ripgrep on local files).
 - **YouTube Transcript**: Transform YouTube video transcripts into comprehensive Obsidian notes with timestamps and structured analysis.
-- **[Dayflow](https://github.com/JerryZLiu/Dayflow)**: Query and analyze your local time-tracking database.
-- **[m-cli](https://github.com/rgcr/m-cli)**: Control macOS system settings (who doesn't want to switch to dark mode in Claude Code?).
+- **[Dayflow](plugins/dayflow/skills/dayflow-review.md)**: Query and analyze your local [Dayflow](https://github.com/JerryZLiu/Dayflow) time-tracking database.
+- **[m-cli](plugins/m-cli/skills/m-cli.md)**: Control macOS system settings with [m-cli](https://github.com/rgcr/m-cli) (who doesn't want to switch to dark mode in Claude Code?).
 - **Code Review**: Russ Cox's philosophy for maintainable software.
 - **Testing**: Guidance on writing effective, maintainable tests.
 
@@ -41,4 +41,3 @@ Once the marketplace is added, you can install specific tools using their names:
 # Install Testing guidance
 /plugin install testing@wilbeibi-toolkit
 ```
-
