@@ -1,7 +1,7 @@
 {
   "name": "code-review",
-  "version": "0.1.0",
-  "description": "Code review guidance based on Russ Cox's philosophy of simplicity and maintainability.",
+  "version": "0.2.0",
+  "description": "Code review guidance based on engineering philosophies from Russ Cox (simplicity, anti-bloat) and Armin Ronacher (pragmatism, minimal dependencies, stability).",
   "skills": [
     "skills/*.md"
   ]
