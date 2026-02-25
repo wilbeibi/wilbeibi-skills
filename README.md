@@ -14,27 +14,20 @@ My junk drawer of non-deterministic scripts:
 
 ## Installation
 
-Install any plugin directly by path in Claude Code:
+First, add the marketplace:
 
 ```bash
-# Obsidian integration
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/obsidian
+/plugin marketplace add wilbeibi/claude-toolkit
+```
 
-# YouTube Transcript
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/youtube-transcript
+Then install any plugin:
 
-# Dayflow time tracking
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/dayflow
-
-# macOS system tools
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/m-cli
-
-# Code Review
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/code-review
-
-# Testing guidance
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/testing
-
-# Newcomer Lens Review
-/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/newcomer-lens-review
+```bash
+/plugin install obsidian@claude-toolkit
+/plugin install youtube-transcript@claude-toolkit
+/plugin install dayflow@claude-toolkit
+/plugin install m-cli@claude-toolkit
+/plugin install code-review@claude-toolkit
+/plugin install testing@claude-toolkit
+/plugin install newcomer-lens-review@claude-toolkit
 ```
