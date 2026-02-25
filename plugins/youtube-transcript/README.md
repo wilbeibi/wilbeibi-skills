@@ -51,5 +51,5 @@ Files are saved with the format: `YYYY-MM-DD - [Video Title].md`
 ## Installation
 
 ```bash
-/plugin install youtube-transcript@wilbeibi-toolkit
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/youtube-transcript
 ```

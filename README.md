@@ -14,35 +14,27 @@ My junk drawer of non-deterministic scripts:
 
 ## Installation
 
-### 1. Add the Marketplace
-First, in Claude Code terminal:
+Install any plugin directly by path in Claude Code:
 
 ```bash
-/plugin marketplace add https://github.com/wilbeibi/claude-toolkit
-```
+# Obsidian integration
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/obsidian
 
-### 2. Install Individual Tools
-Once the marketplace is added, you can install specific tools using their names:
+# YouTube Transcript
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/youtube-transcript
 
-```bash
-# Install Obsidian integration
-/plugin install obsidian@wilbeibi-toolkit
+# Dayflow time tracking
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/dayflow
 
-# Install YouTube Transcript tool
-/plugin install youtube-transcript@wilbeibi-toolkit
+# macOS system tools
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/m-cli
 
-# Install Dayflow review tools
-/plugin install dayflow@wilbeibi-toolkit
+# Code Review
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/code-review
 
-# Install macOS system tools
-/plugin install m-cli@wilbeibi-toolkit
+# Testing guidance
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/testing
 
-# Install Code Review philosophy
-/plugin install code-review@wilbeibi-toolkit
-
-# Install Testing guidance
-/plugin install testing@wilbeibi-toolkit
-
-# Install Newcomer Lens Review
-/plugin install newcomer-lens-review@wilbeibi-toolkit
+# Newcomer Lens Review
+/plugin install https://github.com/wilbeibi/claude-toolkit/tree/main/plugins/newcomer-lens-review
 ```
