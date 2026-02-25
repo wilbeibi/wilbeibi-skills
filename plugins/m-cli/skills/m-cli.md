@@ -1,6 +1,6 @@
 ---
 name: m-cli
-description: Swiss Army Knife for macOS - control system functions, manage utilities, and tweak macOS preferences from the command line. Use when user needs to manage macOS settings like dark mode, dock, wifi, battery, display, volume, or any other system preference via CLI.
+description: Swiss Army Knife for macOS - control system functions, manage utilities, and tweak preferences via the `m` CLI tool. Use ONLY when the user explicitly asks you to perform a macOS system action (e.g. "turn on dark mode", "check wifi status", "mute volume") AND the `m` command can accomplish it. Do NOT use just because macOS, wifi, display, dock, or battery topics are mentioned in a programming, informational, or troubleshooting-code context.
 allowed-tools:
   - Bash
 ---
@@ -10,11 +10,24 @@ allowed-tools:
 Control macOS system settings, preferences, and utilities directly from the command line using the `m` command.
 
 ## When to Use
-- User asks to change system settings (dark mode, brightness, volume)
-- User needs to manage system state (sleep, lock, restart)
-- User wants to check system info (battery, wifi status, display settings)
-- User requests dock or appearance customization
-- User needs to control macOS utilities and preferences
+
+**Use this skill ONLY when all of the following are true:**
+1. The user is explicitly asking Claude to **perform a system action** (not just asking about it, discussing it in code, or troubleshooting software)
+2. The action targets the **local macOS system** (not a remote system, container, or VM)
+3. The `m` CLI tool has a command that covers the requested action
+
+**Good examples (use this skill):**
+- "Turn on dark mode" → `m appearance dark`
+- "Mute my volume" → `m volume mute`
+- "Check my wifi status" → `m wifi status`
+- "Hide the Dock automatically" → `m dock autohide YES`
+
+**Bad examples (do NOT use this skill):**
+- User mentions wifi/display/battery in a programming question
+- User asks how to detect dark mode in their app code
+- User is troubleshooting a macOS issue but wants to understand it, not run a command
+- User is asking about macOS APIs or frameworks
+- Any informational question about macOS topics
 
 ## Command Reference
 
