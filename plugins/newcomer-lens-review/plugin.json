@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "description": "Code review framework from the perspective of a competent engineer without project context - identifies documentation gaps and missing context that impede onboarding.",
   "skills": [
-    "skills/newcomer-lens-review"
+    "skills/newcomer-lens-review.md"
   ]
 }
