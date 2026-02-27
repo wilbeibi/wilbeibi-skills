@@ -1,8 +1,5 @@
 {
   "name": "testing",
   "version": "0.1.0",
-  "description": "Guidance on writing effective, maintainable tests.",
-  "skills": [
-    "skills/*.md"
-  ]
+  "description": "Guidance on writing effective, maintainable tests."
 }

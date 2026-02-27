@@ -1,8 +1,5 @@
 {
   "name": "m-cli",
   "version": "0.1.0",
-  "description": "Swiss Army Knife for macOS - control system functions.",
-  "skills": [
-    "skills/*.md"
-  ]
+  "description": "Swiss Army Knife for macOS - control system functions."
 }

@@ -1,8 +1,5 @@
 {
   "name": "dayflow",
   "version": "0.1.0",
-  "description": "Query and analyze Dayflow time tracking database.",
-  "skills": [
-    "skills/*.md"
-  ]
+  "description": "Query and analyze Dayflow time tracking database."
 }
