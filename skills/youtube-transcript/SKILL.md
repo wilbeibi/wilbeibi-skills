@@ -1,3 +1,8 @@
+---
+name: youtube-transcript
+description: Transform YouTube videos or transcripts into structured Obsidian notes with timestamps, metadata, callouts, and detailed section breakdowns. Use when the user provides a YouTube URL or asks to summarize, analyze, or convert a YouTube video into notes.
+---
+
 # YouTube Transcript to Obsidian Note
 
 Use this skill when the user asks to "analyze YouTube video", "transform YouTube transcript", "create Obsidian note from YouTube", "summarize YouTube video", or provides a YouTube URL for detailed note-taking.

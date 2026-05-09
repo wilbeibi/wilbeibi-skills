@@ -1,33 +1,45 @@
-# Claude Toolkit
+# wilbeibi-skills
 
-My junk drawer of non-deterministic scripts:
+Personal agent skills packaged for `npx skills`.
 
-- **[Obsidian](plugins/obsidian/skills/vault-search/skill.md)**: Search your [Obsidian](https://obsidian.md/) vault using natural language queries with date/tag/content filters (uses ripgrep on local files).
-- **YouTube Transcript**: Transform YouTube video transcripts into comprehensive Obsidian notes with timestamps and structured analysis.
-- **[Dayflow](plugins/dayflow/skills/dayflow-review.md)**: Query and analyze your local [Dayflow](https://github.com/JerryZLiu/Dayflow) time-tracking database.
-- **[m-cli](plugins/m-cli/skills/m-cli.md)**: Control macOS system settings with [m-cli](https://github.com/rgcr/m-cli) (who doesn't want to switch to dark mode in Claude Code?).
-- **[Code Review: Russ Cox](plugins/code-review/skills/code-review-russ-cox.md)**: Review code through the lens of simplicity, orthogonality, and anti-bloat philosophy.
-- **[Code Review: Armin Ronacher](plugins/code-review/skills/code-review-mitsuhiko.md)**: Review code with pragmatic focus on context-appropriate design, minimal dependencies, and stability.
-- **[Testing](plugins/testing/skills/test-writing/SKILL.md)**: Guidance on writing effective, maintainable tests.
-- **[Newcomer Lens Review](plugins/newcomer-lens-review/skills/newcomer-lens-review.md)**: Review code like you just joined the team and ask "why did we do this?"
+## Install
 
-
-## Installation
-
-First, add the marketplace:
+List available skills:
 
 ```bash
-/plugin marketplace add wilbeibi/claude-toolkit
+npx skills add wilbeibi/wilbeibi-skills --list
 ```
 
-Then install any plugin:
+Install one skill:
 
 ```bash
-/plugin install obsidian@claude-toolkit
-/plugin install youtube-transcript@claude-toolkit
-/plugin install dayflow@claude-toolkit
-/plugin install m-cli@claude-toolkit
-/plugin install code-review@claude-toolkit
-/plugin install testing@claude-toolkit
-/plugin install newcomer-lens-review@claude-toolkit
+npx skills add wilbeibi/wilbeibi-skills --skill youtube-transcript
 ```
+
+Install all skills for the detected agent:
+
+```bash
+npx skills add wilbeibi/wilbeibi-skills --skill '*'
+```
+
+Install all skills for a specific agent:
+
+```bash
+npx skills add wilbeibi/wilbeibi-skills --skill '*' -a claude-code
+npx skills add wilbeibi/wilbeibi-skills --skill '*' -a codex
+```
+
+## Skills
+
+- [obsidian-vault-search](skills/obsidian-vault-search/SKILL.md): Search an Obsidian vault using natural language queries, dates, tags, and task filters.
+- [youtube-transcript](skills/youtube-transcript/SKILL.md): Transform YouTube videos or transcripts into structured Obsidian notes with timestamps and callouts.
+- [dayflow-review](skills/dayflow-review/SKILL.md): Query and analyze a local Dayflow time-tracking database.
+- [m-cli](skills/m-cli/SKILL.md): Control macOS system settings with the `m` CLI when explicitly requested.
+- [test-writing](skills/test-writing/SKILL.md): Guide effective, maintainable test writing.
+- [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md): Review code for missing context, onboarding gaps, and undocumented assumptions.
+- [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md): Review code through a simplicity, orthogonality, and anti-bloat lens.
+- [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md): Review code with pragmatic focus on APIs, dependencies, compatibility, and user value.
+
+## Layout
+
+Each skill lives in `skills/<skill-name>/SKILL.md`. Supporting scripts live inside the same skill directory so each skill is self-contained.

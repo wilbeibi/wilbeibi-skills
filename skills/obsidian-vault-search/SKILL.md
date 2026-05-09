@@ -1,3 +1,8 @@
+---
+name: obsidian-vault-search
+description: Search an Obsidian vault using natural language, date filters, tags, task states, and multilingual terms. Use when finding notes, recent writing, tagged content, due tasks, overdue tasks, or high-priority tasks in a local Markdown vault.
+---
+
 # Vault Search Skill
 
 ## Architecture: 3 Layers
@@ -73,13 +78,13 @@ Fallback:
 
 ```bash
 # Notes
-vault_search.py "recent week psychology"
-vault_search.py "找3-2-1技巧"
+scripts/vault_search.py "recent week psychology"
+scripts/vault_search.py "找3-2-1技巧"
 
 # Tasks
-vault_search.py "tasks due today"
-vault_search.py "overdue tasks"
+scripts/vault_search.py "tasks due today"
+scripts/vault_search.py "overdue tasks"
 
 # Raw output for piping
-vault_search.py "3-2-1" --raw | xargs -I {} echo "{}"
+scripts/vault_search.py "3-2-1" --raw | xargs -I {} echo "{}"
 ```

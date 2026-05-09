@@ -1,3 +1,8 @@
+---
+name: newcomer-lens-review
+description: Review code from the perspective of a competent engineer who just joined the team. Use to identify missing context, undocumented design rationale, implicit assumptions, onboarding gaps, and project-specific knowledge that is not evident from the code.
+---
+
 # Newcomer Lens Code Review
 
 ## Core Directive

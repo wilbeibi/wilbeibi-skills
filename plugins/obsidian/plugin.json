@@ -1,5 +1,0 @@
-{
-  "name": "obsidian",
-  "version": "0.2.0",
-  "description": "Search Obsidian vault using natural language queries with date/tag/content filters."
-}
