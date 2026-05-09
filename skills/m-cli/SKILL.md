@@ -1,18 +1,18 @@
 ---
 name: m-cli
-description: Swiss Army Knife for macOS - control system functions, manage utilities, and tweak preferences via the `m` CLI tool. Use ONLY when the user explicitly asks you to perform a macOS system action (e.g. "turn on dark mode", "check wifi status", "mute volume") AND the `m` command can accomplish it. Do NOT use just because macOS, wifi, display, dock, or battery topics are mentioned in a programming, informational, or troubleshooting-code context.
+description: macOS-only system control via the `m` CLI and a shell command tool such as Bash. Use ONLY when the user explicitly asks you to perform a local macOS system action (e.g. "turn on dark mode", "check wifi status", "mute volume") AND the `m` command can accomplish it. Do NOT use just because macOS, wifi, display, dock, or battery topics are mentioned in a programming, informational, or troubleshooting-code context.
 allowed-tools:
   - Bash
 ---
 
 # m-cli: macOS System Control
 
-Control macOS system settings, preferences, and utilities directly from the command line using the `m` command.
+Control macOS system settings, preferences, and utilities directly from the command line using the `m` command. This requires local macOS access, the `m` CLI, and an available shell command tool.
 
 ## When to Use
 
 **Use this skill ONLY when all of the following are true:**
-1. The user is explicitly asking Claude to **perform a system action** (not just asking about it, discussing it in code, or troubleshooting software)
+1. The user is explicitly asking the agent to **perform a system action** (not just asking about it, discussing it in code, or troubleshooting software)
 2. The action targets the **local macOS system** (not a remote system, container, or VM)
 3. The `m` CLI tool has a command that covers the requested action
 

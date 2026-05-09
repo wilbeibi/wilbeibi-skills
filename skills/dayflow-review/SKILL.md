@@ -1,12 +1,12 @@
 ---
 name: dayflow-review
-description: Query and analyze Dayflow time tracking database. Generate daily or weekly summaries, productivity insights, and timeline reports. Use when reviewing time usage or trends.
+description: macOS-only Dayflow review for a local Dayflow SQLite database at `~/Library/Application Support/Dayflow/chunks.sqlite`. Generate daily or weekly summaries, productivity insights, and timeline reports. Use when reviewing local Dayflow time usage or trends.
 ---
 
 # Dayflow Review
 
 ## Summary
-Use this skill to summarize Dayflow time tracking data from the local SQLite DB. Keep queries focused and filter soft deletes.
+Use this skill to summarize Dayflow time tracking data from the local macOS SQLite DB. Keep queries focused and filter soft deletes.
 
 ## Details
 
