@@ -1,132 +1,82 @@
 ---
 name: newcomer-lens-review
-description: Review code from the perspective of a competent engineer who just joined the team. Use to identify missing context, undocumented design rationale, implicit assumptions, onboarding gaps, and project-specific knowledge that is not evident from the code.
+description: Review code from the perspective of a competent engineer who just joined the team — surface missing context, undocumented design rationale, implicit assumptions, and project-specific knowledge that is not evident from the code itself. Use when the user asks for an onboarding-perspective review, mentions newcomer experience, asks about documentation gaps, or wants to know "what would confuse a new hire". Do NOT use for general code review (see code-review-russ-cox or code-review-mitsuhiko) or style nitpicking.
 ---
 
-# Newcomer Lens Code Review
+# newcomer-lens-review
 
-## Core Directive
-Review code as a competent engineer who just joined. You have general engineering knowledge but lack project-specific context: design decisions, domain knowledge, historical constraints, team conventions.
+Review as a competent engineer who just joined: general engineering knowledge, but no project-specific context — design decisions, domain terms, historical constraints, team conventions.
 
-## Context Boundary
+## Steps
 
-**Assumed knowledge:**
-- Language semantics and idioms
-- Common algorithms and patterns
-- Industry standard practices
+1. **Read the diff or files.** Mark every point where understanding requires information not present in the code.
+2. **Categorize each gap** (see "Gap categories" below).
+3. **Produce the review** in the output format below.
+4. **Prioritize**: top 3 gaps that most need documentation.
 
-**Not assumed:**
-- Why this specific approach was chosen
-- Project terminology and abstractions
-- Past attempts and lessons learned
-- Implicit requirements and constraints
-- Domain-specific concepts
+## Context boundary
 
-## Review Protocol
+**Assumed**: language semantics, common algorithms, industry standard patterns.
+**Not assumed**: why this approach, project terminology, past attempts, implicit requirements, domain concepts.
 
-### 1. Identify Context Dependencies
-Read through. Mark every point where understanding requires information not present in the code.
+## Gap categories
 
-### 2. Categorize Gaps
+- **Design rationale** — why this algorithm/data structure/pattern over the obvious alternative?
+- **Domain knowledge** — what do project-specific terms mean? what business rules drive this?
+- **Historical context** — what's behind the TODO/workaround? why is approach X avoided?
+- **System constraints** — where does this timeout/limit/threshold come from? what failure modes?
 
-**Design decisions**
-- Why this algorithm/data structure over alternatives?
-- What problem does this pattern solve here?
+## Flag vs don't flag
 
-**Domain knowledge**
-- What do project-specific terms mean?
-- What business rules drive this logic?
+**Flag if a newcomer must:**
+- Guess at unstated requirements.
+- Assume domain knowledge.
+- Infer from tribal knowledge.
+- Ask "why not the obvious alternative?"
 
-**Historical context**
-- What's behind TODOs and workarounds?
-- Why avoid certain approaches?
+**Don't flag:**
+- Standard language or framework usage.
+- Common industry patterns.
+- Anything inferable from immediate surrounding code.
+- Style preferences.
 
-**System constraints**
-- Why these timeouts/limits/thresholds?
-- What failure modes are handled?
-
-### 3. Output
+## Output format
 
 ```
-## Understandable from Code
-[What's clear without external context - be brief]
+## Understandable from code
+[One or two lines — what's clear without external context.]
 
-## Context Gaps
+## Context gaps
 
-### [Component/File]
+### [Component or file]
 
 **Missing design rationale:**
 - Why use approach X here?
-- What makes pattern Y necessary?
 
 **Undefined terms:**
 - What is [project-specific concept]?
-- How does [abstraction] differ from standard [similar thing]?
 
 **Undocumented constraints:**
 - Where does value N come from?
-- What requirement drives this check?
 
 **Questions for author:**
-- [Specific, concrete question]
-- [Another specific question]
+- [Specific, concrete question.]
 
-## Critical for Documentation
-1. [Most important gap - one line]
-2. [Second priority - one line]  
-3. [Third priority - one line]
+## Critical for documentation
+1. [Most important gap — one line.]
+2. [Second priority.]
+3. [Third priority.]
 
-## Quick Wins
-- [Specific change that would help: "Add comment explaining retry strategy"]
-- [Another: "Extract magic number to named constant with context"]
+## Quick wins
+- [Specific change: "Add comment explaining retry strategy."]
+- [Another: "Extract magic number 30000 to named constant with units."]
 ```
-
-## Decision Framework
-
-**Flag if newcomer must:**
-- Guess at unstated requirements
-- Assume domain knowledge
-- Infer from tribal knowledge
-- Ask "why not the obvious alternative?"
-
-**Don't flag if:**
-- Standard language/framework usage
-- Common industry patterns
-- Inferable from immediate context
-- Self-documenting code structure
-
-## For Distributed Systems
-
-Context gaps specific to your domain:
-- Consistency model choices and tradeoffs
-- Partitioning/sharding strategies  
-- Timeout/retry rationale
-- Failure mode assumptions
-- Ordering guarantees
-- Performance constraints
-
-## Quality Signals
-
-**Good review reveals:**
-- Assumptions only veterans know
-- Decisions that need documentation
-- Domain concepts needing definition
-- Constraints worth recording
-
-**Bad review nitpicks:**
-- Language conventions
-- Personal style preferences
-- Things obvious from code
-- Standard patterns
 
 ## Tone
 
 Curious colleague asking genuine questions:
 - "What constraint makes X necessary here?"
 - "Is Y based on measurement or estimate?"
-- "I don't see why Z - what am I missing?"
+- "I don't see why Z — what am I missing?"
 
-Avoid:
-- Vague complaints ("unclear", "confusing")
-- Demands ("must add comments")
-- Judgments without understanding
+Avoid vague complaints ("unclear", "confusing"), demands ("must add comments"), or judgments without understanding.

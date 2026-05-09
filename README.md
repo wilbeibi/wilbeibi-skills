@@ -39,6 +39,7 @@ npx skills add wilbeibi/wilbeibi-skills --skill '*' -a codex
 - [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md): Review code for missing context, onboarding gaps, and undocumented assumptions.
 - [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md): Review code through a simplicity, orthogonality, and anti-bloat lens.
 - [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md): Review code with pragmatic focus on APIs, dependencies, compatibility, and user value.
+- [write-skill](skills/write-skill/SKILL.md): Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles.
 
 ## Layout
 
