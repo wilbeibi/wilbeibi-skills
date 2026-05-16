@@ -5,7 +5,7 @@ description: Guide test writing and review with focus on observable behavior ove
 
 # test-writing
 
-Test observable behavior, not implementation. Tests must survive refactoring.
+Test units of behavior, not units of code. A good test describes one meaningful scenario, observes the result from the system boundary, and survives refactoring.
 
 ## Decision tree
 
@@ -13,35 +13,37 @@ Test observable behavior, not implementation. Tests must survive refactoring.
 Complex/important code?
 ├─ No  → Skip (trivial getters, setters, glue)
 └─ Yes → Many dependencies?
-    ├─ No  → Unit test (pure logic, public API)
+    ├─ No  → Unit test the behavior through the public API
     └─ Yes → Can extract logic?
-        ├─ Yes → Extract to domain (unit) + thin controller (integration)
-        └─ No  → Integration test
+        ├─ Yes → Extract behavior to domain + test thin orchestration separately
+        └─ No  → Integration test the end-to-end behavior
 ```
 
 ## What to test
 
-- **Unit**: domain logic, pure functions, business rules — through public APIs.
-- **Integration**: controllers, real databases, real filesystems.
+- **Unit**: one business scenario or domain behavior through a public API, not one class by default.
+- **Integration**: orchestration, controllers, real databases, real filesystems, and observable system results.
 - **Skip**: trivial accessors, private methods (extract instead), implementation details (internal structure, call order).
 
 ## Mocking rules
 
 - **Mock unmanaged dependencies** (external systems others depend on): SMTP, message buses, third-party APIs. Mock at the system boundary.
-- **Never mock managed dependencies** (resources only your app uses): database, filesystem, in-process domain collaborators. Use the real thing.
+- **Never mock managed dependencies** (resources only your app uses): database, filesystem, in-process domain collaborators. Use the real thing in integration tests.
 - **Never mock time** — inject it as a dependency instead of calling `DateTime.Now` / `time.now()`.
+- When using mocks, verify only edge interactions that are externally visible and compatibility-sensitive.
 
 ## Test structure (AAA)
 
 ```
 // Arrange: set up inputs
 // Act:     execute ONE operation
-// Assert:  verify ONE outcome
+// Assert:  verify the observable outcome
 ```
 
-- One logical assertion per test.
+- One behavior per test; multiple assertions are acceptable when they describe the same outcome.
+- Keep Act to one line when possible. Multiple Act lines often signal poor API encapsulation or multiple behaviors.
 - No conditionals or loops in tests.
-- Name tests as plain English: `User_login_fails_with_invalid_password`.
+- Name tests in plain English, with underscores for readability: `User_login_fails_with_invalid_password`.
 
 ## Style preference (best → worst)
 
@@ -53,8 +55,9 @@ Complex/important code?
 
 - Test duplicates production logic → use hardcoded expectations.
 - Test breaks on refactor → coupled to implementation, not behavior.
-- Coverage % as the goal → measure behavior coverage instead.
+- Coverage % as the goal → use coverage only as a negative signal for untested areas.
 - Mocking the database → use a real instance.
+- Test maps one-to-one to a class or method → reframe around the scenario a domain expert would recognize.
 - Testing private methods → extract to a class with its own public API.
 
 ## Quality bar

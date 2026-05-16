@@ -5,6 +5,7 @@ Worked examples and patterns referenced from `SKILL.md`.
 ## Humble object refactor
 
 When a method mixes domain logic with dependencies, split it so the domain part is unit-testable and only the orchestration needs integration tests.
+Aim for deep business objects with few dependencies and wide orchestration objects with little logic. Code that is both complex and dependency-heavy usually needs redesign before it needs more tests.
 
 **Before** — complex method, hard to test:
 ```
@@ -37,6 +38,7 @@ Controller.changeEmail(id, email) {
 ```
 
 Now the interesting branching lives in `User.changeEmail` and runs in milliseconds. The controller test only proves the wiring.
+The tests should be named for behaviors, such as `User_cannot_change_email_to_an_invalid_address`, not for the implementation method or class shape.
 
 ## Three-context database pattern
 
@@ -64,3 +66,7 @@ If code is "high complexity + many dependencies", don't add integration tests ar
 ## When mocking communication is OK
 
 Communication-based assertions (`verify(service.send, once)`) are acceptable for the boundary between your system and an unmanaged dependency you can't observe directly — e.g., asserting an outbound webhook fired. They're a code smell anywhere else, because they couple the test to the call sequence.
+
+## Coverage numbers
+
+Use coverage as a diagnostic, not a target. Low coverage can reveal untested behavior worth discussing; high coverage does not prove the tests protect the product. Do not add tests that exist only to move a percentage.

@@ -2,7 +2,9 @@
 
 Personal agent skills packaged for `npx skills`.
 
-## Install
+## Install And Update
+
+Use `npx skills` to install skills from this repo into Claude Code, Codex, or both.
 
 List available skills:
 
@@ -28,6 +30,53 @@ Install all skills for a specific agent:
 npx skills add wilbeibi/wilbeibi-skills --skill '*' -a claude-code
 npx skills add wilbeibi/wilbeibi-skills --skill '*' -a codex
 ```
+
+Install all skills for both agents:
+
+```bash
+npx skills add wilbeibi/wilbeibi-skills --skill '*' -a claude-code codex
+```
+
+Install globally instead of only for the current project:
+
+```bash
+npx skills add wilbeibi/wilbeibi-skills --skill '*' -a claude-code codex --global
+```
+
+Update installed skills to the latest version from this repo:
+
+```bash
+npx skills update
+```
+
+Update only global installs:
+
+```bash
+npx skills update --global
+```
+
+Update only project installs:
+
+```bash
+npx skills update --project
+```
+
+Update one skill:
+
+```bash
+npx skills update test-writing
+```
+
+List installed skills:
+
+```bash
+npx skills list
+npx skills list --global
+npx skills list -a claude-code
+npx skills list -a codex
+```
+
+By default, `skills add` links installed skill files into agent directories. Use `--copy` only when you want a detached copy that will not track local edits through the symlink.
 
 ## Skills
 
