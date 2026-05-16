@@ -40,6 +40,7 @@ npx skills add wilbeibi/wilbeibi-skills --skill '*' -a codex
 - [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md): Review code through a simplicity, orthogonality, and anti-bloat lens.
 - [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md): Review code with pragmatic focus on APIs, dependencies, compatibility, and user value.
 - [write-skill](skills/write-skill/SKILL.md): Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles.
+- [grill-me](skills/grill-me/SKILL.md): Relentlessly interview the user one question at a time to stress-test a plan or design.
 
 ## Layout
 
