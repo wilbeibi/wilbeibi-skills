@@ -89,7 +89,9 @@ By default, `skills add` links installed skill files into agent directories. Use
 - [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md): Review code through a simplicity, orthogonality, and anti-bloat lens.
 - [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md): Review code with pragmatic focus on APIs, dependencies, compatibility, and user value.
 - [write-skill](skills/write-skill/SKILL.md): Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles.
+- [skill-curator](skills/skill-curator/SKILL.md): Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects.
 - [grill-me](skills/grill-me/SKILL.md): Relentlessly interview the user one question at a time to stress-test a plan or design.
+- [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md): Review code for honest invariants, error boundaries, cost visibility, and API contracts (BurntSushi lens, works across languages).
 
 ## Layout
 
