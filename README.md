@@ -92,6 +92,7 @@ By default, `skills add` links installed skill files into agent directories. Use
 - [skill-curator](skills/skill-curator/SKILL.md): Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects.
 - [grill-me](skills/grill-me/SKILL.md): Relentlessly interview the user one question at a time to stress-test a plan or design.
 - [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md): Review code for honest invariants, error boundaries, cost visibility, and API contracts (BurntSushi lens, works across languages).
+- [write-readme](skills/write-readme/SKILL.md): Write or critique a README for an open-source lib or CLI tool using the inverted-pyramid structure.
 
 ## Layout
 
