@@ -1,6 +1,6 @@
 # wilbeibi-skills
 
-Agent skills for Claude Code and Codex CLI, installable via `npx skills`.
+Personal agent skills packaged for `npx skills`.
 
 ## Skills
 
