@@ -200,6 +200,20 @@ Use `<details>` when the content matters but breaks the happy path:
 
 Never use `<details>` to hide content that first-time users need. If you're hiding essential information, restructure instead.
 
+## Domain trust signals
+
+Every tool category triggers a specific reader anxiety. Identify it and neutralize it in the opening — not the troubleshooting section.
+
+| Category | Reader anxiety | Signal to surface early |
+|----------|---------------|------------------------|
+| Data analysis / monitoring | "Does this phone home?" | "100% local, no telemetry" |
+| Build / CI tooling | "Will this break my pipeline?" | "Reproducible, hermetic, no side effects" |
+| Auth / security libs | "Will this leak credentials?" | "No network calls", key never leaves process |
+| Hot-path / perf libs | "Does this allocate? Block?" | "Zero alloc", "lock-free", benchmark result |
+| Package manager / installer | "Will this trash my system?" | Isolated, reversible, explicit scope |
+
+If your tool doesn't fit a row, ask: *what would cause a cautious reader to close this tab?* Answer that question in the first two sections.
+
 ## Evidence and benchmarks
 
 A claim without methodology is marketing. Minimum viable methodology note:
@@ -227,7 +241,9 @@ Show raw numbers alongside percentages. Readers who distrust percentages can ver
 
 ### Content
 - [ ] Every capability claim has evidence or a methodology note
-- [ ] At least one "where this doesn't help" sentence exists
+- [ ] Support claims name the things, not just count them ("Claude Code, Codex, Cursor" not "15+ tools")
+- [ ] Domain trust signal is surfaced in the opening (see Domain trust signals table)
+- [ ] Limitations have their own heading — not a parenthetical or footnote
 - [ ] Troubleshooting covers 3+ real failure modes with fixes
 - [ ] Zero-config behavior is called out explicitly if true
 - [ ] Breaking change / compatibility policy is stated (libraries)

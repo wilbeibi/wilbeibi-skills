@@ -21,6 +21,8 @@ The answer changes the lead section and the template. See [REFERENCE.md](REFEREN
 
 2. **Find the lead metric** — one line of concrete numbers before any prose description. If the project has no benchmark yet, use the sharpest qualitative differentiator ("zero dependencies", "100% local", "single binary"). Never lead with "A library that…"
 
+   Then find the **domain trust signal**: the one anxiety your tool's category triggers in readers. Data tools: "does this phone home?" → answer with "100% local". Build tools: "will this break my pipeline?" → answer with "reproducible, hermetic". Hot-path libs: "does this allocate?" → answer with "zero alloc". Surface the trust signal in the opening, not in a footnote.
+
 3. **Draft in inverted-pyramid order** — most newsworthy first, reference material last. A reader who stops after two sections should still have a complete, useful picture.
 
 4. **Apply the matching template** from [REFERENCE.md](REFERENCE.md). Fill every section; delete a section only if it truly has nothing to say (not to save space).
@@ -31,7 +33,8 @@ The answer changes the lead section and the template. See [REFERENCE.md](REFEREN
 
 - Install/quickstart comes **before** the explanation of why it works.
 - Benchmarks and capability claims need a methodology note — even one sentence. Claims without method are marketing.
-- Admit where the tool **doesn't** help. Readers trust bounded claims.
+- Admit where the tool **doesn't** help — and give it a **heading**, not a parenthetical. A named limitation ("Estimate Accuracy", "Not for X") reads as honest engineering; a buried caveat reads as defensive marketing.
+- When claiming broad support (platforms, formats, languages), **name the things**: list them explicitly. "Supports 15+ tools" is a count; "Claude Code, Codex, Cursor…" is evidence.
 - Troubleshooting lives in the README, not "open an issue".
 - `<details>` for depth: advanced config, raw data, alternative setup. The happy path must be scannable without expanding anything.
 
