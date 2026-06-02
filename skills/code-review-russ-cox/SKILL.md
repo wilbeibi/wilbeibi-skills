@@ -1,6 +1,6 @@
 ---
 name: code-review-russ-cox
-description: Review code through a simplicity, orthogonality, and anti-bloat lens — focused on whether code, features, or dependencies should exist at all. Use when reviewing system design, dependency additions, new features, large diffs that grow the codebase, or when the user asks "do we need this?", "is this too complex?", or wants a deletion-focused review. For API design, error handling, and product-vs-library tradeoffs use code-review-mitsuhiko instead. See PRINCIPLES.md for the full philosophy.
+description: Review code for simplicity, necessity, and anti-bloat — whether code, features, or dependencies should exist at all. Use when reviewing system design, dependency additions, new features, or when the user asks "do we need this?", "is this too complex?", or wants a deletion-focused review. Do NOT use for API design or product-vs-library tradeoffs (use code-review-mitsuhiko).
 ---
 
 # code-review-russ-cox

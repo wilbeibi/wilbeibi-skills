@@ -1,6 +1,6 @@
 ---
 name: code-review-mitsuhiko
-description: Review code through a pragmatic API-design lens — focused on context-appropriate shape (product vs library), error handling, backward compatibility, extension points, and user value. Use when reviewing public APIs, library interfaces, error types, dependency choices in libraries, or product code that's being over-engineered. Use when deciding between "ship the dumb version" and "design for stability". For deletion-focused or anti-bloat review use code-review-russ-cox instead. See PRINCIPLES.md for the full philosophy.
+description: Review code for API shape, error handling, backward compatibility, and product-vs-library fit. Use when reviewing public APIs, library interfaces, error types, dependency choices, or product code being over-engineered, or when deciding between "ship the dumb version" and "design for stability". Do NOT use for deletion-focused or anti-bloat review (use code-review-russ-cox).
 ---
 
 # code-review-mitsuhiko

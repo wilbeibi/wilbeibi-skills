@@ -1,6 +1,6 @@
 ---
 name: test-writing
-description: Guide test writing and review with focus on observable behavior over implementation. Use when the user asks to write, review, or refactor tests; debates unit vs integration scope; questions whether to mock a dependency; or asks why tests break on refactor. Covers AAA structure, mocking rules (managed vs unmanaged), and the humble-object refactor. See REFERENCE.md for worked examples.
+description: Guide test writing and review with focus on observable behavior over implementation. Use when the user asks to write, review, or refactor tests; debates unit vs integration scope; questions whether to mock a dependency; or asks why tests break on refactor.
 ---
 
 # test-writing

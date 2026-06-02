@@ -16,6 +16,7 @@ Personal agent skills packaged for `npx skills`.
 | [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md) | Review code with pragmatic focus on APIs, dependencies, compatibility, and user value. |
 | [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md) | Review code for honest invariants, error boundaries, cost visibility, and API contracts. |
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design. |
+| [grill-with-docs](skills/grill-with-docs/SKILL.md) | Stress-test a plan interactively and capture resolved terminology or durable decisions in lightweight docs. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
 | [write-readme](skills/write-readme/SKILL.md) | Write or critique a README for an open-source lib or CLI tool using the inverted-pyramid structure. |
