@@ -15,6 +15,7 @@ Personal agent skills packaged for `npx skills`.
 | [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md) | Review code through a simplicity, orthogonality, and anti-bloat lens. |
 | [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md) | Review code with pragmatic focus on APIs, dependencies, compatibility, and user value. |
 | [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md) | Review code for honest invariants, error boundaries, cost visibility, and API contracts. |
+| [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design. |
 | [grill-with-docs](skills/grill-with-docs/SKILL.md) | Stress-test a plan interactively and capture resolved terminology or durable decisions in lightweight docs. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles. |
