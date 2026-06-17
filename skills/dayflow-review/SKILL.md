@@ -5,9 +5,6 @@ description: macOS-only Dayflow review for a local Dayflow SQLite database at `~
 
 # Dayflow Review
 
-## Summary
-Use this skill to summarize Dayflow time tracking data from the local macOS SQLite DB. Keep queries focused and filter soft deletes.
-
 ## Details
 
 Database:

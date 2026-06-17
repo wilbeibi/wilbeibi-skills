@@ -9,25 +9,14 @@ allowed-tools:
 
 Control macOS system settings, preferences, and utilities directly from the command line using the `m` command. This requires local macOS access, the `m` CLI, and an available shell command tool.
 
-## When to Use
+## Intent → command
 
-**Use this skill ONLY when all of the following are true:**
-1. The user is explicitly asking the agent to **perform a system action** (not just asking about it, discussing it in code, or troubleshooting software)
-2. The action targets the **local macOS system** (not a remote system, container, or VM)
-3. The `m` CLI tool has a command that covers the requested action
+The description governs *when* to fire (an explicit request to act on the local system). These map common phrasings to commands:
 
-**Good examples (use this skill):**
 - "Turn on dark mode" → `m appearance dark`
 - "Mute my volume" → `m volume mute`
 - "Check my wifi status" → `m wifi status`
 - "Hide the Dock automatically" → `m dock autohide YES`
-
-**Bad examples (do NOT use this skill):**
-- User mentions wifi/display/battery in a programming question
-- User asks how to detect dark mode in their app code
-- User is troubleshooting a macOS issue but wants to understand it, not run a command
-- User is asking about macOS APIs or frameworks
-- Any informational question about macOS topics
 
 ## Command Reference
 
