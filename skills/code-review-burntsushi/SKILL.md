@@ -18,28 +18,14 @@ Paste a diff or file and say "burntsushi review" or "honest review". Walk the te
 1. **State the change** — what is this patch doing in one sentence? If unclear, ask first.
 2. **Walk all ten general axes** from [REFERENCE.md](REFERENCE.md) in order. Flag every axis with a finding.
 3. **If Rust:** also apply the two Rust-specific axes (encoding invariants, ownership/allocation).
-4. **Emit findings** in the output format below.
+4. **Emit findings first** using the output contract below.
 
-## Output format
+## Output Contract
 
-```
-## Summary
-<one paragraph: overall verdict and the single most important honesty gap>
-
-## Must fix
-- [Axis N | file:line] <finding — name the invariant, cost, or failure mode>.
-  Suggestion: <one concrete alternative>.
-
-## Consider
-- [Axis N | file:line] <finding>.
-  Tradeoff: <what's gained vs. lost>.
-
-## Praise
-- <what is genuinely honest — name it specifically>
-
-## Open questions
-- <anything needing author context before a final call>
-```
+- Lead with findings, ordered by severity. Use `Must fix`, then `Consider`, then `Open questions`; omit empty sections.
+- Prefix findings with `[Axis N | file:line]`.
+- Each finding names the invariant, cost, or failure mode and gives one concrete alternative.
+- Add a brief `Summary` after findings. Do not add praise unless the user asks.
 
 ## Tone rules
 

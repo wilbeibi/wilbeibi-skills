@@ -1,8 +1,6 @@
 ---
 name: web-recap
 description: Extract browser history for finding URLs by topic or getting visit stats. Use when user asks about their browsing history, visited websites, or what they were doing online.
-allowed-tools:
-  - Bash
 ---
 
 # web-recap

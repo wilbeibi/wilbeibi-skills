@@ -1,9 +1,6 @@
 ---
 name: ast-grep
 description: Write ast-grep rules for structural (AST-based) code search — matching code by structure, not text. Use when the user wants to find code patterns, locate specific language constructs, or run queries that plain text/regex search can't express ("find async functions without error handling", "calls with these args").
-allowed-tools:
-  - Bash
-  - Read
 ---
 
 # ast-grep Code Search

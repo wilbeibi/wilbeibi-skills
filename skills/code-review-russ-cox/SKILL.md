@@ -12,7 +12,7 @@ Maintenance cost vastly exceeds implementation cost. Optimize every decision for
 1. **Understand the problem** — what is this change *actually* solving? If you can't state it in one sentence, ask before reviewing.
 2. **Walk the four passes** below in order. Each pass is a checklist of questions; flag whatever fails.
 3. **Apply the five universal tests** to anything that survived the four passes.
-4. **Produce findings** in the output format below.
+4. **Produce findings first** using the output contract below.
 
 ## Pass 1 — Feature creep ("useful" ≠ "worth it")
 
@@ -53,24 +53,12 @@ Apply to anything new or non-trivial:
 - **Future-self** — will I understand this at 2am during an outage in 6 months?
 - **Abstraction** — do we have 3+ concrete use cases? If no, it's premature; solve directly first.
 
-## Output format
+## Output Contract
 
-```
-## Summary
-<one paragraph: overall verdict and the single most important issue>
-
-## Must fix
-- [Pass N | file:line] <finding>. Suggested approach: <sketch>.
-
-## Consider
-- [Pass N | file:line] <finding>. Tradeoff: <what's gained vs lost>.
-
-## Praise
-- <what was done well — name it specifically; this isn't filler>
-
-## Open questions
-- <anything that needs author context before a final call>
-```
+- Lead with findings, ordered by severity. Use `Must fix`, then `Consider`, then `Open questions`; omit empty sections.
+- Prefix findings with `[Pass N | file:line]`.
+- Each finding states why the code should not exist, should move layers, or should be simplified, plus one concrete alternative.
+- Add a brief `Summary` after findings. Do not add praise unless the user asks.
 
 ## Constructive phrasing
 

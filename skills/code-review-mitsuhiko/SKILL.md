@@ -12,7 +12,7 @@ Different projects need different rules. Products optimize for speed and user va
 1. **Classify the context** — is this a product (application code, end-user feature) or a library (reusable interface, framework, SDK)? When in doubt, ask. The answer changes most subsequent calls.
 2. **Walk the matching checklist** below. Don't apply library standards to product code or vice versa.
 3. **Always walk the cross-cutting checks** (errors, dependencies, extension points).
-4. **Produce findings** in the output format below.
+4. **Produce findings first** using the output contract below.
 
 ## Product checklist (ship fast, validate, iterate)
 
@@ -61,27 +61,12 @@ Different projects need different rules. Products optimize for speed and user va
 - Are extension interfaces documented and stable?
 - "Just fork it" is not an extension story.
 
-## Output format
+## Output Contract
 
-```
-## Context call
-Product / Library / Mixed (which parts are which)
-
-## Summary
-<one paragraph: overall verdict and the single most important issue>
-
-## Must fix
-- [file:line] <finding>. Suggested approach: <sketch>.
-
-## Consider
-- [file:line] <finding>. Tradeoff: <gained vs lost>.
-
-## Praise
-- <named, specific>
-
-## Open questions
-- <needs author context>
-```
+- Start with `Context call: Product / Library / Mixed` in one line.
+- Lead with findings, ordered by severity. Use `Must fix`, then `Consider`, then `Open questions`; omit empty sections.
+- Each finding includes `[file:line]`, the product-vs-library reason, and a concrete next step.
+- Add a brief `Summary` after findings. Do not add praise unless the user asks.
 
 ## Constructive phrasing
 

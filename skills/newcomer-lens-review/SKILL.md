@@ -11,7 +11,7 @@ Review as a competent engineer who just joined: general engineering knowledge, b
 
 1. **Read the diff or files.** Mark every point where understanding requires information not present in the code.
 2. **Categorize each gap** (see "Gap categories" below).
-3. **Produce the review** in the output format below.
+3. **Produce findings first** using the output contract below.
 4. **Prioritize**: top 3 gaps that most need documentation.
 
 ## Context boundary
@@ -40,37 +40,13 @@ Review as a competent engineer who just joined: general engineering knowledge, b
 - Anything inferable from immediate surrounding code.
 - Style preferences.
 
-## Output format
+## Output Contract
 
-```
-## Understandable from code
-[One or two lines — what's clear without external context.]
-
-## Context gaps
-
-### [Component or file]
-
-**Missing design rationale:**
-- Why use approach X here?
-
-**Undefined terms:**
-- What is [project-specific concept]?
-
-**Undocumented constraints:**
-- Where does value N come from?
-
-**Questions for author:**
-- [Specific, concrete question.]
-
-## Critical for documentation
-1. [Most important gap — one line.]
-2. [Second priority.]
-3. [Third priority.]
-
-## Quick wins
-- [Specific change: "Add comment explaining retry strategy."]
-- [Another: "Extract magic number 30000 to named constant with units."]
-```
+- Lead with `Context gaps`, grouped by file/component and ordered by onboarding risk.
+- Each finding names the category: design rationale, domain knowledge, historical context, or system constraint.
+- Add a short `Critical for documentation` list with the top 3 gaps.
+- Add `Quick wins` only for concrete fixes such as comments, names, constants, or doc links.
+- End with one line on what is understandable from the code. Omit praise.
 
 ## Tone
 
