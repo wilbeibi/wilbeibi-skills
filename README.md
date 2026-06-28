@@ -8,7 +8,6 @@ Personal agent skills packaged for `npx skills`.
 |-------|-------------|
 | [obsidian-vault-search](skills/obsidian-vault-search/SKILL.md) | Search an Obsidian vault using natural language queries, dates, tags, and task filters. |
 | [youtube-transcript](skills/youtube-transcript/SKILL.md) | Transform YouTube videos or transcripts into structured Obsidian notes with timestamps and callouts. |
-| [dayflow-review](skills/dayflow-review/SKILL.md) | Query and analyze a local Dayflow time-tracking database. |
 | [m-cli](skills/m-cli/SKILL.md) | Control macOS system settings with the `m` CLI when explicitly requested. |
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
@@ -18,7 +17,7 @@ Personal agent skills packaged for `npx skills`.
 | [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design. |
 | [grill-with-docs](skills/grill-with-docs/SKILL.md) | Stress-test a plan interactively and capture resolved terminology or durable decisions in lightweight docs. |
-| [write-skill](skills/write-skill/SKILL.md) | Scaffold a new skill in this repo following progressive-disclosure and trigger-rich-description principles. |
+| [write-skill](skills/write-skill/SKILL.md) | Scaffold compact trigger-rich and command-first skills in this repo. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
 | [write-readme](skills/write-readme/SKILL.md) | Write or critique a README for an open-source lib or CLI tool using the inverted-pyramid structure. |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |

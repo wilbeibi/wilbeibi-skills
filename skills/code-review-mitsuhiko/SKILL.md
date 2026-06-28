@@ -5,73 +5,43 @@ description: Review code for API shape, error handling, backward compatibility, 
 
 # code-review-mitsuhiko
 
-Different projects need different rules. Products optimize for speed and user value; libraries optimize for stability and reusability. Decide which one this is *first* — then apply the right checklist.
+First decide whether this is product code, library code, or mixed. The right review standard changes with that call.
 
 ## Steps
 
-1. **Classify the context** — is this a product (application code, end-user feature) or a library (reusable interface, framework, SDK)? When in doubt, ask. The answer changes most subsequent calls.
-2. **Walk the matching checklist** below. Don't apply library standards to product code or vice versa.
-3. **Always walk the cross-cutting checks** (errors, dependencies, extension points).
-4. **Produce findings first** using the output contract below.
+1. State `Context call: Product / Library / Mixed`.
+2. Apply the matching lens below, then the cross-cutting checks.
+3. Produce findings first, ordered by severity.
 
-## Product checklist (ship fast, validate, iterate)
+## Product Lens
 
-- Does this solve a real, validated user problem?
-- Could a "dumb but working" version ship faster?
-- Are we building generic abstractions before the second use case appears?
-- Are we optimizing non-bottlenecks?
-- If we accept debt, is there a written "refactor when X happens" trigger?
+- Does this solve a real user problem now?
+- Could a dumb working version ship faster and validate the need?
+- Is this abstraction, dependency, or extension point justified by a second real use case?
+- If debt is accepted, is there a concrete refactor trigger?
 
-**Red flags**: hypothetical-future generality; elegance users won't perceive; "we might need this someday"; premature optimization.
+Flag: speculative flexibility, invisible elegance, non-bottleneck optimization, and generic frameworks for one feature.
 
-## Library checklist (stability, clear APIs, extensibility)
+## Library Lens
 
-- Will this API still make sense in 5 years?
-- Does this break existing code? (If yes — major version bump + migration guide, no exceptions.)
-- Can users extend this without forking?
-- Have errors been designed as carefully as return values?
-- Are extension interfaces treated as first-class APIs (documented, stable, tested)?
+- Will this API still make sense years from now?
+- Does it break existing users? If yes, call out versioning and migration cost.
+- Can users extend behavior without forking?
+- Are errors, defaults, and extension points treated as stable public API?
 
-**Red flags**: breaking changes for minor improvements; "move fast and break things" applied to public APIs; errors as plain strings; tight coupling preventing extension.
+Flag: breaking changes for minor improvements, string-matched errors, undocumented extension contracts, and "just fork it" design.
 
-**Compatibility pledge**: *"I'd rather skip a feature than break existing code."*
+## Cross-Cutting Checks
 
-## Cross-cutting checks (both contexts)
-
-### Errors
-
-- Can callers distinguish error types programmatically (not by string matching)?
-- Is context structured (`field=…`, `value=…`, `constraint=…`), not crammed into a message?
-- Will this error help diagnose a production issue without reading the source?
-- Bad: `throw Error("Invalid user")`. Good: `ValidationError(field="age", value=42, constraint="must be 18-120")`.
-
-### Dependencies
-
-- Is this dep worth compiling thousands of lines for one function?
-- Could we implement it in 20–50 lines?
-- What's the full transitive tree?
-- Is it actively maintained with stable APIs?
-- DIY when: simple/well-defined, core to your domain, or a "left-pad" scenario.
-- Take the dep when: genuinely complex (crypto, image processing, protocols), security-sensitive, battle-tested.
-
-### Extension points (libraries especially)
-
-- Can users extend behavior without modifying our code?
-- Are there hooks at key decision points?
-- Are extension interfaces documented and stable?
-- "Just fork it" is not an extension story.
+- Errors: typed/structured enough for callers and production diagnosis?
+- Dependencies: worth the transitive tree, or implementable in 20-50 clear lines?
+- Defaults: safe, unsurprising, and honest about cost?
+- Product/library mismatch: library standards slowing a product, or product habits destabilizing a library?
 
 ## Output Contract
 
-- Start with `Context call: Product / Library / Mixed` in one line.
-- Lead with findings, ordered by severity. Use `Must fix`, then `Consider`, then `Open questions`; omit empty sections.
-- Each finding includes `[file:line]`, the product-vs-library reason, and a concrete next step.
-- Add a brief `Summary` after findings. Do not add praise unless the user asks.
+- Findings first: `Must fix`, `Consider`, `Open questions`; omit empty sections.
+- Each finding includes `[file:line]`, the context-specific reason, and a concrete next step.
+- Add a brief `Summary` after findings. Do not add praise unless asked.
 
-## Constructive phrasing
-
-Always pair a critique with the next step. Instead of *"this is too complex"* → *"for a product feature, consider [sketch]; ship, validate, refactor if proven."* Instead of *"add this dependency"* → *"this dep adds N transitive deps for X; we can implement in ~Y lines: [sketch]."* Full phrasing patterns in PRINCIPLES.md.
-
-## Reference
-
-- [PRINCIPLES.md](PRINCIPLES.md) — full philosophy, error-design depth, modularity/extension patterns, type-system stance, language-specific notes, source quotes.
+See [PRINCIPLES.md](PRINCIPLES.md) for full philosophy and phrasing patterns.
