@@ -25,6 +25,7 @@ Personal agent skills packaged for `npx skills`.
 | [ast-grep](skills/ast-grep/SKILL.md) | Write ast-grep rules for structural (AST-based) code search that goes beyond text grep. Adapted from [ast-grep/agent-skill](https://github.com/ast-grep/agent-skill). |
 | [web-recap](skills/web-recap/SKILL.md) | Extract browser history (Chrome, Firefox, Safari, Edge, Brave) to find URLs by topic or get visit stats. Adapted from [robzolkos/web-recap](https://github.com/robzolkos/web-recap). |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Pre-coding planning gate: surface assumptions, pick the simplest approach, and define declarative success criteria with a verification loop. Adapted from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). |
+| [write-comment](skills/write-comment/SKILL.md) | Write high-quality code comments by matching the missing information to the right comment type — function, design, why, teacher, checklist, or guide. |
 
 ## Install
 
