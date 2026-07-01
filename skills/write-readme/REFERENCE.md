@@ -2,16 +2,18 @@
 
 ## The inverted pyramid
 
-Journalism's inverted pyramid applied to READMEs: put the most important information first, so readers who stop early still have something complete and actionable. For agent tools, the pyramid serves both humans (top-down skimming) and AI agents (top-down scanning for command signatures and flag definitions).
+Journalism's inverted pyramid applied to READMEs: put the most important information first, so readers who stop early still have something complete and actionable. Assume the reader is impatient and skeptical. Every line must earn its place by answering a real question, reducing risk, or changing the next action.
+
+For agent tools, the pyramid serves both humans (top-down skimming) and AI agents (top-down scanning for command signatures and output contracts). It is not permission to paste a manpage into the README.
 
 ```
-Headline metric / one-line value prop          ← why care (most readers stop here)
+Plain outcome / strongest concrete fact        ← why care (most readers stop here)
 ─────────────────────────────────────────────
 Install + quickstart                            ← remove friction first
 ─────────────────────────────────────────────
 Why it exists + what it ISN'T                  ← earn the explanation, set boundaries
 ─────────────────────────────────────────────
-Feature surface, API, CLI reference            ← for committed readers
+Feature surface, API, CLI reference            ← only if not already covered by help/docs
 ─────────────────────────────────────────────
 How it works internally / architecture         ← for contributors / skeptics
 ─────────────────────────────────────────────
@@ -22,6 +24,8 @@ Troubleshooting, changelog, license            ← reference tail
 
 Use when the project is run directly (`codegraph init`, `jq`, `ripgrep`). For CLI tools designed to be invoked by coding agents (via bash), see the agent tool section below — the template is the same but adds agent-specific requirements.
 
+This is a menu, not a checklist. Omit sections that repeat earlier content or belong in `--help`, generated docs, or package docs.
+
 ```markdown
 <div align="center">
 
@@ -29,11 +33,11 @@ Use when the project is run directly (`codegraph init`, `jq`, `ripgrep`). For CL
 
 ### One-sentence tagline
 
-**<metric 1> · <metric 2> · <metric 3>**
-
-[badges: version · license · platform support]
-
 </div>
+
+<One plain sentence: what it reads/builds/changes and what output the user gets.>
+
+<One plain sentence: when to use it.>
 
 ## Install
 
@@ -45,9 +49,9 @@ Use when the project is run directly (`codegraph init`, `jq`, `ripgrep`). For CL
 
 <smallest working example — input → output, or command → result>
 
-## Why ProjectName?
+## Why ProjectName? / Boundaries
 
-<Explain the problem in one paragraph. Then: what existing tools do, and where they fall short.>
+<Explain the problem in one paragraph only if the problem is not obvious from the commands.>
 <End with a clear heuristic: "Use ProjectName when X. Don't use it when Y.">
 
 ### What ProjectName is NOT
@@ -67,15 +71,9 @@ Use when the project is run directly (`codegraph init`, `jq`, `ripgrep`). For CL
 
 </details>
 
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| ...     | ...         |
-
 ## Usage
 
-<main commands with flags table>
+<main commands. Prefer a compact example block over a full flags table.>
 
 ```bash
 # common invocations, one per use case
@@ -104,21 +102,13 @@ Use when the project is run directly (`codegraph init`, `jq`, `ripgrep`). For CL
 
 **Symptom** — cause and fix.
 
-<3–5 real issues from dogfooding or early issues.>
+<Only real, common, actionable issues from dogfooding or early issues.>
 
 ## License
 
 MIT / Apache-2.0 / etc.
 
----
-
-<div align="center">
-
-**Made for <target audience>**
-
-[Report Bug](…) · [Request Feature](…)
-
-</div>
+<!-- Avoid footer slogans unless they add a useful link. -->
 ```
 
 ## Agent tool guidance
@@ -129,7 +119,7 @@ Use when the CLI tool is designed to be invoked by coding agents (via bash, not 
 
 **Invocation must be unambiguous within 3 seconds of scanning.** The most common invocation pattern must appear within the first 30 lines.
 
-**Every flag, every argument needs to be explicit.** Agents cannot infer defaults. Show the exact command they should run, including all required and recommended optional flags. A `--help` dump alone is insufficient — it doesn't show expected output.
+**Arguments and important flags need to be explicit.** Agents cannot infer defaults. Show the exact command they should run, including required and recommended optional flags. Do not copy the whole `--help` output; keep the common path visible and leave exhaustive reference to the binary or generated docs.
 
 **Show expected output format.** After every invocation example, show what success looks like and what failure looks like. Agents use this to verify their own results.
 
@@ -143,11 +133,11 @@ $ agent-tool --input /nonexistent
 {"status": "error", "message": "path not found: /nonexistent"}
 ```
 
-**Keep tool descriptions under 200 words** for the core interface. The agent's context window is precious. Put edge cases, advanced flags, and internal details behind `<details>` or link out to separate docs.
+**Keep the core interface under 200 words.** The agent's context window is precious. Put edge cases, advanced flags, and internal details behind `<details>` or link out to separate docs.
 
 **`Not for X` warnings are functional** — they prevent the agent from using your tool for the wrong job. Be specific: "Not for files over 100MB" is better than the agent discovering it through a timeout.
 
-**Use the `agent` tag** in your badges tier. If your tool is designed for specific agent harnesses, list them: `[![Claude Code]](#) [![Codex]](#) [![OpenCode]](#)`.
+**Name supported agents once.** If they affect command syntax, list the tokens where commands are shown. Avoid repeating the same support list in the hero, features, usage, and a separate support section.
 
 ## Library template
 
@@ -243,7 +233,9 @@ Examples:
 
 ## Badge patterns
 
-Group badges by semantic tier — don't flatten everything into one row.
+Badges are optional. Use them only when they answer an early trust question: install source, license, release version, supported platform, or CI status for a library where CI meaningfully signals compatibility. Do not keep badges as decoration.
+
+If badges are useful, group them by semantic tier — don't flatten everything into one row.
 
 ```markdown
 <!-- tier 1: package metadata -->
@@ -260,7 +252,7 @@ Group badges by semantic tier — don't flatten everything into one row.
 [![Cursor](…)](#)
 ```
 
-For agent tools, tier 3 is especially important — it signals which agent harnesses the tool is tested with.
+For agent tools, tier 3 can help only if the harness list is otherwise hard to find. If the first command block already names the supported agents, badges may be redundant.
 
 Use `(#)` for badges that link nowhere meaningful. Never link badges to the top of the same page.
 
@@ -331,7 +323,10 @@ Show raw numbers alongside percentages. Readers who distrust percentages can ver
 
 ## Final pass
 
-The steps, templates, and non-negotiables cover the structure. These two things people miss even after reading everything else:
+The steps, templates, and non-negotiables cover the structure. These are the things people miss even after reading everything else:
 
 - The opening answers both questions *immediately*: "Is this for me?" and "How will I benefit?" If paragraph two arrives without answering both, rewrite the opening.
 - Agent tools: the README will be read by a model with limited context. The most common invocation and its expected output must be findable in a 3-second scan.
+- Delete duplicated facts. If supported agents, platforms, formats, or limitations appear in multiple sections, keep the version closest to the reader's action.
+- Delete reference sections that only restate `--help`. Keep README reference only when it teaches relationships, defaults, or output shape that the tool itself does not make obvious.
+- Read it aloud as a cautious maintainer, not as a launch announcement. If it sounds like a 2000s TV ad, rewrite it as a plain operational fact.
