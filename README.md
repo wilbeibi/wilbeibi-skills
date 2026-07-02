@@ -88,3 +88,11 @@ npx skills update test-writing      # one skill
 ## Layout
 
 Each skill lives in `skills/<name>/SKILL.md`. Supporting scripts and reference docs are colocated in the same directory.
+
+## Validation
+
+Check skill frontmatter before pushing:
+
+```bash
+uv run scripts/check_skill_frontmatter.py
+```

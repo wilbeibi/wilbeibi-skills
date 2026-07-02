@@ -1,6 +1,13 @@
 ---
 name: write-readme
-description: Write or critique a README for an open-source project (library, CLI tool, or agent tool) with an impatient-reader lens: concrete value first, shortest path to use, no duplicated claims, and reference material only when it earns space. Use when the user asks to "write a README", "draft a README", "review my README", "improve my README", or starts a new lib/tool and needs documentation. Do NOT use for internal service docs, monorepo root READMEs, or non-public projects.
+description: >-
+  Write or critique a README for an open-source project (library, CLI tool, or
+  agent tool) with an impatient-reader lens: concrete value first, shortest path
+  to use, no duplicated claims, and reference material only when it earns space.
+  Use when the user asks to "write a README", "draft a README", "review my
+  README", "improve my README", or starts a new lib/tool and needs
+  documentation. Do NOT use for internal service docs, monorepo root READMEs, or
+  non-public projects.
 ---
 
 # write-readme
