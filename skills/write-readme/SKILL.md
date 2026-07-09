@@ -31,6 +31,8 @@ Write READMEs for readers with short attention: what is it, when do I use it, ho
 - Name the target audience and the non-goal early.
 - Claims need evidence or a methodology note.
 - Be genuine. Avoid ad-copy words like "seamless", "instant", "powerful", and "no re-explaining" unless the README proves them.
+- Prefer a normal-user voice over a product-sheet voice. A first-person note is fine when it names a real daily use; cut it if it turns into taste-making, hype, or a joke.
+- Open on the human moment the tool fixes, then name the mechanism. "I was here, this helped" beats "this solution enables..."
 
 ## Ruthless Cut Pass
 
@@ -59,5 +61,6 @@ For CLIs meant to be invoked by coding agents:
 - Troubleshooting belongs in the README only when the failure is common and actionable.
 - Use `<details>` only for advanced config, raw data, methodology, or alternative setup.
 - No marketing adjectives; use numbers, examples, and named evidence.
+- No dramatic connector cadence as a default voice: em dashes, arrows, and "not just X, but Y" need a reason.
 
 See [REFERENCE.md](REFERENCE.md) for templates, badge patterns, screenshot guidance, tone notes, and final-pass prompts.

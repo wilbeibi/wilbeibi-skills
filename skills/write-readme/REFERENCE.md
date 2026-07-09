@@ -329,4 +329,4 @@ The steps, templates, and non-negotiables cover the structure. These are the thi
 - Agent tools: the README will be read by a model with limited context. The most common invocation and its expected output must be findable in a 3-second scan.
 - Delete duplicated facts. If supported agents, platforms, formats, or limitations appear in multiple sections, keep the version closest to the reader's action.
 - Delete reference sections that only restate `--help`. Keep README reference only when it teaches relationships, defaults, or output shape that the tool itself does not make obvious.
-- Read it aloud as a cautious maintainer, not as a launch announcement. If it sounds like a 2000s TV ad, rewrite it as a plain operational fact.
+- Read it aloud as a cautious maintainer who uses the thing. A small first-person aside can build trust when it names a real daily use. If it sounds like an ad spot, rewrite it as a plain operational fact.
