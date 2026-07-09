@@ -220,7 +220,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("query", help="Search query")
-    parser.add_argument("--vault", default=".", help="Vault path")
+    parser.add_argument(
+        "--vault",
+        default=os.environ.get("OBSIDIAN_VAULT", "."),
+        help="Vault path (default: $OBSIDIAN_VAULT or .)",
+    )
     parser.add_argument("--limit", type=int, default=10, help="Max results")
     parser.add_argument("--raw", action="store_true", help="Raw output for piping")
 

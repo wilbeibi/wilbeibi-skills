@@ -1,41 +1,53 @@
 ---
 name: obsidian-vault-search
-description: Search an Obsidian vault using natural language, date filters, tags, task states, and multilingual terms. Use when finding notes, recent writing, tagged content, due tasks, overdue tasks, or high-priority tasks in a local Markdown vault.
+description: Search an Obsidian vault three ways — Meilisearch for topic and fuzzy queries, ripgrep for exact strings/tags/task glyphs, and a date-aware helper for natural-language dates and overdue math. Use when finding notes about a topic, half-remembered ideas, recent writing, tagged content, or due/overdue/high-priority tasks in a local Markdown vault. Do NOT use to add or edit notes (use obsidian-capture).
 ---
 
 # obsidian-vault-search
 
-Find Markdown notes and tasks in a local Obsidian vault without loading the whole vault into context.
+Find Markdown notes and tasks in an Obsidian vault without loading the whole vault into context.
 
 ## Routing
 
-Use direct `rg` for exact content, frontmatter, tags, and simple task glyph matches. Use `scripts/vault_search.py` when the query needs natural-language dates, overdue comparisons, language-aware term extraction, result ranking, or mtime fallback.
+1. **Topic / fuzzy / "notes about X"** → `scripts/meili_search.py`. Typo-tolerant full-text over a Meilisearch index; best when the user won't remember exact words. Expand synonyms yourself across queries.
+2. **Exact content, frontmatter, tags, task glyphs** → direct `rg`.
+3. **Natural-language dates, overdue comparisons, CJK term extraction** → `scripts/vault_search.py`.
+
+If Meilisearch is unreachable or unconfigured (script exits non-zero), fall back to tiers 2–3 — they only need the local vault.
+
+Env: `OBSIDIAN_VAULT` (vault root), `MEILI_URL` (default `http://127.0.0.1:7700`), `MEILI_SEARCH_KEY` (file fallback `~/meilisearch/search-key.txt`), `MEILI_INDEX` (default `notes`).
+
+## Meilisearch
+
+Run with `--help` for all flags. **Never dump raw hits into context** — use `--fields` and small `--limit`.
+
+```bash
+uv run scripts/meili_search.py "spaced repetition" --limit 5 --fields "title,path"
+uv run scripts/meili_search.py "prompt caching" --filter "tags=ai" --sort "updated:desc" --json
+```
+
+Hit `path` values are vault-relative (e.g. `Library/Book Notes/Influence.md`); join with `$OBSIDIAN_VAULT` to open.
 
 ## Direct Patterns
 
 ```bash
-rg "keyword" --glob "*.md" <vault>
-rg "tags:.*tagname" --glob "*.md" <vault>
-rg "created: $(date +%Y-%m)" --glob "*.md" <vault>
-rg "^- \[ \]" --glob "*.md" <vault>
-rg "^- \[ \].*📅 $(date +%F)" --glob "*.md" <vault>
-rg "^- \[ \].*⏫" --glob "*.md" <vault>
+rg "keyword" --glob "*.md" "$OBSIDIAN_VAULT"
+rg -lU 'tags:\n(\s*- .*\n)*?\s*- tagname\b' --glob "*.md" "$OBSIDIAN_VAULT"  # YAML list tags; prefer meili --filter "tags=tagname" when index is up
+rg "created: $(date +%Y-%m)" --glob "*.md" "$OBSIDIAN_VAULT"
+rg "^- \[ \].*📅 $(date +%F)" --glob "*.md" "$OBSIDIAN_VAULT"
+rg "^- \[ \].*⏫" --glob "*.md" "$OBSIDIAN_VAULT"
 ```
 
-## Script Usage
+## Date-Aware Script
 
 ```bash
-scripts/vault_search.py "recent week psychology" --vault <vault>
-scripts/vault_search.py "找3-2-1技巧" --vault <vault>
-scripts/vault_search.py "tasks due today" --vault <vault>
-scripts/vault_search.py "overdue tasks" --vault <vault>
-scripts/vault_search.py "3-2-1" --vault <vault> --raw
+uv run scripts/vault_search.py "recent week psychology"
+uv run scripts/vault_search.py "overdue tasks"
+uv run scripts/vault_search.py "找3-2-1技巧" --raw   # --raw: plain paths for piping
 ```
 
 ## Notes
 
-- Most date frontmatter uses `created: YYYY-MM-DD`; the script falls back to file mtime when frontmatter is missing.
-- Task markers: `📅` due, `🛫` start, `⏳` scheduled, `⏫` high, `🔼` medium, `🔽` low.
-- Chinese queries use contiguous CJK terms; English queries use alnum tokens of 3+ chars.
-- Synonym expansion is the agent's job, not the script's.
-- Prefer `--raw` when piping into another command or combining with `xargs`.
+- `created: YYYY-MM-DD` frontmatter drives dates; `vault_search.py` falls back to file mtime.
+- Task markers (Tasks plugin): `📅` due, `🛫` start, `⏳` scheduled, `⏫`/`🔼`/`🔽` priority.
+- Synonym expansion is the agent's job, not the scripts'.
