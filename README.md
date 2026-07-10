@@ -11,7 +11,7 @@ Personal agent skills packaged for `npx skills`.
 | [youtube-transcript](skills/youtube-transcript/SKILL.md) | Transform YouTube videos or transcripts into structured Obsidian notes with timestamps and callouts. |
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
-| [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md) | Review code through a simplicity, orthogonality, and anti-bloat lens. |
+| [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md) | Review a diff or audit an existing package through the Russ Cox lens — necessity, layering, seams, error/logging/testing discipline, anti-bloat. |
 | [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md) | Review code with pragmatic focus on APIs, dependencies, compatibility, and user value. |
 | [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md) | Review code for honest invariants, error boundaries, cost visibility, and API contracts. |
 | [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
