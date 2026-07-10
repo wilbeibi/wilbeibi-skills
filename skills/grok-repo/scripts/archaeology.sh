@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # archaeology.sh [repo-dir] — one-shot git history digest for understanding a codebase.
 # Prints: founding commits, recent direction, authors, hot (most-churned) files,
-# and the largest commits by lines touched. Read-only; stdlib git only.
-set -euo pipefail
+# fix-prone files, reverts, and the largest commits by lines touched.
+# Read-only; stdlib git only.
+# No pipefail: every pipeline ends in head/sort/cut, and upstream git/grep
+# legitimately exit non-zero on SIGPIPE or empty match sets.
+set -eu
 cd "${1:-.}"
 git rev-parse --is-inside-work-tree >/dev/null
 
@@ -20,6 +23,13 @@ git shortlog -sn --no-merges | head -12
 section "HOT FILES (most-churned = load-bearing; blame-worthy)"
 git log --no-merges --name-only --pretty=format: \
   | grep -v '^$' | sort | uniq -c | sort -rn | head -20
+
+section "FIX-PRONE FILES (named in fix/bug commits — where invariants bite)"
+git log --no-merges -i -E --grep='fix|bug|regress' --name-only --pretty=format: \
+  | grep -v '^$' | sort | uniq -c | sort -rn | head -15
+
+section "ABANDONED DIRECTIONS (reverts/rollbacks — designs that didn't survive)"
+git log --oneline --no-merges -i -E --grep='revert|roll ?back' | head -10
 
 section "BIGGEST COMMITS (by lines touched — likely rewrites/redesigns)"
 git log --no-merges --pretty='%h|%ad|%s' --date=short --shortstat \

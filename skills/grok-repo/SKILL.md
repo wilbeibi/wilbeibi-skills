@@ -50,7 +50,7 @@ components instead of exhausting the tree — say what you sampled.
 
 ```bash
 scripts/archaeology.sh [repo-dir]   # one-shot digest: founding commits, recent direction,
-                                    # authors, hot files, biggest commits
+                                    # authors, hot files, fix-prone files, reverts, biggest commits
 ```
 
 Then drill into what the digest surfaces:
@@ -64,6 +64,13 @@ git log -S '<symbol>' --oneline           # when/why a concept appeared or died
 - Find "key changes" by size and message, not recency: rewrites, "refactor", "redesign",
   version-bump commits, and any commit whose message explains a tradeoff. Good projects
   hide design docs in commit messages — quote them.
+- Cross-reference **hot × fix-prone**: files high on both lists are the fragile heart —
+  the domain's hardest invariants live there, so read them first, and don't mistake
+  battle scars for bad taste.
+- **Reverts are negative rationale**: a design that was tried and rolled back explains the
+  current shape as well as any commit that survived — feed them to History & rationale.
+- Test a "team boundary" seam hypothesis with `git shortlog -sn -- <dir>` on each side:
+  disjoint author sets confirm Conway's law; the same names on both sides refute it.
 - `git blame` a surprising line before calling it a wart; it often has a fix-commit story.
 
 ## Briefing contract
