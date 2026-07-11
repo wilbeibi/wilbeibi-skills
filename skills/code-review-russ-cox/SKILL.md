@@ -28,7 +28,7 @@ These are principles, not a compliance checklist: translate each into the codeba
 3. **Error regimes** — Split by whose bug it is: fail fast (panic/assert) on programmer bugs and corrupted invariants, as documented policy; recoverable errors with context for expected environmental failure; log-and-continue in long-running loops so one bad item can't kill a pass. Are the error paths tested?
 4. **Observability** — Logger injected as a dependency, never global. Structured key-value attrs; message strings are stable lowercase identifiers with variable data in attrs, not interpolated. Test logs route through the test harness so they appear only on failure.
 5. **Testing** — A fake at every interface; deterministic tests (no timing/race dependence); record/replay for network calls; human-editable fixtures; conformance suites for interfaces with multiple impls; coverage gaps justified with a comment, not ignored.
-6. **Docs & style** — Every package has a real package doc; the main package's doc is the living architecture tour. Doc comments state contract and edge cases, not mechanics; inline comments are *why*-only; TODOs are signed with the considered tradeoff; genuine design doubts are recorded, not smoothed over.
+6. **Docs & style** — Every package has a real package doc; the main package's doc is the living architecture tour. Doc comments state contract, edge cases, and cost shape, not mechanics: expensive APIs should look expensive, and cheap APIs should look cheap. Inline comments are *why*-only; TODOs are signed with the considered tradeoff; genuine design doubts are recorded, not smoothed over.
 
 ## Universal tests
 
