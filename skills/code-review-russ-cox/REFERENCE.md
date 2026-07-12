@@ -60,6 +60,8 @@ Gaby defines its *own* minimal interface for everything it needs from the enviro
 
 A design metric, not an aesthetic: oscar's embeddocs package "has very little to it, given the abstractions of a document store with incremental scanning, an LLM embedder, and a vector database." When a new unit is nearly trivial, the abstractions below it are right. Corollary: judge refactors by what they delete — one oscar refactor's headline benefit was deleting four packages.
 
+Control flow as representation: explicit state is sometimes accidental machinery. A `state` field, iterator stack, pending queue, or state machine may only be simulating the program counter or call stack. In that case, prefer a direct loop, recursion, callback traversal, generator/coroutine, or small adapter that lets the natural control flow carry the state. Keep state as data when it must be serialized, inspected externally, persisted, shared across processes, or updated by unpredictable events.
+
 Constructor shape: `New(lg, db, gh, vdb, docs, name)` for required deps, then `p.EnableProject(...)`, `p.SkipTitleSuffix(...)` for policy. Deps are positional; config is methods.
 
 Also from oscar's design: prefer deterministic code, and confine the fuzzy/probabilistic part (LLM calls, heuristics) to proposing; deterministic, reviewable code acts — with a human-approval log for irreversible actions.
