@@ -18,8 +18,8 @@ scripts/paper_search.py "raft consensus" --field any --limit 25  # non-CS, or wi
 scripts/paper_search.py --selftest                               # offline; no network
 ```
 
-`--json` for machine output. `--after` takes `arXiv:ID`, `DOI:x`, or an OpenAlex `Wxxx`.
-Set `OPENALEX_MAILTO=<your email>` for OpenAlex's faster polite pool (optional).
+`--after` takes `arXiv:ID`, `DOI:x`, or an OpenAlex `Wxxx`. `--json` for machine output;
+`--help` for all flags. Set `OPENALEX_MAILTO=<your email>` for OpenAlex's polite pool.
 
 ## Reading the output
 
@@ -47,28 +47,23 @@ paper with 300. `[TOP]` = top-tier venue (NeurIPS/ICML/ACL/OSDI/SOSP/VLDB/…).
 - **Citation counts are a lagging indicator.** In AI/infra, the paper that matters may be
   6 weeks old with zero citations. Never conclude "nothing exists" from a citation-ranked
   list — run `--fresh 60` before saying a topic is unexplored.
-- **FWCI is noise for papers under ~18 months** (the expected-citation denominator is near
-  zero, so 7 citations can score FWCI 108). The script already ignores FWCI below that age;
-  don't reintroduce it by reading the raw number off a young paper.
+- **FWCI is noise below ~18 months** — the expected-citation denominator is near zero, so
+  7 citations can score FWCI 108. The script ignores it below that age; don't reintroduce
+  it by reading the raw number off a young paper.
 - **Preprint date ≠ publication date.** A 2024 TACL paper may be a 2023 arXiv paper; the
   idea landed 8 months before the venue date, and in a fast field that lead is the story.
   Output shows `preprint YYYY-MM` when they differ — cite the earlier one for priority.
-- **h-index is name-conflated, so read `@ affiliation` instead.** OpenAlex merges authors
-  with common names — "Kevin Lin" reports h=75 across 825 works, several different people.
-  `h=` is the max across the authors, which is the value conflation inflates. Treat a high
-  `h=` on a common name as unproven; the `@ Stanford, Berkeley` affiliation next to it is
-  free of that problem and is the better prior on a paper too new to be cited.
-- **`--fresh` arXiv hits show `h=?` and no affiliation, and that is not a bug.** arXiv's
-  API exposes no institutions, and resolving authors by name is worse than useless
-  ("Feng Wang" matches 4,865 OpenAlex authors, so you would attach a stranger's h-index).
-  A days-old preprint has no trustworthy machine signal — hence `FRESH?`, "verify
-  yourself". Open the PDF and judge it; that is the only real option, so budget for it.
+- **Author credibility is the weakest signal here; don't lean on it.** OpenAlex conflates
+  common names ("Kevin Lin": h=75 across 825 works, several people), and `h=` is the max
+  across authors — the value conflation inflates. Prefer the `@ Stanford, Berkeley`
+  affiliation beside it. On `--fresh` arXiv hits both are absent by design: arXiv exposes
+  no institutions, and name lookup is worse than useless ("Feng Wang" → 4,865 authors, so
+  you'd attach a stranger's h-index). That is what `FRESH?` means — open the PDF.
 - **A landmark is cited by every field.** `--after` on a famous paper returns medical and
   legal applications too; pass `--about "<keywords>"` to keep the frontier on topic.
-- **`--field cs` is the default** and filters to Computer Science. Pass `--field any` for
-  anything else, or results will look mysteriously empty.
-- OpenAlex venue metadata is imperfect: a paper published at EMNLP may still be tagged
-  `[PREPRINT] arXiv`. Trust the citation numbers over the tier label; check the PDF link.
+- **`--field cs` is the default.** Pass `--field any` for anything else, or results look
+  mysteriously empty. Venue metadata is imperfect regardless — a paper published at EMNLP
+  may still read `[PREPRINT] arXiv`, so trust the citation numbers over the tier label.
 
 ## Workflow for a fast-moving topic
 
