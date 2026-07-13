@@ -22,6 +22,7 @@ Personal agent skills packaged for `npx skills`.
 | [write-readme](skills/write-readme/SKILL.md) | Write or critique a README for an open-source lib or CLI tool using the inverted-pyramid structure. |
 | [grok-repo](skills/grok-repo/SKILL.md) | Understand an unfamiliar codebase: a full briefing (purpose, architecture, seams, taste, history, standout code) or a scoped dataflow trace of one subsystem. |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |
+| [paper-search](skills/paper-search/SKILL.md) | Find papers across Semantic Scholar, OpenAlex, and arXiv, ranked by impact relative to field and age — so recent work and credible work are told apart from noise. |
 | [ast-grep](skills/ast-grep/SKILL.md) | Write ast-grep rules for structural (AST-based) code search that goes beyond text grep. Adapted from [ast-grep/agent-skill](https://github.com/ast-grep/agent-skill). |
 | [web-recap](skills/web-recap/SKILL.md) | Extract browser history (Chrome, Firefox, Safari, Edge, Brave) to find URLs by topic or get visit stats. Adapted from [robzolkos/web-recap](https://github.com/robzolkos/web-recap). |
 | [write-cli](skills/write-cli/SKILL.md) | Design or review CLI tool shape — flags, subcommands, help, errors, and output contracts — against established conventions. |
