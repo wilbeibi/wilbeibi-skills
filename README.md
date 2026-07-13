@@ -8,7 +8,6 @@ Personal agent skills packaged for `npx skills`.
 |-------|-------------|
 | [obsidian-vault-search](skills/obsidian-vault-search/SKILL.md) | Search an Obsidian vault three-tier: Meilisearch for topic/fuzzy queries, ripgrep for exact matches, date-aware helper for natural-language dates and tasks. |
 | [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append quick todos (with due dates), log lines, learnings, and reflections to the right section of Obsidian daily and weekly notes. |
-| [youtube-transcript](skills/youtube-transcript/SKILL.md) | Transform YouTube videos or transcripts into structured Obsidian notes with timestamps and callouts. |
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
 | [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md) | Review a diff or audit an existing package through the Russ Cox lens — necessity, layering, seams, error/logging/testing discipline, anti-bloat. |
