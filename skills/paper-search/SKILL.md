@@ -53,6 +53,16 @@ paper with 300. `[TOP]` = top-tier venue (NeurIPS/ICML/ACL/OSDI/SOSP/VLDB/…).
 - **Preprint date ≠ publication date.** A 2024 TACL paper may be a 2023 arXiv paper; the
   idea landed 8 months before the venue date, and in a fast field that lead is the story.
   Output shows `preprint YYYY-MM` when they differ — cite the earlier one for priority.
+- **h-index is name-conflated, so read `@ affiliation` instead.** OpenAlex merges authors
+  with common names — "Kevin Lin" reports h=75 across 825 works, several different people.
+  `h=` is the max across the authors, which is the value conflation inflates. Treat a high
+  `h=` on a common name as unproven; the `@ Stanford, Berkeley` affiliation next to it is
+  free of that problem and is the better prior on a paper too new to be cited.
+- **`--fresh` arXiv hits show `h=?` and no affiliation, and that is not a bug.** arXiv's
+  API exposes no institutions, and resolving authors by name is worse than useless
+  ("Feng Wang" matches 4,865 OpenAlex authors, so you would attach a stranger's h-index).
+  A days-old preprint has no trustworthy machine signal — hence `FRESH?`, "verify
+  yourself". Open the PDF and judge it; that is the only real option, so budget for it.
 - **A landmark is cited by every field.** `--after` on a famous paper returns medical and
   legal applications too; pass `--about "<keywords>"` to keep the frontier on topic.
 - **`--field cs` is the default** and filters to Computer Science. Pass `--field any` for

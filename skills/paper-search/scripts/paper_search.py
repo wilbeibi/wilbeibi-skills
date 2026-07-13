@@ -136,6 +136,11 @@ def from_openalex(w):
         "authors": [(a.get("author") or {}).get("display_name") for a in auth],
         "author_ids": [((a.get("author") or {}).get("id") or "").rsplit("/", 1)[-1]
                        for a in auth if (a.get("author") or {}).get("id")],
+        # Free (already in the payload) and, unlike h-index, immune to name conflation.
+        # For a paper too new to be cited, the lab is the most honest prior available.
+        "affil": list(dict.fromkeys(
+            i.get("display_name") for a in auth
+            for i in (a.get("institutions") or []) if i.get("display_name")))[:2],
         "h_max": 0,  # filled in by enrich_authors()
         "arxiv": arxiv,
         "doi": doi,
@@ -166,6 +171,7 @@ def from_arxiv(entry, ns):
         "authors": [(a.find("a:name", ns).text or "").strip()
                     for a in entry.findall("a:author", ns)][:4],
         "author_ids": [],
+        "affil": [],  # arXiv's API does not expose affiliations
         "h_max": 0,
         "arxiv": re.sub(r"v\d+$", "", aid),
         "doi": None,
@@ -387,7 +393,8 @@ def dedupe(papers):
             continue
         keep, other = (cur, p) if (cur["cites"], cur["tier"] == "TOP") >= (
             p["cites"], p["tier"] == "TOP") else (p, cur)
-        for f in ("fwci", "pctile", "abstract", "doi", "arxiv", "pdf", "author_ids"):
+        for f in ("fwci", "pctile", "abstract", "doi", "arxiv", "pdf", "author_ids",
+                  "affil"):
             if not keep.get(f) and other.get(f):
                 keep[f] = other[f]
         keep["cites"] = max(keep["cites"], other["cites"])
@@ -436,10 +443,13 @@ def render(papers, median, query):
         vel = f"{p['velocity']:.1f}/mo" if p["velocity"] is not None else "—"
         auth = ", ".join(a for a in p["authors"][:2] if a) + (
             "…" if len(p["authors"]) > 2 else "")
+        who = f"{auth}  h={p['h_max'] or '?'}"
+        if p.get("affil"):
+            who += "  @ " + ", ".join(p["affil"])
         print(f"  {p['title'][:88]}")
         print(f"    {p['date']}  ({age})  {p['cites']} cites ({vel})  {fw}"
               f"  [{p['tier']}] {p['venue'][:34]}")
-        print(f"    {auth}  h={p['h_max'] or '?'}")
+        print(f"    {who}")
         if p["abstract"]:
             print(f"    → {p['abstract'][:150]}")
         print(f"    {'https://arxiv.org/abs/' + p['arxiv'] if p['arxiv'] else p['pdf'] or ''}\n")
