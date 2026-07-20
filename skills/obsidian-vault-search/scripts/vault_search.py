@@ -26,12 +26,18 @@ WHAT IT DOESN'T DO:
 
 import os
 import re
+import sys
 import yaml
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import argparse
+
+# Best-effort signal that a task query wanted a date filter, for the
+# "did we silently drop your filter" warning in search_tasks — not
+# exhaustive, just enough to catch phrasing near what's already supported.
+TEMPORAL_HINT = re.compile(r'\b(today|yesterday|overdue|week|month|days?)\b|\d{4}-\d{2}-\d{2}')
 
 def detect_language(query: str) -> str:
     """Simple language detection based on character presence."""
@@ -55,31 +61,60 @@ def get_search_terms(query: str, language: str) -> List[str]:
 
 
 def parse_natural_date(query: str) -> Tuple[Optional[str], Optional[str]]:
-    """Convert natural language to date range."""
+    """Convert natural language to a (start, end) date range, inclusive.
+
+    None on either side means open-ended (unbounded past / unbounded future).
+    This is the single place new date phrases get taught — callers (note
+    search, task search) just consume the resulting range, so adding a
+    phrase here benefits every caller instead of needing a per-caller branch.
+
+    Uses the host machine's local clock (datetime.now()), not a configured
+    timezone — correct as long as this runs where the user is (the Mac).
+    Don't call this from a differently-timezoned host (e.g. a cron job on
+    the joi mirror) and expect "today"/"overdue" to line up with PDT.
+    """
     query_lower = query.lower()
     now = datetime.now()
+    fmt = "%Y-%m-%d"
 
     # Handle "last X days" pattern
     last_n_days = re.search(r'last (\d+) days?', query_lower)
     if last_n_days:
         days = int(last_n_days.group(1))
         start = now - timedelta(days=days)
-        return start.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d")
+        return start.strftime(fmt), now.strftime(fmt)
 
     if any(x in query_lower for x in ["recent week", "last week", "past week"]):
         start = now - timedelta(days=7)
-        return start.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d")
+        return start.strftime(fmt), now.strftime(fmt)
 
     if any(x in query_lower for x in ["recent month", "last month", "past month"]):
         start = now - timedelta(days=30)
-        return start.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d")
+        return start.strftime(fmt), now.strftime(fmt)
+
+    # ISO week (Monday-Sunday) containing "now", shifted by `offset` weeks.
+    def iso_week_range(offset: int) -> Tuple[str, str]:
+        monday = now - timedelta(days=now.weekday()) + timedelta(weeks=offset)
+        sunday = monday + timedelta(days=6)
+        return monday.strftime(fmt), sunday.strftime(fmt)
+
+    if "this week" in query_lower:
+        return iso_week_range(0)
+
+    if "next week" in query_lower:
+        return iso_week_range(1)
+
+    if "overdue" in query_lower:
+        # Open start, end = yesterday: anything with a date strictly before today.
+        yesterday = now - timedelta(days=1)
+        return None, yesterday.strftime(fmt)
 
     if "yesterday" in query_lower:
         date = now - timedelta(days=1)
-        return date.strftime("%Y-%m-%d"), date.strftime("%Y-%m-%d")
+        return date.strftime(fmt), date.strftime(fmt)
 
     if "today" in query_lower:
-        return now.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d")
+        return now.strftime(fmt), now.strftime(fmt)
 
     # Extract specific dates
     date_match = re.search(r'\d{4}-\d{2}-\d{2}', query)
@@ -88,6 +123,20 @@ def parse_natural_date(query: str) -> Tuple[Optional[str], Optional[str]]:
         return date, date
 
     return None, None
+
+def in_range(date_str: str, start: Optional[str], end: Optional[str]) -> bool:
+    """ISO date-string membership in an inclusive [start, end] range.
+
+    None on either side is an open bound. The one place every date filter
+    (task due-dates, note created-dates, the mtime fallback) checks
+    membership, so all three agree on inclusivity instead of each inventing
+    its own comparison.
+    """
+    if start and date_str < start:
+        return False
+    if end and date_str > end:
+        return False
+    return True
 
 def rg(pattern: str, path: str = ".", extra_args: List[str] = None) -> List[str]:
     """Simple ripgrep wrapper."""
@@ -105,8 +154,13 @@ def rg(pattern: str, path: str = ".", extra_args: List[str] = None) -> List[str]
         )
         if result.returncode == 0:
             return result.stdout.strip().split('\n')
-    except:
-        pass
+        if result.returncode > 1:
+            # 1 = no matches (normal, silent). >1 = rg itself failed
+            # (bad pattern, missing binary, etc.) — an agent caller can't
+            # tell that apart from "genuinely zero results" unless we say so.
+            print(f"rg failed (exit {result.returncode}): {result.stderr.strip()}", file=sys.stderr)
+    except Exception as e:
+        print(f"rg failed to run: {e}", file=sys.stderr)
     return []
 
 def search_notes_simple(query: str, vault_path: str = ".") -> List[str]:
@@ -119,29 +173,29 @@ def search_notes_simple(query: str, vault_path: str = ".") -> List[str]:
 
     results = []
 
-    # Date-based search - only check most common pattern
-    if start_date:
-        if start_date == end_date:
-            # Single day - check YYYY-MM-DD format only
-            pattern = f"created: {start_date}"
-        else:
-            # Date range - match YYYY-MM pattern
-            pattern = f"created: {start_date[:7]}"  # 2026-01
+    # Date-based search: grep a superset of dated frontmatter, then filter
+    # precisely with in_range — same shape and same inclusivity rule that
+    # search_tasks uses for 📅 due-dates, instead of a month-prefix
+    # approximation that overmatches (a week can span two months).
+    if start_date or end_date:
+        candidates = rg(r"created: \d{4}-\d{2}-\d{2}", vault_path, ["-n"])
+        date_results = []
+        for line in candidates:
+            if not line:
+                continue
+            parts = line.split(':', 2)
+            if len(parts) < 3:
+                continue
+            date_match = re.search(r'\d{4}-\d{2}-\d{2}', parts[2])
+            if date_match and in_range(date_match.group(), start_date, end_date):
+                date_results.append(parts[0])
 
-        date_results = rg(pattern, vault_path, ["-l"])
-
-        # If no results, fallback to file system time
-        if not date_results and start_date:
-            # Get all .md files and filter by mtime
-            import os
-            from pathlib import Path
-
-            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-            end_dt = datetime.strptime(end_date, "%Y-%m-%d") if end_date else start_dt
-
+        # No frontmatter matches at all → fall back to file system mtime,
+        # same range check.
+        if not date_results:
             for file_path in Path(vault_path).glob("**/*.md"):
-                mtime = datetime.fromtimestamp(file_path.stat().st_mtime)
-                if start_dt <= mtime <= end_dt + timedelta(days=1):
+                mtime_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d")
+                if in_range(mtime_date, start_date, end_date):
                     date_results.append(str(file_path.relative_to(vault_path)))
 
         results.extend(date_results)
@@ -166,20 +220,29 @@ def search_notes_simple(query: str, vault_path: str = ".") -> List[str]:
     return unique
 
 def search_tasks(query: str, vault_path: str = ".") -> List[Dict]:
-    """Task search with simple filtering."""
-    query_lower = query.lower()
-    today = datetime.now().strftime("%Y-%m-%d")
+    """Task search with simple filtering.
 
-    # Build pattern based on query type
-    if "due today" in query_lower:
-        pattern = f"^- \\[ \\].*📅 {today}"
-    elif "overdue" in query_lower:
-        # Get all tasks with dates, filter in Python
-        pattern = "^- \\[ \\].*📅 \\d{4}-\\d{2}-\\d{2}"
-    elif "high priority" in query_lower:
+    Priority is its own concept (not date-based) and stays a direct glyph
+    match. Everything date-related — today, overdue, this week, a specific
+    date — goes through parse_natural_date's (start, end) range so new date
+    phrases only need to be taught once, in that one function.
+    """
+    query_lower = query.lower()
+    start_date, end_date = parse_natural_date(query)
+
+    if not (start_date or end_date) and TEMPORAL_HINT.search(query_lower):
+        # Query looks like it wanted a date filter but no phrase matched —
+        # say so, rather than silently falling through to an unfiltered
+        # task dump that looks identical to a real (empty) date match.
+        print(f"# date phrase not recognized in {query!r} — showing unfiltered results", file=sys.stderr)
+
+    if "high priority" in query_lower:
         pattern = "^- \\[ \\].*⏫"
     elif "priority" in query_lower:
         pattern = "^- \\[ \\].*[⏫🔼🔽]"
+    elif start_date or end_date:
+        # Get all tasks with dates, filter by range in Python
+        pattern = "^- \\[ \\].*📅 \\d{4}-\\d{2}-\\d{2}"
     else:
         # General task search
         pattern = "^- \\[ \\]"
@@ -200,10 +263,9 @@ def search_tasks(query: str, vault_path: str = ".") -> List[Dict]:
                 "text": parts[2]
             }
 
-            # Filter overdue tasks
-            if "overdue" in query_lower:
+            if start_date or end_date:
                 date_match = re.search(r'📅 (\d{4}-\d{2}-\d{2})', parts[2])
-                if date_match and date_match.group(1) < today:
+                if date_match and in_range(date_match.group(1), start_date, end_date):
                     tasks.append(task)
             else:
                 tasks.append(task)
