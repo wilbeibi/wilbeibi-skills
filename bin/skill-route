@@ -1,0 +1,295 @@
+#!/bin/sh
+# skill-route — reconcile agent skill symlinks from skill-routing.conf.
+#
+# Usage:
+#   skill-route [ROOT]     project mode: reconcile ROOT/.claude/skills and
+#                          ROOT/.codex/skills (ROOT defaults to $PWD)
+#   skill-route --global   reconcile always-on skills into ~/.claude/skills,
+#                          ~/.codex/skills and ~/.config/opencode/skills
+#   skill-route --check    with either mode: print planned changes, touch nothing
+#   skill-route --lint     validate skill-routing.conf against skills/ (used by CI)
+#
+# Policy grammar: see skill-routing.conf header.
+#
+# Only symlinks pointing into ~/.agents/skills (or at a declared external path)
+# are ever removed or replaced; real directories and foreign links are left
+# alone. Stateless: every run recomputes the desired set and converges to it.
+
+set -u
+
+STORE=${SKILL_ROUTE_STORE:-$HOME/.agents/skills}
+REPO=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+POLICY=$REPO/skill-routing.conf
+
+warn() { printf 'skill-route: %s\n' "$*" >&2; }
+
+usage() {
+  sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+expand_path() {
+  case $1 in
+    '~') printf '%s' "$HOME" ;;
+    '~/'*) printf '%s' "$HOME/${1#??}" ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
+
+in_list() { # $1=item $2=space-separated list
+  case " $2 " in *" $1 "*) return 0 ;; *) return 1 ;; esac
+}
+
+# ---- predicate evaluation -------------------------------------------------
+
+eval_pred() { # $1=token $2=root
+  case $1 in
+    file:*) [ -e "$2/${1#file:}" ] ;;
+    dir:*) [ -d "$2/${1#dir:}" ] ;;
+    glob:*)
+      [ -n "$(find "$2" -maxdepth 4 \
+          \( -name .git -o -name node_modules -o -name .venv \
+             -o -name .claude -o -name .codex \) -prune \
+          -o -type f -name "${1#glob:}" -print 2>/dev/null | head -n 1)" ] ;;
+    grep:*)
+      _pr=${1#grep:}
+      grep -Eqs -- "${_pr#*:}" "$2/${_pr%%:*}" ;;
+    *) return 1 ;;
+  esac
+}
+
+eval_profile() { # $1=profile name $2=root; true if any "profile $1" line matches
+  _pf_hit=1
+  while read -r _pf_kw _pf_name _pf_rest; do
+    [ "$_pf_kw" = profile ] && [ "$_pf_name" = "$1" ] || continue
+    _pf_ok=0
+    for _pf_t in $_pf_rest; do
+      eval_pred "$_pf_t" "$2" || { _pf_ok=1; break; }
+    done
+    [ "$_pf_ok" = 0 ] && { _pf_hit=0; break; }
+  done <"$POLICY"
+  return $_pf_hit
+}
+
+eval_tokens() { # $1=space-separated tokens (AND) $2=root
+  for _tk in $1; do
+    case $_tk in
+      file:*|dir:*|glob:*|grep:*) eval_pred "$_tk" "$2" || return 1 ;;
+      *) eval_profile "$_tk" "$2" || return 1 ;;
+    esac
+  done
+  return 0
+}
+
+# ---- hit set --------------------------------------------------------------
+
+compute_hits() { # $1=mode(project|global) $2=root; sets HITS
+  HITS=
+  while read -r _ch_name _ch_rest; do
+    case $_ch_name in ''|'#'*|external|profile) continue ;; esac
+    if [ "$1" = global ]; then
+      [ "$_ch_rest" = always ] || continue
+    else
+      [ "$_ch_rest" = always ] && continue
+      eval_tokens "$_ch_rest" "$2" || continue
+    fi
+    in_list "$_ch_name" "$HITS" || HITS="$HITS $_ch_name"
+  done <"$POLICY"
+}
+
+# ---- reconciliation -------------------------------------------------------
+
+external_path() { # $1=name; prints declared PATH ('' if none)
+  awk -v n="$1" '$1=="external" && $2==n { print $3; exit }' "$POLICY"
+}
+
+is_managed_link() { # $1=raw readlink content
+  case $1 in
+    "$STORE"/*) return 0 ;;
+    */.agents/skills/*) return 0 ;;
+  esac
+  for _ml_p in $EXT_PATHS; do
+    [ "$1" = "$(expand_path "$_ml_p")" ] && return 0
+  done
+  return 1
+}
+
+do_rm() {
+  if [ "$CHECK" = 1 ]; then printf 'remove %s\n' "$1"; else rm -- "$1"; fi
+}
+
+do_ln() { # $1=src $2=dest
+  if [ "$CHECK" = 1 ]; then
+    printf 'link   %s -> %s\n' "$2" "$1"
+  else
+    mkdir -p -- "${2%/*}" && ln -s -- "$1" "$2"
+  fi
+}
+
+reconcile_dir() { # $1=target dir $2=hit names $3=prune-empty(yes/no)
+  if [ -d "$1" ]; then
+    for _rc_e in "$1"/*; do
+      [ -L "$_rc_e" ] || continue
+      is_managed_link "$(readlink -- "$_rc_e")" || continue
+      in_list "${_rc_e##*/}" "$2" || do_rm "$_rc_e"
+    done
+  fi
+  for _rc_n in $2; do
+    _rc_src=$(external_path "$_rc_n")
+    if [ -n "$_rc_src" ]; then _rc_src=$(expand_path "$_rc_src"); else _rc_src=$STORE/$_rc_n; fi
+    if [ ! -d "$_rc_src" ]; then
+      warn "skill '$_rc_n' in policy but missing at $_rc_src"
+      continue
+    fi
+    _rc_dest=$1/$_rc_n
+    if [ -L "$_rc_dest" ]; then
+      [ "$(readlink -- "$_rc_dest")" = "$_rc_src" ] && continue
+      if is_managed_link "$(readlink -- "$_rc_dest")"; then
+        do_rm "$_rc_dest"
+        do_ln "$_rc_src" "$_rc_dest"
+      else
+        warn "unmanaged link in the way: $_rc_dest"
+      fi
+    elif [ -e "$_rc_dest" ]; then
+      warn "real entry in the way: $_rc_dest"
+    else
+      do_ln "$_rc_src" "$_rc_dest"
+    fi
+  done
+  if [ "$3" = yes ] && [ "$CHECK" != 1 ]; then
+    rmdir -- "$1" 2>/dev/null || true
+    rmdir -- "${1%/*}" 2>/dev/null || true
+  fi
+}
+
+# ---- lint -----------------------------------------------------------------
+
+check_pred() {
+  case $1 in
+    file:?*|dir:?*|glob:?*|grep:?*:?*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+lint() {
+  _lt_fail=0
+  _lt_ext= _lt_profiles= _lt_always= _lt_pred= _lt_names= _lt_refs=
+  while read -r _lt_line; do
+    # shellcheck disable=SC2086
+    set -- $_lt_line
+    [ $# -gt 0 ] || continue
+    case $1 in
+      '#'*) continue ;;
+      external)
+        if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+          warn "lint: bad external line: $_lt_line"; _lt_fail=1; continue
+        fi
+        _lt_ext="$_lt_ext $2" ;;
+      profile)
+        if [ $# -lt 3 ]; then
+          warn "lint: profile needs a name and predicates: $_lt_line"; _lt_fail=1; continue
+        fi
+        _lt_profiles="$_lt_profiles $2"
+        _lt_p=$2; shift 2
+        for _lt_t in "$@"; do
+          check_pred "$_lt_t" || {
+            warn "lint: profile $_lt_p: invalid predicate '$_lt_t' (profiles may not reference profiles)"
+            _lt_fail=1
+          }
+        done ;;
+      *)
+        _lt_n=$1; shift
+        in_list "$_lt_n" "$_lt_names" || _lt_names="$_lt_names $_lt_n"
+        if [ "$*" = always ]; then
+          _lt_always="$_lt_always $_lt_n"
+        elif [ $# -lt 1 ]; then
+          warn "lint: skill $_lt_n: no tokens"; _lt_fail=1
+        else
+          _lt_pred="$_lt_pred $_lt_n"
+          for _lt_t in "$@"; do
+            case $_lt_t in
+              always)
+                warn "lint: $_lt_n: 'always' cannot combine with other tokens"; _lt_fail=1 ;;
+              file:*|dir:*|glob:*|grep:*)
+                check_pred "$_lt_t" || { warn "lint: $_lt_n: bad predicate '$_lt_t'"; _lt_fail=1; } ;;
+              *)
+                in_list "$_lt_t" "$_lt_refs" || _lt_refs="$_lt_refs $_lt_t" ;;
+            esac
+          done
+        fi ;;
+    esac
+  done <"$POLICY"
+
+  for _lt_r in $_lt_refs; do
+    in_list "$_lt_r" "$_lt_profiles" || { warn "lint: unknown profile or predicate '$_lt_r'"; _lt_fail=1; }
+  done
+  for _lt_n in $_lt_names; do
+    [ -f "$REPO/skills/$_lt_n/SKILL.md" ] || in_list "$_lt_n" "$_lt_ext" || {
+      warn "lint: '$_lt_n' is neither in skills/ nor declared external"; _lt_fail=1
+    }
+  done
+  for _lt_n in $_lt_always; do
+    in_list "$_lt_n" "$_lt_pred" && { warn "lint: '$_lt_n' has both always and predicate lines"; _lt_fail=1; }
+  done
+  for _lt_d in "$REPO"/skills/*/; do
+    [ -f "$_lt_d/SKILL.md" ] || continue
+    _lt_n=${_lt_d%/}; _lt_n=${_lt_n##*/}
+    in_list "$_lt_n" "$_lt_names" || { warn "lint: skill '$_lt_n' is not routed in the policy"; _lt_fail=1; }
+  done
+  return $_lt_fail
+}
+
+# ---- main -----------------------------------------------------------------
+
+MODE=project CHECK=0 ROOT=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --global) MODE=global ;;
+    --lint) MODE=lint ;;
+    --check) CHECK=1 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) warn "unknown option: $1"; exit 2 ;;
+    *) ROOT=$1 ;;
+  esac
+  shift
+done
+
+if [ ! -f "$POLICY" ]; then
+  warn "policy not found: $POLICY"
+  if [ "$MODE" = lint ] || [ "$CHECK" = 1 ]; then exit 1; fi
+  exit 0
+fi
+
+if [ "$MODE" = lint ]; then
+  lint && exit 0 || exit 1
+fi
+
+[ -n "${SKILL_ROUTE_OFF:-}" ] && exit 0
+
+if [ ! -d "$STORE" ]; then
+  warn "store not found: $STORE"
+  [ "$CHECK" = 1 ] && exit 1
+  exit 0
+fi
+
+EXT_PATHS=$(awk '$1=="external" && NF>=3 { print $3 }' "$POLICY")
+
+if [ "$MODE" = global ]; then
+  compute_hits global ''
+  reconcile_dir "$HOME/.claude/skills" "$HITS" no
+  reconcile_dir "$HOME/.codex/skills" "$HITS" no
+  reconcile_dir "$HOME/.config/opencode/skills" "$HITS" no
+  exit 0
+fi
+
+ROOT=${ROOT:-$PWD}
+if [ ! -d "$ROOT" ]; then
+  warn "no such directory: $ROOT"
+  exit 0
+fi
+ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
+[ "$ROOT" = "$HOME" ] && exit 0
+
+compute_hits project "$ROOT"
+reconcile_dir "$ROOT/.claude/skills" "$HITS" yes
+reconcile_dir "$ROOT/.codex/skills" "$HITS" yes
+exit 0
