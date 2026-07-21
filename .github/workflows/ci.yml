@@ -20,6 +20,3 @@ jobs:
 
       - name: Validate skill frontmatter
         run: uv run scripts/check_skill_frontmatter.py
-
-      - name: Lint skill routing policy
-        run: bin/skill-route --lint

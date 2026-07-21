@@ -91,38 +91,10 @@ npx skills update test-writing      # one skill
 
 Each skill lives in `skills/<name>/SKILL.md`. Supporting scripts and reference docs are colocated in the same directory.
 
-## Routing (on-demand loading)
-
-`skill-routing.conf` declares which skills appear where (always-on vs per project
-shape); `bin/skill-route` is a stateless reconciler that projects the
-`~/.agents/skills` store into `.claude/skills` (Claude Code + OpenCode) and
-`.codex/skills` (Codex) via per-skill symlinks. It only ever touches symlinks
-that point into the store or at a declared external path.
-
-```bash
-bin/skill-route             # reconcile current project
-bin/skill-route --global    # reconcile always-on set into user-level dirs
-bin/skill-route --check     # dry-run
-bin/skill-route --lint      # validate the policy table (run by CI)
-```
-
-Setup on a machine: install direnv, add `eval "$(direnv hook zsh)"` to the shell
-rc, whitelist `~/src` in `~/.config/direnv/direnv.toml`, and give each project a
-one-line `.envrc`:
-
-```bash
-"$HOME/src/wilbeibi-skills/bin/skill-route" "$PWD" >/dev/null || true
-```
-
-`npx skills` still manages store *contents*; after updates run
-`skills-sync` (alias for `npx skills update && bin/skill-route --global`) so the
-reconciler re-prunes any global links it re-creates.
-
 ## Validation
 
-Check skill frontmatter and the routing policy before pushing:
+Check skill frontmatter before pushing:
 
 ```bash
 uv run scripts/check_skill_frontmatter.py
-bin/skill-route --lint
 ```
