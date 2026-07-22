@@ -28,6 +28,7 @@ Personal agent skills packaged for `npx skills`.
 | [write-cli](skills/write-cli/SKILL.md) | Design or review CLI tool shape — flags, subcommands, help, errors, and output contracts — against established conventions. |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Pre-coding planning gate: surface assumptions, pick the simplest approach, and define declarative success criteria with a verification loop. Adapted from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). |
 | [write-comment](skills/write-comment/SKILL.md) | Write high-quality code comments by matching the missing information to the right comment type — function, design, why, teacher, checklist, or guide. |
+| [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon: one-off `hs -c` Lua for apps, browser tabs, and system toggles, plus authoring persistent automations in ~/.hammerspoon. |
 
 ## Install
 
