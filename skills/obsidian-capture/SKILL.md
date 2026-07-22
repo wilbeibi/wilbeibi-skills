@@ -1,49 +1,40 @@
 ---
 name: obsidian-capture
-description: Append quick captures — todos with due dates, log lines, learnings, reflections — to the right section of Obsidian daily (DailyPlan/) and weekly (Weekly/) notes. Use when asked to "add a todo", "note this down", "log this", "capture an idea", "due Friday", or to record something fun or a weekly reflection. Do NOT use for searching notes (use obsidian-vault-search) or for creating standalone long-form notes.
+description: Append quick captures — todos with due dates, log lines, learnings, reflections — to the right section of Obsidian daily (DailyPlan/) and weekly (Weekly/) notes via scripts/capture.py. Use when asked to "add a todo", "note this down", "log this", "capture an idea", "due Friday", or to record something fun or a weekly reflection. Do NOT use for searching notes (use obsidian-vault-search) or for creating standalone long-form notes.
 ---
 
 # obsidian-capture
 
-Turn a quick capture into one small edit in today's daily note or this week's weekly note, following the vault's existing template conventions.
+One capture = one `scripts/capture.py` call. The script handles everything deterministic — resolves today's daily / this week's weekly note (creates it from the vault template if missing), routes to the right section, fills empty placeholder slots before appending, formats Tasks-plugin dates — so never edit the notes by hand. Needs `$OBSIDIAN_VAULT` and python3 (stdlib only).
 
-## Targets
-
-Vault root: `$OBSIDIAN_VAULT` (e.g. `~/vaults/Vault`).
+## Commands
 
 ```bash
-daily=$OBSIDIAN_VAULT/DailyPlan/$(LC_TIME=C date '+%Y-%m-%d %a').md   # 2026-07-08 Wed.md
-weekly=$OBSIDIAN_VAULT/Weekly/$(date +%G-W%V).md                       # 2026-W28.md (ISO week)
+scripts/capture.py todo "回 offer 邮件"                    # daily ✅ 其他, due today
+scripts/capture.py todo "准备 design review" --must        # daily 🎯 今天必须完成, due today
+scripts/capture.py todo "写 freshrss theme" --weekly       # weekly ## Todos, due = today+3d, capped at Sunday
+scripts/capture.py todo "读论文" --due friday -p high      # any todo: explicit due + ⏫ priority
+scripts/capture.py log "和 recruiter 通话"                 # daily 🪵 Log, timestamped now (--time HH:MM to backfill)
+scripts/capture.py learned "TIL 内容"                      # daily 📝 今日记 → 新知:
+scripts/capture.py diary "发生的事"                        # daily 📝 今日记 → 新事:
+scripts/capture.py fun "有趣的事"                          # weekly ## Something Fun This Week
+scripts/capture.py reflect "杠杆" "答案全文"               # weekly Reflections, under the Q: matching the substring
+scripts/capture.py done "package 邮件"                     # tick first matching open todo (today's notes first, then all), appends ✅ date
+scripts/capture.py annotate "加 CI" "blocked: 缺权限"      # append a sub-bullet under first matching open todo
+
+# agent-owned todos (#agent-todo): captured for a later, possibly weaker, agent to execute cold
+scripts/capture.py todo "给 skills repo 加 CI" --agent \
+  --ctx "context: repo ~/Local/wilbeibi-skills，GitHub Actions 跑 skill lint" \
+  --ctx "done-when: push 后 Actions 全绿"
+scripts/capture.py agenda                                  # list open #agent-todo due ≤ today + context, file:line (--days 90 default)
 ```
 
-If the target note is missing, create it from `Meta-Obsidian/Templates/DailyTemplate.md` or `Weekly Template.md`, resolving `{{date:...}}` placeholders to real dates (nav links use adjacent day/week names).
+`--due` accepts `today`, `tomorrow`, `+Nd`, `mon`..`sunday`, `this-week`, `next-week`, `YYYY-MM-DD`, `none` — pass the user's phrase through instead of computing dates yourself. Run `--help` for the rest.
 
-## Section Routing
+## Judgment (the only part the model decides)
 
-| Capture | Destination |
-|---------|-------------|
-| Must-do / important todo | daily `## 🎯 今天必须完成` |
-| Any other todo, incl. future due dates | daily `## ✅ 其他` |
-| Timestamped happening | daily `## 🪵 Log` as `- HH:mm <text>` |
-| Learned something new / diary entry | daily `## 📝 今日记` (`新知:` / `新事:`) |
-| Fun thing this week | weekly `## Something Fun This Week` |
-| Reflection answer | weekly `## Reflections`, under the matching `Q:` |
-
-A todo due next month still goes in **today's** daily note — the Tasks plugin finds it by its `📅` date, not by file location.
-
-## Task Format (Tasks plugin)
-
-```markdown
-- [ ] Review Daytona doc 📅 2026-07-10 ⏫
-```
-
-- `📅` due, `🛫` start, `⏳` scheduled, `⏫` high, `🔼` medium, `🔽` low.
-- Resolve natural-language dates ("Friday", "next week") to absolute `YYYY-MM-DD` — check `date +%F` first, never guess today's date.
-- Keep the capture text in the language the user used.
-
-## Rules
-
-- Fill the first empty `- [ ]` slot in the target section before appending a new line; likewise replace a still-empty `- HH:mm ` placeholder in Log.
-- Append at the end of the section otherwise; one capture = one line.
-- Never touch: frontmatter, `> [!summary]` callouts (RescueTime), ` ```base ` and ` ```dataviewjs ` blocks, the `**<< [[prev]] | [[next]] >>` nav line.
-- Marking a todo done: `- [x] ... ✅ YYYY-MM-DD` (append the completion date, keep the rest of the line).
+- Keep the capture text in the language the user used; don't translate or rephrase.
+- "必须 / must / today's deadline / blocking" → `--must`; otherwise a plain todo.
+- Daily vs weekly: default daily. Use `--weekly` only when the user says weekly / 本周, or the task is week-scoped with no fixed day. A todo due far in the future still goes in **today's** daily — the Tasks plugin finds it by its 📅 date, not by file location.
+- "让 agent 做 / 给 agent 记" → `--agent`. The executor may be a weak model with no conversation history, so the todo must be cold-start executable: `--ctx "context: ..."` with absolute paths/repos/URLs and `--ctx "done-when: ..."` acceptance criteria. Pull specifics from the current conversation; if you can't make it self-contained, ask the user rather than capture a vague one. (The script refuses `--agent` without `--ctx`.)
+- The script prints the file, section, and exact line it wrote — relay that as confirmation, and stop. If it errors (unmatched section/question/todo), fix the arguments; don't fall back to hand-editing.
