@@ -1,9 +1,9 @@
 ---
-name: obsidian-vault-search
-description: Search an Obsidian vault three ways — Meilisearch for topic and fuzzy queries, ripgrep for exact strings/tags/task glyphs, and a date-aware helper for natural-language dates and overdue math. Use when finding notes about a topic, half-remembered ideas, recent writing, tagged content, or due/overdue/high-priority tasks in a local Markdown vault. Do NOT use to add or edit notes (use obsidian-capture).
+name: obsidian-search
+description: Search an Obsidian vault for topics, exact text, tags, recent notes, and tasks. Use when fuzzy, date-aware, due, or overdue note retrieval is needed.
 ---
 
-# obsidian-vault-search
+# obsidian-search
 
 Find Markdown notes and tasks in an Obsidian vault without loading the whole vault into context.
 

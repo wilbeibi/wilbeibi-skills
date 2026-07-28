@@ -1,4 +1,4 @@
-# write-agentsmd — sourced research
+# AGENTS.md — sourced research
 
 Background for the rules in [SKILL.md](SKILL.md). Pulled from a web research pass, July 2026.
 

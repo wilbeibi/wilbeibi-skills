@@ -1,6 +1,6 @@
 ---
 name: write-skill
-description: Author a new agent skill in this repo following compact trigger-rich and command-first skill patterns. Use when the user asks to "write a skill", "add a skill", "create a new skill", update skill guidance, or scaffold a SKILL.md. Targets the `npx skills` layout (top-level `skills/<name>/SKILL.md`).
+description: Author or update compact agent skills under skills/<name>/SKILL.md. Use when asked to write, add, or change a skill; not to audit a skill library.
 ---
 
 # write-skill

@@ -1,6 +1,6 @@
 ---
 name: skill-curator
-description: Audit and de-duplicate an existing agent-skill library — find forked scripts, contradictory or restated instructions across SKILL.md files, bloated frequently-loaded files, and internal defects (duplicate headers/numbering, dead refs, dead code). Use when the user says "audit my skills", "some skills look duplicated", "polish/clean up the skill library", "consolidate these skills", or points at a skills/ tree and asks what overlaps. Do NOT use to author one new skill (use write-skill) or to review application source code (use a code-review skill).
+description: Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. Use when cleaning, consolidating, or de-duplicating a skills tree.
 ---
 
 # skill-curator

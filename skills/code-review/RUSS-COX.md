@@ -1,16 +1,9 @@
----
-name: code-review-russ-cox
-description: Review a change or audit existing code through the Russ Cox lens — necessity, layering, minimal seams, error/logging/testing discipline, and anti-bloat. Use when reviewing diffs, new features, or dependency additions, or when asked to "audit this package", "refactor/polish this code", "find design, implementation, or style problems", "do we need this?", or "is this too complex?". Do NOT use for public API shape or product-vs-library tradeoffs (use code-review-mitsuhiko) or invariant/cost honesty (use code-review-burntsushi).
----
-
-# code-review-russ-cox
+# Lens: Russ Cox — necessity, layering, deletion
 
 Judge code by long-term maintenance cost: whether it should exist, whether it sits at the right layer, and whether its seams, errors, tests, and docs would pass the Go team's bar. Two modes — pick by input.
 
 - **Change review** — input is a diff, PR, proposed feature, or new dependency: run the four passes.
 - **Package audit** — input is existing code ("audit", "polish", "refactor", "what's wrong with this package"): read the target in full — doc comments, tests, and imports included — plus a sample of its callers, then walk the six dimensions. End with a refactor plan judged by what it deletes.
-
-State the problem the code solves in one sentence before either mode. If you cannot, ask. In an established codebase, search for existing primitives before judging anything new — the most common finding is a helper, interface, or package that already does this.
 
 ## Change review — four passes
 
@@ -38,12 +31,8 @@ These are principles, not a compliance checklist: translate each into the codeba
 - **Future-self:** understandable during an outage.
 - **Abstraction:** wait for 3 real use cases before generalizing.
 
-## Output contract
+## Output — this lens
 
-- Findings first: `Must fix`, `Consider`, `Open questions`; omit empty sections. No praise unless asked.
-- Prefix change-review findings `[Pass N | file:line]`; audit findings `[Dim N | file:line]`.
-- Each finding names what should not exist, move layers, or be simplified — plus one concrete alternative (sketch the shape, don't just point).
-- Audit mode ends with a **Refactor plan**: steps ordered by payoff, each stating what it lets you delete or simplify. Each step must be independently shippable — reviewable as one PR, tests green at every point; flag any step that changes behavior.
-- Brief `Summary` last.
+Audit mode ends with a **Refactor plan**: steps ordered by payoff, each stating what it lets you delete or simplify. Each step must be independently shippable — reviewable as one PR, tests green at every point; flag any step that changes behavior.
 
-See [REFERENCE.md](REFERENCE.md) for the full philosophy, red-flag catalogs, phrasing patterns, and the oscar-repo exemplars behind each dimension.
+See [RUSS-COX-REFERENCE.md](RUSS-COX-REFERENCE.md) for the full philosophy, red-flag catalogs, and the exemplars behind each dimension.

@@ -1,6 +1,6 @@
 ---
 name: repo-eval
-description: Evaluate a public GitHub repo's health on two axes — momentum (is it growing or past its peak?) and maintenance (is it well run?) — and place it on a quadrant. Use when asked to assess whether a repo is healthy, popular, declining, abandoned, or well-maintained; to vet a dependency, OSS project, agent product, or SaaS-OSS repo; or to compare repos by activity, responsiveness, release cadence, or contributor concentration. Pulls popularity trajectory from the OSS Insight API and maintenance signals via the `gh` CLI. Do NOT use to review code quality of a diff (use a code-review skill).
+description: Evaluate a public GitHub repository's momentum and maintenance health. Use when asked whether a repository is healthy, growing, declining, abandoned, or well maintained, or when vetting dependencies and OSS projects. Do NOT use for code or architecture review.
 ---
 
 # repo-eval

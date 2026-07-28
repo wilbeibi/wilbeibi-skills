@@ -1,4 +1,4 @@
-# code-review-russ-cox — Reference
+# Lens reference: Russ Cox
 
 Full philosophy behind the passes and audit dimensions in `SKILL.md`. Load this to justify a finding, decide an edge case, or explain a principle to the author.
 
@@ -138,19 +138,4 @@ Choose by *whose bug it is*:
 
 ### Commit/PR messages (when polish includes history or PR text)
 
-`affected/package: short lowercase summary`, then a body that argues the change: problem → approach → consequences; evidence, not adjectives (paste real before/after output and measured numbers); deviations from the agreed design as explicit bullets; deletion as a headline benefit; honest hedging with planned follow-ups; issue links.
-
-## Constructive phrasing patterns
-
-- Instead of "This is too complex": "This has N layers of indirection. Could we solve directly: [sketch]. Benefits: [list]. Tradeoffs: [list]."
-- Instead of "Don't add this dependency": "This adds N transitive deps. Alternative: [stdlib / 20 lines]. The simpler approach wins here because [reason]."
-- Instead of "This abstraction is wrong": "We have 1 use case; suggest solving directly now and abstracting when the pattern emerges (3+ uses)."
-- Instead of "Rewrite this": "Current approach: [analysis]. Maintenance implications: [list]. Alternative: [sketch]. Which fits our long-term goals?"
-
-## When to compromise
-
-**Legitimate**: hard deadlines with a documented debt plan; regulatory/compliance requirements; vendor lock-in chosen with eyes open; team-skill constraints paired with training.
-
-**How**: document the decision; write a dated paydown plan; minimize scope; review quarterly.
-
-**Never**: security vulnerabilities, data integrity, silent failures, untested critical paths.
+Judge history and PR text by whether it argues the change rather than labels the diff: `affected/package: short lowercase summary`, then problem → approach → consequences, with evidence instead of adjectives and deletion as a headline benefit. To *write* one rather than review it, use the `write-docs` skill.

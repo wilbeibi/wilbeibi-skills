@@ -1,6 +1,6 @@
 ---
 name: complexity-budget
-description: A gate to run before and after changing existing code, to keep added complexity in line with what the change is actually worth. Use when adding a feature, fixing a bug, or extending code that already exists — especially when the cheap path is to add (a new flag, a new branch, a copy-paste, a parallel code path) instead of folding into what's there. It asks four questions before you edit, then checks your own diff for new duplication and new coupling. Do NOT use for greenfield code with nothing to integrate into, and do NOT treat it as a correctness review of someone else's finished PR (use code-review-russ-cox for a deletion-focused review).
+description: Gate changes to existing code by comparing added complexity with expected value before and after editing. Use when adding features, fixes, flags, branches, abstractions, or parallel paths. Do NOT use for greenfield work or finished-code review (use code-review).
 ---
 
 # complexity-budget

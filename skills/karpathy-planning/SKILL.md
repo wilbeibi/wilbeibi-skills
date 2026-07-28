@@ -1,6 +1,6 @@
 ---
 name: karpathy-planning
-description: A pre-coding planning gate based on Andrej Karpathy's observations about LLM coding pitfalls — surface assumptions, choose the simplest approach, and turn the request into declarative success criteria with a verification loop before writing code. Use when the user says "plan this", "how should I approach X", "make a plan before coding", or before any non-trivial implementation where the requirements or scope are not yet pinned down. Do NOT use for trivial one-line edits, or when the user wants an interactive back-and-forth interrogation (use grill-me) or a complexity-vs-value check on an existing diff (use complexity-budget).
+description: Plan non-trivial coding work by surfacing assumptions, minimizing scope, and defining success criteria and verification. Use when asked to plan or when implementation scope is ambiguous. Do NOT use for interactive interviews (use grill-me) or value-versus-complexity checks on existing code (use complexity-budget).
 ---
 
 # karpathy-planning

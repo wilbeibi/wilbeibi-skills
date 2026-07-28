@@ -1,6 +1,6 @@
 ---
 name: obsidian-capture
-description: Append quick captures — todos with due dates, log lines, learnings, reflections — to the right section of Obsidian daily (DailyPlan/) and weekly (Weekly/) notes via scripts/capture.py. Use when asked to "add a todo", "note this down", "log this", "capture an idea", "due Friday", or to record something fun or a weekly reflection. Do NOT use for searching notes (use obsidian-vault-search) or for creating standalone long-form notes.
+description: Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, or record a weekly reflection. Do NOT use for searching notes (use obsidian-search) or for creating standalone long-form notes.
 ---
 
 # obsidian-capture

@@ -1,6 +1,6 @@
 ---
 name: newcomer-lens-review
-description: Review code from the perspective of a competent engineer who just joined the team — surface missing context, undocumented design rationale, implicit assumptions, and project-specific knowledge that is not evident from the code itself. Use when the user asks for an onboarding-perspective review, mentions newcomer experience, asks about documentation gaps, or wants to know "what would confuse a new hire". Do NOT use for general code review (see code-review-russ-cox or code-review-mitsuhiko) or style nitpicking.
+description: Review code for rationale, domain terms, constraints, and assumptions missing to a newcomer, and produce a documentation backlog. Use when asked for an onboarding review, what would confuse a new hire, what a handover is missing, or which parts of a codebase need documenting first. Do NOT use to find defects (use code-review) or to build your own understanding of unfamiliar code (use grok-repo).
 ---
 
 # newcomer-lens-review
@@ -40,7 +40,7 @@ Review as a competent engineer who just joined: general engineering knowledge, b
 - Anything inferable from immediate surrounding code.
 - Style preferences.
 
-## Output Contract
+## Output contract
 
 - Lead with `Context gaps`, grouped by file/component and ordered by onboarding risk.
 - Each finding names the category: design rationale, domain knowledge, historical context, or system constraint.

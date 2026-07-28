@@ -1,9 +1,4 @@
----
-name: write-comment
-description: Write high-quality code comments by matching the missing information to the right comment type. Use when asked to "write comments", "add comments to code", "how should I comment this", "document this function", "add a docstring", or when generating code that needs inline documentation. Do NOT use for READMEs, prose documentation, or reviewing existing comments — those are write-readme, writing, and code-review tasks respectively.
----
-
-# write-comment
+# Code comments
 
 Comments exist to say what the code *can't*. If the code alone answers the question, you don't need a comment. If it doesn't, identify what's missing and pick the type.
 

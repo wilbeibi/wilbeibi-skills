@@ -1,9 +1,4 @@
----
-name: write-agentsmd
-description: Write or review an AGENTS.md (or CLAUDE.md) operating guide for coding agents against length, structure, and effectiveness conventions from the open AGENTS.md standard. Use when the user asks to "write AGENTS.md", "review AGENTS.md", "audit CLAUDE.md", says an agent guide "feels bloated" or "needs maintenance", or a repo's AGENTS.md has grown past ~150 lines. Do NOT use for general project READMEs (use write-readme) or per-skill SKILL.md files (use write-skill).
----
-
-# write-agentsmd
+# AGENTS.md / CLAUDE.md
 
 AGENTS.md is loaded into every agent session in the repo — its cost compounds across every future conversation. Optimize for token budget and signal density, not completeness.
 
@@ -50,4 +45,4 @@ Any single bullet over ~500 chars (~80–100 words) is a strong extraction candi
 - Every extraction target was actually checked to contain the removed detail — not assumed.
 - Structure still validates (run the project's own frontmatter/linter checker if one exists).
 
-See [REFERENCE.md](REFERENCE.md) for the sourced research behind these rules.
+See [AGENTSMD-REFERENCE.md](AGENTSMD-REFERENCE.md) for the sourced research behind these rules.

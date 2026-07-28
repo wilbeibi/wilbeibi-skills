@@ -1,6 +1,6 @@
 ---
 name: grok-repo
-description: Understand an unfamiliar codebase — either a full briefing (purpose, architecture, seams, design taste, commit-history rationale, standout code) or a scoped dataflow trace of one subsystem. Use when asked to "understand this repo", "explain this codebase", "give me a tour", "how does X work here", "trace how data flows", "where does this value come from", or "why is it designed this way". Do NOT use to assess repo health/popularity (use repo-eval) or to review a diff (use a code-review skill).
+description: Explain an unfamiliar codebase through a repository briefing or scoped dataflow trace. Use when asked for a repo tour, how something works, where a value comes from, or design rationale. Do NOT use for repository health (use repo-eval) or diff review.
 ---
 
 # grok-repo

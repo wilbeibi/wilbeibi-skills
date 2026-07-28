@@ -1,9 +1,4 @@
----
-name: write-cli
-description: Design or review command-line interface shape — flags, subcommands, help, errors, and output contracts — against established CLI conventions (clig.dev, POSIX, GNU). Use when the agent is about to write a CLI tool, add a subcommand, design flag names, review --help output, or evaluate CLI UX. Do NOT use for TUI/full-screen terminal apps, GUI design, or web API design.
----
-
-# write-cli
+# CLI shape
 
 Apply systematic CLI design checks before writing or reviewing a command-line tool. Every rule is a concrete yes/no question — answer it, don't rationalize around it.
 

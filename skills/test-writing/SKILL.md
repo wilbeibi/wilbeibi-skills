@@ -1,6 +1,6 @@
 ---
 name: test-writing
-description: Guide test writing and review with focus on observable behavior over implementation. Use when the user asks to write, review, or refactor tests; debates unit vs integration scope; questions whether to mock a dependency; or asks why tests break on refactor.
+description: Guide tests toward observable behavior instead of implementation. Use when writing or reviewing tests, choosing test scope or mocks, or fixing brittle tests.
 ---
 
 # test-writing

@@ -1,16 +1,4 @@
----
-name: write-readme
-description: >-
-  Write or critique a README for an open-source project (library, CLI tool, or
-  agent tool) with an impatient-reader lens: concrete value first, shortest path
-  to use, no duplicated claims, and reference material only when it earns space.
-  Use when the user asks to "write a README", "draft a README", "review my
-  README", "improve my README", or starts a new lib/tool and needs
-  documentation. Do NOT use for internal service docs, monorepo root READMEs, or
-  non-public projects.
----
-
-# write-readme
+# READMEs
 
 Write READMEs for readers with short attention: what is it, when do I use it, how do I start, what should I not expect.
 
@@ -21,7 +9,7 @@ Write READMEs for readers with short attention: what is it, when do I use it, ho
 3. Cut before adding: remove duplicated inventories, badge noise, marketing claims, and copied `--help` tables.
 4. Draft in inverted-pyramid order: plain value, install, common use, boundaries, then optional reference.
 5. Put the most common invocation or import path in the first 30 lines.
-6. Use [REFERENCE.md](REFERENCE.md) only for section choices, not as a required template.
+6. Use [READMES-REFERENCE.md](READMES-REFERENCE.md) only for section choices, not as a required template.
 7. Final pass: every line must answer a likely reader question or change their next action.
 
 ## Opening Rules
@@ -63,4 +51,4 @@ For CLIs meant to be invoked by coding agents:
 - No marketing adjectives; use numbers, examples, and named evidence.
 - No dramatic connector cadence as a default voice: em dashes, arrows, and "not just X, but Y" need a reason.
 
-See [REFERENCE.md](REFERENCE.md) for templates, badge patterns, screenshot guidance, tone notes, and final-pass prompts.
+See [READMES-REFERENCE.md](READMES-REFERENCE.md) for templates, badge patterns, screenshot guidance, tone notes, and final-pass prompts.

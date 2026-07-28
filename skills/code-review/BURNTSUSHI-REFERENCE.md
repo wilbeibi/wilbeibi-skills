@@ -1,4 +1,4 @@
-# code-review-burntsushi — Axes Reference
+# Lens reference: BurntSushi — Axes
 
 Ten general axes apply to any language. Two Rust-specific axes follow.
 

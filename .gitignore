@@ -2,3 +2,7 @@
 node_modules/
 .env
 __pycache__/
+
+# Local agent installs (host-specific absolute symlinks)
+.claude/
+.codex/

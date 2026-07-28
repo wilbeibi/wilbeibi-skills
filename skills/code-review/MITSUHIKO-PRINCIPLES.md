@@ -1,4 +1,4 @@
-# code-review-mitsuhiko — Principles
+# Lens reference: Mitsuhiko — Principles
 
 The full philosophy behind the checklists in `SKILL.md`. Load this when you need to justify a finding, explain a principle to the author, or decide an edge case.
 

@@ -1,9 +1,4 @@
----
-name: code-review-mitsuhiko
-description: Review code for API shape, error handling, backward compatibility, and product-vs-library fit. Use when reviewing public APIs, library interfaces, error types, dependency choices, or product code being over-engineered, or when deciding between "ship the dumb version" and "design for stability". Do NOT use for deletion-focused or anti-bloat review (use code-review-russ-cox).
----
-
-# code-review-mitsuhiko
+# Lens: Mitsuhiko — product versus library fit
 
 First decide whether this is product code, library code, or mixed. The right review standard changes with that call.
 
@@ -11,7 +6,7 @@ First decide whether this is product code, library code, or mixed. The right rev
 
 1. State `Context call: Product / Library / Mixed`.
 2. Apply the matching lens below, then the cross-cutting checks.
-3. Produce findings first, ordered by severity.
+3. Produce findings using the router's output contract.
 
 ## Product Lens
 
@@ -38,10 +33,8 @@ Flag: breaking changes for minor improvements, string-matched errors, undocument
 - Defaults: safe, unsurprising, and honest about cost?
 - Product/library mismatch: library standards slowing a product, or product habits destabilizing a library?
 
-## Output Contract
+## Output — this lens
 
-- Findings first: `Must fix`, `Consider`, `Open questions`; omit empty sections.
-- Each finding includes `[file:line]`, the context-specific reason, and a concrete next step.
-- Add a brief `Summary` after findings. Do not add praise unless asked.
+Beyond the router's contract: every finding states the context-specific reason — why this matters *given* the product/library call you made in step 1.
 
-See [PRINCIPLES.md](PRINCIPLES.md) for full philosophy and phrasing patterns.
+See [MITSUHIKO-PRINCIPLES.md](MITSUHIKO-PRINCIPLES.md) for the full philosophy and phrasing patterns.

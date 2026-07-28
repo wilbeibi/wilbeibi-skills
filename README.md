@@ -6,28 +6,22 @@ Personal agent skills packaged for `npx skills`.
 
 | Skill | Description |
 |-------|-------------|
-| [obsidian-vault-search](skills/obsidian-vault-search/SKILL.md) | Search an Obsidian vault three-tier: Meilisearch for topic/fuzzy queries, ripgrep for exact matches, date-aware helper for natural-language dates and tasks. |
+| [obsidian-search](skills/obsidian-search/SKILL.md) | Search an Obsidian vault three-tier: Meilisearch for topic/fuzzy queries, ripgrep for exact matches, date-aware helper for natural-language dates and tasks. |
 | [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append quick todos (with due dates), log lines, learnings, and reflections to the right section of Obsidian daily and weekly notes. |
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
-| [code-review-russ-cox](skills/code-review-russ-cox/SKILL.md) | Review a diff or audit an existing package through the Russ Cox lens — necessity, layering, seams, error/logging/testing discipline, anti-bloat. |
-| [code-review-mitsuhiko](skills/code-review-mitsuhiko/SKILL.md) | Review code with pragmatic focus on APIs, dependencies, compatibility, and user value. |
-| [code-review-burntsushi](skills/code-review-burntsushi/SKILL.md) | Review code for honest invariants, error boundaries, cost visibility, and API contracts. |
+| [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). |
 | [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
-| [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design. |
-| [grill-with-docs](skills/grill-with-docs/SKILL.md) | Stress-test a plan interactively and capture resolved terminology or durable decisions in lightweight docs. |
+| [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design, capturing resolved terminology and durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold compact trigger-rich and command-first skills in this repo. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
-| [write-readme](skills/write-readme/SKILL.md) | Write or critique a README for an open-source lib or CLI tool using the inverted-pyramid structure. |
+| [write-docs](skills/write-docs/SKILL.md) | Write or critique the prose that ships with a codebase — READMEs, CLI shape, code comments, AGENTS.md guides, and commit/PR descriptions. |
 | [grok-repo](skills/grok-repo/SKILL.md) | Understand an unfamiliar codebase: a full briefing (purpose, architecture, seams, taste, history, standout code) or a scoped dataflow trace of one subsystem. |
-| [write-agentsmd](skills/write-agentsmd/SKILL.md) | Write or review an AGENTS.md/CLAUDE.md operating guide against length, ordering, and progressive-disclosure conventions from the open AGENTS.md standard. |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |
 | [paper-search](skills/paper-search/SKILL.md) | Find papers across Semantic Scholar, OpenAlex, and arXiv, ranked by impact relative to field and age — so recent work and credible work are told apart from noise. |
 | [ast-grep](skills/ast-grep/SKILL.md) | Write ast-grep rules for structural (AST-based) code search that goes beyond text grep. Adapted from [ast-grep/agent-skill](https://github.com/ast-grep/agent-skill). |
 | [web-recap](skills/web-recap/SKILL.md) | Extract browser history (Chrome, Firefox, Safari, Edge, Brave) to find URLs by topic or get visit stats. Adapted from [robzolkos/web-recap](https://github.com/robzolkos/web-recap). |
-| [write-cli](skills/write-cli/SKILL.md) | Design or review CLI tool shape — flags, subcommands, help, errors, and output contracts — against established conventions. |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Pre-coding planning gate: surface assumptions, pick the simplest approach, and define declarative success criteria with a verification loop. Adapted from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). |
-| [write-comment](skills/write-comment/SKILL.md) | Write high-quality code comments by matching the missing information to the right comment type — function, design, why, teacher, checklist, or guide. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon: one-off `hs -c` Lua for apps, browser tabs, and system toggles, plus authoring persistent automations in ~/.hammerspoon. |
 
 ## Install

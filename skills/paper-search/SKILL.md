@@ -1,6 +1,6 @@
 ---
 name: paper-search
-description: Find research papers on a topic with publication date and quality signals attached, so recent work and credible work can be told apart from noise. Use when asked to "find papers on X", "what's the research on Y", "is there a paper about Z", "what's new in <field> since <date>", "what superseded this paper", or when a claim about AI/ML/systems should be grounded in literature. Do NOT use for general web search (use a web-search skill) or to evaluate a GitHub repo (use repo-eval).
+description: Find and rank research papers by recency and field-adjusted impact. Use when searching literature, recent or superseding work, or evidence for AI/ML/systems claims. Do NOT use for general web search or GitHub repository evaluation.
 ---
 
 # paper-search
