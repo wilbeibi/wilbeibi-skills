@@ -107,7 +107,10 @@ def render_template(text: str, base: dt.date) -> str:
 
 
 def ensure_note(root: Path, path: Path, template_name: str, base: dt.date) -> bool:
-    if path.exists():
+    # Non-empty, not merely existing: clicking a dangling [[2026-W30]] nav link
+    # in Obsidian leaves a 0-byte note, and treating that as "already created"
+    # means the template (and its ## Clips base block) never lands.
+    if path.exists() and path.stat().st_size > 0:
         return False
     tpl = root / "Meta-Obsidian" / "Templates" / template_name
     if not tpl.exists():
