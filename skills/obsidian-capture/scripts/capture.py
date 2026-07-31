@@ -332,9 +332,9 @@ def find_open_todo(root, today, match):
         lines = load(path)
         mask = fence_mask(lines)
         for i, ln in enumerate(lines):
-            if not mask[i] and ln.lstrip().startswith("- [ ]") and match in ln:
+            if not mask[i] and ln.lstrip().startswith("- [ ]") and "#agent-todo" in ln and match in ln:
                 return path, lines, i
-    die(f"no open todo matches {match!r} in DailyPlan/ or Weekly/")
+    die(f"no open #agent-todo matches {match!r} in DailyPlan/ or Weekly/")
 
 
 def cmd_done(args, root, today):
@@ -422,12 +422,12 @@ def main():
     r.add_argument("text", help="the answer")
     r.set_defaults(func=cmd_reflect)
 
-    d = sub.add_parser("done", help="tick the first open todo matching a substring "
+    d = sub.add_parser("done", help="tick the first open #agent-todo matching a substring "
                                     "(today's notes searched first, then all notes)")
     d.add_argument("match")
     d.set_defaults(func=cmd_done)
 
-    a = sub.add_parser("annotate", help="append a sub-bullet under the first matching open todo "
+    a = sub.add_parser("annotate", help="append a sub-bullet under the first matching open #agent-todo "
                                         "(e.g. 'blocked: <question>')")
     a.add_argument("match")
     a.add_argument("text")

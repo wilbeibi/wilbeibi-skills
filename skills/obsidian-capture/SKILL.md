@@ -1,6 +1,6 @@
 ---
 name: obsidian-capture
-description: Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, or record a weekly reflection. Do NOT use for searching notes (use obsidian-search) or for creating standalone long-form notes.
+description: Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes, and run the agent's own #agent-todo queue, via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, record a weekly reflection, or list/close the agent's assigned tasks ("看你的 todo", "干活", "what's on your todo list"). Do NOT use for searching notes (use obsidian-search) or for creating standalone long-form notes.
 ---
 
 # obsidian-capture
@@ -19,8 +19,8 @@ scripts/capture.py learned "TIL 内容"                      # daily 📝 今日
 scripts/capture.py diary "发生的事"                        # daily 📝 今日记 → 新事:
 scripts/capture.py fun "有趣的事"                          # weekly ## Something Fun This Week
 scripts/capture.py reflect "杠杆" "答案全文"               # weekly Reflections, under the Q: matching the substring
-scripts/capture.py done "package 邮件"                     # tick first matching open todo (today's notes first, then all), appends ✅ date
-scripts/capture.py annotate "加 CI" "blocked: 缺权限"      # append a sub-bullet under first matching open todo
+scripts/capture.py done "package 邮件"                     # tick first matching open #agent-todo (today's notes first, then all), appends ✅ date
+scripts/capture.py annotate "加 CI" "blocked: 缺权限"      # append a sub-bullet under first matching open #agent-todo
 
 # agent-owned todos (#agent-todo): captured for a later, possibly weaker, agent to execute cold
 scripts/capture.py todo "给 skills repo 加 CI" --agent \
@@ -33,6 +33,7 @@ scripts/capture.py agenda                                  # list open #agent-to
 
 ## Judgment (the only part the model decides)
 
+- **Plain todos are the human's; `--agent` ones are yours.** `agenda`/`done`/`annotate` only ever match `#agent-todo` lines, so they can't touch a human todo — but never mark one done without checking it against its own `done-when:`.
 - Keep the capture text in the language the user used; don't translate or rephrase.
 - "必须 / must / today's deadline / blocking" → `--must`; otherwise a plain todo.
 - Daily vs weekly: default daily. Use `--weekly` only when the user says weekly / 本周, or the task is week-scoped with no fixed day. A todo due far in the future still goes in **today's** daily — the Tasks plugin finds it by its 📅 date, not by file location.
