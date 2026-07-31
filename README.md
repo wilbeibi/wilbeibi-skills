@@ -2,7 +2,7 @@
 
 > A trillion-parameter brain to wash my digital dishes.
 
-16 agent skills for **Claude Code** and **Codex**: code review, test writing, documentation, pre-coding planning, codebase onboarding, repo health evaluation, research paper search, skill authoring, browser history recall, macOS automation, and Obsidian note capture and search. Each is a single `SKILL.md` your agent loads on demand; install all of them or just one with `npx skills`.
+17 agent skills for **Claude Code** and **Codex**: code review, test writing, documentation, pre-coding planning, codebase onboarding, repo health evaluation, research paper search, skill authoring, browser history recall, macOS automation, and Obsidian note capture and search. Each is a single `SKILL.md` your agent loads on demand; install all of them or just one with `npx skills`.
 
 ```bash
 npx skills add wilbeibi/wilbeibi-skills --skill '*'
@@ -19,6 +19,7 @@ npx skills add wilbeibi/wilbeibi-skills --skill '*'
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). |
 | [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design, capturing resolved terminology and durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
+| [questionnaire](skills/questionnaire/SKILL.md) | Batch a long discussion's open decisions into an offline HTML questionnaire (branching, autosaved drafts) whose answers come back as markdown keyed by stable question ids. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold compact trigger-rich and command-first skills in this repo. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
 | [write-docs](skills/write-docs/SKILL.md) | Write or critique codebase prose — READMEs, developer guides and runbooks, CLI text, comments, agent guides, and commit/PR descriptions — with an advisory clarity checker. |
