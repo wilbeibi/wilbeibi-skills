@@ -1,6 +1,12 @@
 # wilbeibi-skills
 
-Personal agent skills packaged for `npx skills`.
+> A trillion-parameter brain to wash my digital dishes.
+
+16 agent skills for **Claude Code** and **Codex**: code review, test writing, documentation, pre-coding planning, codebase onboarding, repo health evaluation, research paper search, skill authoring, browser history recall, macOS automation, and Obsidian note capture and search. Each is a single `SKILL.md` your agent loads on demand; install all of them or just one with `npx skills`.
+
+```bash
+npx skills add wilbeibi/wilbeibi-skills --skill '*'
+```
 
 ## Skills
 
@@ -15,7 +21,7 @@ Personal agent skills packaged for `npx skills`.
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design, capturing resolved terminology and durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold compact trigger-rich and command-first skills in this repo. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
-| [write-docs](skills/write-docs/SKILL.md) | Write or critique the prose that ships with a codebase — READMEs, CLI shape, code comments, AGENTS.md guides, and commit/PR descriptions. |
+| [write-docs](skills/write-docs/SKILL.md) | Write or critique codebase prose — READMEs, developer guides and runbooks, CLI text, comments, agent guides, and commit/PR descriptions — with an advisory clarity checker. |
 | [grok-repo](skills/grok-repo/SKILL.md) | Understand an unfamiliar codebase: a full briefing (purpose, architecture, seams, taste, history, standout code) or a scoped dataflow trace of one subsystem. |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |
 | [paper-search](skills/paper-search/SKILL.md) | Find papers across Semantic Scholar, OpenAlex, and arXiv, ranked by impact relative to field and age — so recent work and credible work are told apart from noise. |
