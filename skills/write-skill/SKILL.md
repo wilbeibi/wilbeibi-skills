@@ -77,16 +77,34 @@ Delete:
 - Keep the lens, decision order, and output contract.
 - Avoid rigid full templates unless structure is the skill's core value.
 - Findings should lead for review skills; summaries and praise are optional.
-- Split philosophy, examples, and source notes into `REFERENCE.md`.
+- Split philosophy, examples, and source notes into `references/REFERENCE.md`. Keep examples
+  inline when the example *is* the instruction, as in an output-shape skill.
 
-## Portability
+## Targeting
 
-This repo is consumed by multiple agents via `npx skills`. Avoid agent-specific frontmatter such as `allowed-tools:`, hooks, or `context: fork` unless the skill requires that platform and says so in the description.
+Write for Claude Code at full power — its subagents, built-in skills, and tool syntax — not for
+the intersection of every agent. Codex is a secondary consumer; pick per-agent skill sets at
+install time (`npx skills add ... -a claude-code`), never by flattening a skill.
+
+Declare hard requirements instead of avoiding them. `compatibility` (≤500 chars) and
+`allowed-tools` are Agent Skills spec fields, and `metadata` takes arbitrary string keys that
+conforming runtimes ignore when unrecognized. Hooks and `context: fork` are Claude-Code-only and
+absent from the spec, so a skill using them declares:
+
+```yaml
+compatibility: Designed for Claude Code (or similar products)
+```
+
+Cross-skill pointers: a negative one (`Do NOT use for charts (use dataviz)`) degrades harmlessly
+where the named skill is absent; a positive one (`run X first`) dangles, so those must name a
+skill in `skills/`.
 
 ## Final Check
 
 - Name is unique kebab-case.
 - Description has concrete `Use when ...` triggers and needed `Do NOT use ...` boundaries.
-- `SKILL.md` is under ~100 lines, preferably 30-60 for tool wrappers.
+- `SKILL.md` is under ~120 lines, preferably 30-60 for tool wrappers.
 - Helpers are invoked, not duplicated in prose.
+- Positive cross-skill pointers name a skill that exists in `skills/`.
+- Agent- or OS-only requirements are declared in `compatibility:`, not worked around.
 - README has one row.

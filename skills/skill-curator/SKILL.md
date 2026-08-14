@@ -26,7 +26,7 @@ description: Audit a skill library for duplicated guidance, contradictions, bloa
 
 - Read every claimed defect before asserting it — heuristics misfire on code blocks and intentional parallel structures.
 - One owner per capability; the other references it by explicit path.
-- Progressive disclosure: description → SKILL.md (terse) → `references/` (deep). Terseness scales with load frequency.
+- Progressive disclosure: description → SKILL.md (terse) → `references/REFERENCE.md` (deep). Terseness scales with load frequency.
 - Fix the defect only — no adjacent refactoring, no extra cross-links.
 
 ## See also
