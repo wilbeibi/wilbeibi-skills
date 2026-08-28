@@ -29,7 +29,7 @@ Not this skill: design docs, ADRs (use `grill-me`), internal service wikis, or a
 
 ## Clarity modes
 
-- **Strict** — procedures, safety rules, agent workflows, CLI help, and recovery instructions. Put conditions before commands. Use imperative steps, one action per step, direct verbs, and sentences of at most 20 words.
+- **Strict** — procedures, safety rules, agent workflows, CLI help, and recovery instructions. Also any text whose reader cannot ask a follow-up question: tool and function descriptions, error messages, and output another agent or script parses. Put conditions before commands. Use imperative steps, one action per step, direct verbs, simple tenses, and sentences of at most 20 words.
 - **Natural** — README narrative, explanations, comments, and PR rationale. Keep terminology and actors clear, but allow contractions, semicolons, sentence rhythm, and passive voice when the actor is unknown or irrelevant.
 
 Apply modes by content block. A README quickstart can be strict while its motivation remains natural.
@@ -41,6 +41,7 @@ Apply modes by content block. A README quickstart can be strict while its motiva
 - Use evidence instead of quality adjectives. Give the measurement, example, or boundary behind the claim.
 - Use one name for one thing. Do not rotate synonyms unless they identify different concepts.
 - Prefer a direct verb to a noun phrase: “analyze the log,” not “perform an analysis.”
+- Break noun stacks of four or more words: “calibration of the connection resistance,” not “connection resistance calibration procedure.”
 - Say each fact once. Omit template sections that do not change the reader's next action.
 - State unsupported cases and tradeoffs. Simpler wording must not erase precise technical meaning.
 

@@ -78,6 +78,15 @@ PHRASE_RULES = (
     ),
 )
 
+PERFECT_TENSE_RE = re.compile(
+    r"\b(?:has|have|had)\s+(?:already\s+|just\s+|not\s+|never\s+)?"
+    r"(?:been|\w+ed|built|done|found|given|gone|held|kept|known|made|"
+    r"put|run|seen|sent|set|shown|taken|thrown|written)\b",
+    re.IGNORECASE,
+)
+
+MAX_PARAGRAPH_SENTENCES = 6
+
 PASSIVE_RE = re.compile(
     r"\b(?:am|is|are|was|were|be|been|being)\s+"
     r"(?:\w+ly\s+)?(?:\w+ed|built|done|found|given|held|kept|known|made|"
@@ -269,7 +278,18 @@ def lint_text(text: str, mode: str) -> list[Finding]:
     length_severity = "error" if mode == "strict" else "review"
 
     for block_text, line_map in prose_blocks(text):
-        for start, end in sentence_spans(block_text):
+        spans = sentence_spans(block_text)
+        if len(spans) > MAX_PARAGRAPH_SENTENCES:
+            findings.append(
+                Finding(
+                    line_for_offset(line_map, spans[0][0]),
+                    "paragraph-length",
+                    "review",
+                    f"{len(spans)} sentences in one paragraph; split by topic "
+                    f"(aim for at most {MAX_PARAGRAPH_SENTENCES})",
+                )
+            )
+        for start, end in spans:
             sentence = block_text[start:end]
             count = len(WORD_RE.findall(sentence))
             if count > max_words:
@@ -299,6 +319,16 @@ def lint_text(text: str, mode: str) -> list[Finding]:
                         "contraction",
                         "error",
                         "expand contractions in strict procedural text",
+                    )
+                )
+            for match in PERFECT_TENSE_RE.finditer(block_text):
+                findings.append(
+                    Finding(
+                        line_for_offset(line_map, match.start()),
+                        "perfect-tense",
+                        "review",
+                        "prefer a simple tense: “the service stopped”, "
+                        "not “the service has stopped”",
                     )
                 )
 

@@ -43,10 +43,36 @@ class ProseLintBehaviorTests(unittest.TestCase):
             {(item["line"], item["rule"], item["severity"]) for item in findings},
             {
                 (1, "sentence-length", "error"),
+                (1, "perfect-tense", "review"),
                 (2, "contraction", "error"),
                 (2, "semicolon", "error"),
             },
         )
+
+    def test_strict_mode_reviews_perfect_tense_but_natural_mode_allows_it(self):
+        text = "The installer has finished. Restart the service.\n"
+
+        strict = json.loads(run_lint(text).stdout)["files"][0]["findings"]
+        natural = json.loads(run_lint(text, mode="natural").stdout)["files"][0]["findings"]
+
+        self.assertEqual(
+            [(item["rule"], item["severity"]) for item in strict],
+            [("perfect-tense", "review")],
+        )
+        self.assertEqual(natural, [])
+
+    def test_long_paragraph_is_a_review_finding_in_both_modes(self):
+        text = " ".join(["Open the panel."] * 7) + "\n"
+
+        for mode in ("strict", "natural"):
+            result = run_lint(text, mode=mode)
+            findings = json.loads(result.stdout)["files"][0]["findings"]
+
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(
+                [(item["rule"], item["severity"]) for item in findings],
+                [("paragraph-length", "review")],
+            )
 
     def test_natural_mode_allows_contractions_but_reviews_passive_voice(self):
         result = run_lint(

@@ -9,9 +9,13 @@ This skill borrows a small, useful subset of ASD-STE100 without turning all deve
 - one technical name for one item and consistent wording for repeated actions;
 - active voice unless the actor is unknown;
 - direct verbs for actions;
+- simple verb tenses — no present perfect or other compound constructions;
 - conditions before commands and one instruction per procedural sentence;
 - 20-word procedural sentences and 25-word descriptive sentences;
-- one topic per paragraph.
+- noun clusters capped at three words;
+- one topic per paragraph, at most about six sentences.
+
+STE's original reader — a technician working from a manual with no author to call — maps directly onto an agent or script parsing text with no back-channel. That is why strict mode also covers tool descriptions, error messages, and machine-parsed output, not only human-facing procedures.
 
 These constraints help most where ambiguity changes an action. A 1996 study of 175 aircraft maintenance technicians found significantly better comprehension for Simplified English, especially on difficult workcards and for non-native speakers. A 1998 study of 41 non-native students found no significant overall difference, but a trend favoring readers with lower English proficiency. The evidence supports targeted use, not a universal prose style.
 
