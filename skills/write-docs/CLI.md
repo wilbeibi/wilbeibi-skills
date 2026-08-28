@@ -2,6 +2,8 @@
 
 Apply systematic CLI design checks before writing or reviewing a command-line tool. Every rule is a concrete yes/no question — answer it, don't rationalize around it.
 
+Inspect the parser, current `--help`, exit behavior, and output implementation before changing user-facing text. Use **strict** mode for help, errors, prompts, and recovery instructions.
+
 ## Signature Shape
 
 1. **Flags over positional args.** Max 2 positional args, and only when the action is primary and memorable (`cp <src> <dst>`). Everything else gets `--long-name`.
@@ -32,15 +34,16 @@ Apply systematic CLI design checks before writing or reviewing a command-line to
 
 15. **Every error says what happened AND what to do next.** Not "permission denied" — "permission denied: cannot write to config.yaml. Run with `--config /path/to/writable/file` or use `chmod +w config.yaml`."
 16. **Never print a raw stack trace to users.** Catch expected errors and rewrite them. Unexpected errors get a debug log file path plus a bug report URL.
+17. **Do not blame the user.** Name the invalid value or failed condition. Passive voice is acceptable when naming an actor would be irrelevant or accusatory.
 
 ## Safety & Scriptability
 
-17. **No secrets in flags.** `--password`, `--token`, `--api-key` leak to `ps` and shell history. Use `--password-file`, environment variables, or stdin.
-18. **Every prompt has a flag fallback.** If the tool prompts for input interactively, provide `--name`, `--yes`, or `--confirm` so scripts don't hang.
-19. **Confirm before destructive actions.** Require `--force` or interactive confirmation for anything that can't be undone. For severe destruction (deleting a server), require typing the resource name.
-20. **Exit 0 on success, non-zero on failure.** Map distinct non-zero codes to distinct failure modes so scripts can branch on them.
+18. **No secrets in flags.** `--password`, `--token`, `--api-key` leak to `ps` and shell history. Use `--password-file`, environment variables, or stdin.
+19. **Every prompt has a flag fallback.** If the tool prompts for input interactively, provide `--name`, `--yes`, or `--confirm` so scripts don't hang.
+20. **Confirm before destructive actions.** Require `--force` or interactive confirmation for anything that can't be undone. For severe destruction (deleting a server), require typing the resource name.
+21. **Exit 0 on success, non-zero on failure.** Map distinct non-zero codes to distinct failure modes so scripts can branch on them.
 
 ## Function vs Form
 
-21. **Make the default the right thing for 90% of users.** If users need a flag for the common case, the default is wrong.
-22. **If an action spans multiple underlying operations, make it one command.** `merge` is one command, not `create-merge-request` + `approve` + `apply`. The user's intent is "merge this" — match it.
+22. **Make the default the right thing for 90% of users.** If users need a flag for the common case, the default is wrong.
+23. **If an action spans multiple underlying operations, make it one command.** `merge` is one command, not `create-merge-request` + `approve` + `apply`. The user's intent is "merge this" — match it.

@@ -2,6 +2,8 @@
 
 AGENTS.md is loaded into every agent session in the repo — its cost compounds across every future conversation. Optimize for token budget and signal density, not completeness.
 
+Use **strict** mode for prohibitions and procedures. Use **natural** mode for short rationale that explains why a surprising rule exists.
+
 ## Workflow
 
 1. Measure the current file: `wc -l` and a char/4 token estimate (see Bloat Scan below). Flag anything past ~150 lines / ~2500 tokens.

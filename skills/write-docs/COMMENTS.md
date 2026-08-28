@@ -2,6 +2,8 @@
 
 Comments exist to say what the code *can't*. If the code alone answers the question, you don't need a comment. If it doesn't, identify what's missing and pick the type.
 
+Read the surrounding implementation and callers before writing. Preserve exact domain terms and identifiers. Use **natural** mode for rationale; use short, contract-like sentences for API guarantees and warnings.
+
 ## The litmus test
 
 Before writing: **can the reader understand this without the comment?** If yes → delete the comment, improve the name instead. If no → identify the gap below and fill it.

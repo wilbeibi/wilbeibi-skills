@@ -4,13 +4,15 @@ Write READMEs for readers with short attention: what is it, when do I use it, ho
 
 ## Workflow
 
-1. Gather context: problem solved, target audience, current alternatives, sharpest value/proof, and non-goals.
-2. Classify once: library, CLI/tool, or agent tool. Ask if unclear.
-3. Cut before adding: remove duplicated inventories, badge noise, marketing claims, and copied `--help` tables.
-4. Draft in inverted-pyramid order: plain value, install, common use, boundaries, then optional reference.
-5. Put the most common invocation or import path in the first 30 lines.
-6. Use [READMES-REFERENCE.md](READMES-REFERENCE.md) only for section choices, not as a required template.
-7. Final pass: every line must answer a likely reader question or change their next action.
+1. Verify the install command, common invocation or import, output, supported versions, and limitations against the code and tests.
+2. Gather context: problem solved, target audience, current alternatives, sharpest value/proof, and non-goals.
+3. Classify once: library, CLI/tool, or agent tool. Ask if unclear.
+4. Cut before adding: remove duplicated inventories, badge noise, marketing claims, and copied `--help` tables.
+5. Draft in inverted-pyramid order: plain value, install, common use, boundaries, then optional reference.
+6. Put the most common invocation or import path in the first 30 lines.
+7. Use **strict** mode for install and quickstart steps; use **natural** mode for motivation and explanation.
+8. Use [READMES-REFERENCE.md](READMES-REFERENCE.md) only for section choices, not as a required template.
+9. Final pass: every line must answer a likely reader question or change their next action.
 
 ## Opening Rules
 

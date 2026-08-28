@@ -2,6 +2,8 @@
 
 A commit message is not a label for the diff — the diff already says what changed. It exists to answer the question a maintainer will have in two years: *why does this code look like this?* Write for the reader running `git log` during an outage.
 
+Read the complete diff and verification output before drafting. Use **natural** mode: clarity and consistent terminology matter, but a mechanical procedural voice does not.
+
 ## Subject line
 
 `affected/package: short lowercase summary`

@@ -1,6 +1,6 @@
 ---
 name: write-docs
-description: Write or critique the prose that ships with a codebase — READMEs, CLI help and flag design, code comments and docstrings, AGENTS.md/CLAUDE.md agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing any of these; not for design docs or internal wikis.
+description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for design docs or internal wikis.
 ---
 
 # write-docs
@@ -10,6 +10,7 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 | Writing… | Read | Reader you are serving |
 |---|---|---|
 | A README for a public lib, CLI, or agent tool | [READMES.md](READMES.md) | someone deciding in 30 seconds whether to use this |
+| A developer guide, tutorial, runbook, migration, or deprecation | [GUIDES.md](GUIDES.md) | someone trying to complete a task without guessing |
 | CLI flags, subcommands, `--help`, error text, output contracts | [CLI.md](CLI.md) | someone typing at a prompt, and the script that wraps them |
 | Code comments, docstrings, inline rationale | [COMMENTS.md](COMMENTS.md) | the maintainer reading this during an outage |
 | `AGENTS.md` / `CLAUDE.md` operating guides | [AGENTSMD.md](AGENTSMD.md) | an agent with no memory of your project |
@@ -17,17 +18,41 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 
 Not this skill: design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
 
-## What every one of them owes the reader
+## Workflow
 
-These hold regardless of artifact. The lens files add the conventions specific to each.
+1. Read the implementation, schema, tests, `--help`, or diff that establishes the facts.
+2. Name the reader and the action this document must enable.
+3. Choose one canonical term for each repeated concept. Preserve exact API names and identifiers.
+4. Draft through the selected artifact lens.
+5. Check that every claim, command, caveat, and boundary still matches the source.
+6. Apply the clarity mode below, then run the checker. Treat heuristic findings as questions, not automatic edits.
 
-- **Name the reader before the first sentence.** Every rule below is downstream of who is reading and what they came for. A README written for a contributor and a README written for a user are different documents.
-- **Lead with what they came for.** Value and shortest path first; provenance, philosophy, and history later or not at all.
-- **Evidence, not adjectives.** "Fast," "clean," "robust," and "simple" are claims the reader cannot check. Replace each with the number, the benchmark, the before/after, or delete it.
-- **Say each thing once.** Repetition across sections is the most common defect in all five artifacts — it signals to the reader that nothing here is load-bearing.
-- **Earn every section.** A heading that exists because the template had one costs the reader a scroll and buys nothing. Omit it.
-- **State what is missing.** Known gaps, unsupported cases, and planned follow-ups read as competence; discovering them later reads as a bug.
+## Clarity modes
+
+- **Strict** — procedures, safety rules, agent workflows, CLI help, and recovery instructions. Put conditions before commands. Use imperative steps, one action per step, direct verbs, and sentences of at most 20 words.
+- **Natural** — README narrative, explanations, comments, and PR rationale. Keep terminology and actors clear, but allow contractions, semicolons, sentence rhythm, and passive voice when the actor is unknown or irrelevant.
+
+Apply modes by content block. A README quickstart can be strict while its motivation remains natural.
+
+## Shared rules
+
+- Lead with the reader's goal and shortest path. Put provenance and history later or omit them.
+- Be genuine. Write as a maintainer helping a reader, not as a product sheet imitating confidence.
+- Use evidence instead of quality adjectives. Give the measurement, example, or boundary behind the claim.
+- Use one name for one thing. Do not rotate synonyms unless they identify different concepts.
+- Prefer a direct verb to a noun phrase: “analyze the log,” not “perform an analysis.”
+- Say each fact once. Omit template sections that do not change the reader's next action.
+- State unsupported cases and tradeoffs. Simpler wording must not erase precise technical meaning.
+
+## Check the draft
+
+```bash
+python3 scripts/prose_lint.py --mode strict <path>
+python3 scripts/prose_lint.py --mode natural <path>
+```
+
+Use `-` for stdin and `--json` for structured findings. Exit 1 means strict errors; review-only findings return 0. Add `<!-- prose-lint-ignore -->` to ignore one line. The checker cannot detect synonym rotation without project context, so check terminology manually. This is not an STE certification or a substitute for factual review. See [CLARITY-REFERENCE.md](CLARITY-REFERENCE.md) for rationale and sources.
 
 ## Reviewing rather than writing
 
-Same lens, inverted: read the artifact against its file's conventions, then report what the target reader cannot get from it and what they are made to read twice. Lead with the defect, not with praise.
+Same lens, inverted: verify the artifact against its source, then report what the target reader cannot do, cannot trust, or must read twice. Lead with the defect and its location, not with praise.
