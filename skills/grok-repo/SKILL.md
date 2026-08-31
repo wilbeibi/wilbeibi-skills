@@ -33,8 +33,15 @@ Reconstruct one feature or decision, not the repository's entire chronology:
 2. **Find its introduction** — use `git log -S '<literal>'` for appearance/disappearance,
    `git log -G '<regex>'` for matching changed lines, and `--follow` for renamed files. Try old names.
 3. **Read commits, not just subjects** — `git show` the introduction and its parent. Bodies,
-   tests, deleted code, issue/PR references, and nearby fixes are evidence; diffs alone imply.
-4. **Trace the arc** — inspect follow-up fixes, refactors, reverts, and blame on surviving lines.
+   tests, deleted code, and nearby fixes are evidence; diffs alone imply.
+4. **Pull the review thread** — the argument for a change usually outlives the commit message
+   in its PR. Recover the number from the merge that carried the commit, then read the
+   discussion, not just the description:
+   ```bash
+   git log --merges --ancestry-path --oneline <sha>..HEAD | tail -1
+   gh pr view <n> --comments        # gh issue view <n> --comments for a linked issue
+   ```
+5. **Trace the arc** — inspect follow-up fixes, refactors, reverts, and blame on surviving lines.
 
 Lead with **before → pressure/evidence → introduction → corrections/reversals → current form**.
 Cite SHA + path per stage; close with supported rationale, rejected alternatives, unresolved
@@ -59,15 +66,8 @@ Work top-down. On large repos, sample representative components and say what you
 
 ## Git archaeology
 
-Resolve `scripts/archaeology.sh` relative to this `SKILL.md`, then run:
-
 ```bash
-bash <skill-dir>/scripts/archaeology.sh [repo-dir]  # history digest and reading candidates
-```
-
-Then drill into what the digest surfaces:
-
-```bash
+scripts/archaeology.sh [repo-dir]         # digest first, then drill into what it surfaces
 git show --stat <sha>                     # read the big commits' messages in full
 git log --follow --oneline -- <hot-file>  # evolution of a load-bearing file
 git log -S '<symbol>' --oneline           # when/why a concept appeared or died

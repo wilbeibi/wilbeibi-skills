@@ -5,6 +5,11 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 fixture_dir=$(mktemp -d)
 trap 'rm -rf -- "$fixture_dir"' EXIT
 
+# Isolate from the developer's git setup: a global commit.gpgsign, a hooksPath,
+# or GIT_AUTHOR_* in the environment would break the fixture before any assertion.
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
+unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+
 git -C "$fixture_dir" init -q
 git -C "$fixture_dir" config user.name Alice
 git -C "$fixture_dir" config user.email alice@example.test
@@ -23,6 +28,14 @@ git -C "$fixture_dir" config user.email bob@example.test
 printf 'repaired\n' >>"$fixture_dir/current.txt"
 git -C "$fixture_dir" add current.txt
 git -C "$fixture_dir" commit -qm 'fix: repair current behavior'
+
+printf 'crash\n' >"$fixture_dir/bug-report.txt"
+git -C "$fixture_dir" add bug-report.txt
+git -C "$fixture_dir" commit -qm 'Bug: crash on empty input'
+
+printf 'migration\n' >"$fixture_dir/bug-tracker.txt"
+git -C "$fixture_dir" add bug-tracker.txt
+git -C "$fixture_dir" commit -qm 'Bug tracker migration'
 
 git -C "$fixture_dir" rm -q deleted.txt
 git -C "$fixture_dir" commit -qm 'Remove temporary file'
@@ -55,7 +68,9 @@ assert_contains "$authors" 'Bob'
 assert_contains "$hot" 'current.txt'
 assert_omits "$hot" 'deleted.txt'
 assert_contains "$fixes" 'current.txt'
+assert_contains "$fixes" 'bug-report.txt'
 assert_omits "$fixes" 'not-a-fix.txt'
+assert_omits "$fixes" 'bug-tracker.txt'
 assert_contains "$reverts" 'Revert broken direction'
 assert_omits "$reverts" 'Discuss fix-prone files and reverts'
 

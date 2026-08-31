@@ -33,7 +33,9 @@ awk '
     NR == FNR { current[$0] = 1; next }
     /^@@SUBJECT@@/ {
       subject = tolower(substr($0, 12))
-      keep = subject ~ /^(fix|bugfix)(\([^)]*\))?!?([:[:space:]])/ || subject ~ /(^|[^[:alnum:]_])(fixed|fixes)([^[:alnum:]_]|$)/
+      keep = subject ~ /^(fix|fixes|fixed|bugfix|hotfix|repair|repairs|correct|corrects)(\([^)]*\))?!?([:[:space:]])/ ||
+             subject ~ /^bug(\([^)]*\))?!?:/ ||
+             subject ~ /(^|[^[:alnum:]_])(fixed|fixes|bugfix|hotfix)([^[:alnum:]_]|$)/
       next
     }
     keep && current[$0] { touches[$0]++ }
