@@ -23,3 +23,6 @@ jobs:
 
       - name: Test prose checker
         run: python3 skills/write-docs/scripts/test_prose_lint.py
+
+      - name: Test repository archaeology report
+        run: bash skills/grok-repo/scripts/test_archaeology.sh

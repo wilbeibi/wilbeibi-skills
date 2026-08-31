@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # archaeology.sh [repo-dir] — one-shot git history digest for understanding a codebase.
-# Prints: founding commits, recent direction, authors, hot (most-churned) files,
-# fix-prone files, reverts, and the largest commits by lines touched.
+# Prints: founding commits, recent direction, authors, frequently touched current files,
+# files touched by fix commits, reverts, and the largest commits by lines touched.
 # Read-only; stdlib git only.
 # No pipefail: every pipeline ends in head/sort/cut, and upstream git/grep
 # legitimately exit non-zero on SIGPIPE or empty match sets.
@@ -17,19 +17,38 @@ git log --oneline --reverse | head -15
 section "RECENT DIRECTION (last 30, no merges)"
 git log --oneline --no-merges | head -30
 
-section "AUTHORS (bus factor)"
-git shortlog -sn --no-merges | head -12
+section "COMMIT AUTHORS (activity distribution, not bus factor)"
+git shortlog -sn --no-merges HEAD | head -12
 
-section "HOT FILES (most-churned = load-bearing; blame-worthy)"
-git log --no-merges --name-only --pretty=format: \
-  | grep -v '^$' | sort | uniq -c | sort -rn | head -20
+section "MOST-TOUCHED CURRENT FILES (reading candidates, not line churn)"
+awk '
+    NR == FNR { current[$0] = 1; next }
+    current[$0] { touches[$0]++ }
+    END { for (path in touches) print touches[path], path }
+  ' <(git ls-files) <(git log --no-merges --name-only --pretty=format:) \
+  | sort -rn | head -20
 
-section "FIX-PRONE FILES (named in fix/bug commits — where invariants bite)"
-git log --no-merges -i -E --grep='fix|bug|regress' --name-only --pretty=format: \
-  | grep -v '^$' | sort | uniq -c | sort -rn | head -15
+section "CURRENT FILES TOUCHED BY FIX COMMITS (investigation candidates)"
+awk '
+    NR == FNR { current[$0] = 1; next }
+    /^@@SUBJECT@@/ {
+      subject = tolower(substr($0, 12))
+      keep = subject ~ /^(fix|bugfix)(\([^)]*\))?!?([:[:space:]])/ || subject ~ /(^|[^[:alnum:]_])(fixed|fixes)([^[:alnum:]_]|$)/
+      next
+    }
+    keep && current[$0] { touches[$0]++ }
+    END { for (path in touches) print touches[path], path }
+  ' <(git ls-files) <(git log --no-merges --format='@@SUBJECT@@%s' --name-only) \
+  | sort -rn | head -15
 
-section "ABANDONED DIRECTIONS (reverts/rollbacks — designs that didn't survive)"
-git log --oneline --no-merges -i -E --grep='revert|roll ?back' | head -10
+section "REVERT/ROLLBACK SUBJECTS (possible abandoned directions)"
+git log --no-merges --format='%h%x09%s' \
+  | awk -F '\t' '
+      {
+        subject = tolower($2)
+        if (subject ~ /^(revert(ed|s|ing)?|roll[ -]?back)([^[:alnum:]_]|$)/) print
+      }' \
+  | head -10
 
 section "BIGGEST COMMITS (by lines touched — likely rewrites/redesigns)"
 git log --no-merges --pretty='%h|%ad|%s' --date=short --shortstat \
