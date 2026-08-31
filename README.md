@@ -17,7 +17,7 @@ npx skills add wilbeibi/wilbeibi-skills --skill '*'
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). |
-| [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: added complexity must justify declared marginal value, before and after the edit. |
+| [complexity-budget](skills/complexity-budget/SKILL.md) | Gate a change to an existing codebase: which layer owns it, then whether the complexity it adds is worth what it buys — before and after the edit. |
 | [grill-me](skills/grill-me/SKILL.md) | Relentlessly interview the user one question at a time to stress-test a plan or design, capturing resolved terminology and durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
 | [questionnaire](skills/questionnaire/SKILL.md) | Batch a long discussion's open decisions into an offline HTML questionnaire (branching, autosaved drafts) whose answers come back as markdown keyed by stable question ids. |
 | [write-skill](skills/write-skill/SKILL.md) | Scaffold compact trigger-rich and command-first skills in this repo. |
