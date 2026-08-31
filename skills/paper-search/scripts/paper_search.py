@@ -47,9 +47,26 @@ TOP_NAME = re.compile(
     r"machine learning research|very large data bases|management of data|"
     r"knowledge discovery and data mining|research and development in information retrieval|"
     r"computer and communications security|usenix (annual technical|security)|"
+    r"symposium on security and privacy|"
+    r"file and storage technologies|principles of distributed computing|"
+    r"transactions on computer systems|innovative data systems research|"
+    r"internet measurement conference|emerging networking experiments|"
+    r"high performance computing, networking, storage|"
+    r"principles and practice of parallel programming|"
+    r"dependable systems and networks|"
     r"international joint conference on artificial|"
+    # AI / agents. AAMAS is filed under its non-official name in OpenAlex.
+    r"adaptive agents and multi|autonomous agents and multiagent|"
+    r"automated planning and scheduling|conference on robot learning|"
+    r"robotics: science and systems|robotics and automation|"
+    r"artificial intelligence and statistics|conference on learning theory|"
+    r"uncertainty in artificial intelligence|"
+    r"pattern analysis and machine intelligence|"
+    r"acm web conference|the web conference|"
     r"neurips|iclr|icml|acl|emnlp|naacl|cvpr|iccv|eccv|aaai|ijcai|colm|tmlr|jmlr|"
+    r"aamas|icaps|corl|aistats|uai|tpami|"
     r"osdi|sosp|nsdi|sigcomm|eurosys|mlsys|asplos|isca|micro|hpca|socc|"
+    r"podc|cidr|conext|ppopp|"
     r"vldb|sigmod|icde|kdd|sigir|pldi|popl|oopsla|icse|ndss)\b",
     re.I,
 )
