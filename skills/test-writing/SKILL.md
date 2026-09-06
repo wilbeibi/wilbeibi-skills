@@ -7,20 +7,21 @@ description: Write and repair tests that verify observable behavior, not impleme
 
 Test behavior through the widest boundary that stays hermetic and cheap to set up.
 
-You are usually the one writing these tests, and you have specific habits that produce green suites with no protective value. Correct them first; the craft guidance below is downstream of that.
+Choose verification proportional to the change and complete the project's required checks.
+Do not expand production scope merely to follow a preferred testing style.
 
 ## Habits to correct
 
 - **Writing the test from the code you just wrote.** Reading the implementation and asserting what it does bakes in its bugs. Derive expected values from the requirement and compute them by hand. If you cannot state the expected answer without running the code, you do not understand the behavior well enough to test it yet.
 - **Copying actual output into expected.** Running the test, seeing it fail, and pasting the actual value produces a recording, not a test. Same for widening a tolerance until it passes.
 - **Mirroring code structure.** One test file per source file and one test per public method is a unit-of-*code* suite. Test units of *behavior*; how many classes implement one is irrelevant.
-- **Mocking by default.** Mocks dominate training data and make things pass locally. If a mock is the only way to test something, the design is the problem, not the test.
+- **Mocking by default.** Prefer real local dependencies when cheap and deterministic. Use a fake or mock at external boundaries when it gives a reliable signal; its presence alone does not justify a redesign.
 - **Repairing the test instead of the code.** A failing test is a hypothesis about the code until proven otherwise. Never weaken an assertion, add a mock, or skip a test to reach green. Changing a test and the code it covers in one commit needs a stated reason why both were wrong.
 - **Mutating the environment to get green.** Seeding a row by hand, flipping a flag, restarting a service, or draining a queue is the deployment-tier version of weakening an assertion — it passes, nothing is fixed, and the shared state has drifted for everyone else.
 - **Debugging against a shared environment by trial and error.** A red run there is ambiguous by construction: your change, someone else's, stale data, or a broken env. Reproduce it locally in a hermetic test first; if you cannot, say so rather than guessing.
 - **Blind-accepting snapshots.** Running the update mode without reading the diff turns the expect-test loop into an auto-approval loop. Treat an unreviewed snapshot update as an untested change.
 - **Generating volume.** Cheap tests become near-duplicates that break together and bury the one real failure. Coverage percentage and test count are not goals.
-- **Making tests "robust."** try/except, conditionals, retries, and sleeps inside a test make it unable to fail. Let it fail loudly and precisely.
+- **Hiding failures.** Avoid retries or exception handling that turn a broken behavior green. Bounded waits and timeouts are appropriate for asynchronous behavior when failures remain clear.
 - **Testing the framework.** Asserting that the ORM saves or the stdlib sorts tests someone else's code.
 
 In an agentic loop the suite is not a safety net — it is the acceptance criteria being optimized against. A tautological suite does not merely miss bugs, it steers the work wrong.
@@ -44,15 +45,15 @@ Widen the boundary until setup gets expensive or the test stops being hermetic, 
 
 ## Rules
 
-- Never let a test's result depend on another system being correct. That test cannot tell you whether you broke something, and it is the one thing every serious source agrees to minimize.
+- Keep routine tests independent of shared external services. Use explicitly scoped integration or end-to-end checks when verifying a real external contract is the task; report environment failures separately.
 - A failure must localize the defect. A red result that only says "something in the system is wrong" is nearly worthless in a loop, because the next step is a guess.
 - One test = one scenario a domain expert would recognize. Name it for the behavior, not the method.
 - Prefer output-based tests, then state-based; use communication mocks only for compatibility-sensitive external calls.
-- Mock unmanaged dependencies: SMTP, queues, third-party APIs. Do not mock managed ones — your DB, filesystem, in-process collaborators.
-- Never mock time; inject a clock. Never spawn work you cannot await — fire-and-forget is untestable from the outside and no layer above can fix it.
+- Prefer fakes for unmanaged dependencies and real local databases/filesystems where practical. Match the boundary to the behavior under test.
+- Prefer an injected clock or the project's established fake-timer mechanism for time-dependent behavior. Await asynchronous work or observe its completion through a bounded public signal.
 - Arrange, Act, Assert. Keep Act to one operation. Assert narrowly, so a failure names one cause.
 - Keep setup scoped to the test that needs it. Shared class-level fixtures tax every individual test run, which is how you debug.
-- To check something the output does not expose — a cache hit, which branch ran, that a fallback did *not* fire — add an observability point (log line, event, counter) and assert on that. Do not reach into internals.
+- Prefer existing public observability for behavior such as cache hits or fallback use. Add instrumentation only when the requested contract needs it, not merely to assert an implementation branch.
 
 ## Red Flags
 
@@ -61,7 +62,7 @@ Widen the boundary until setup gets expensive or the test stops being hermetic, 
 - Test breaks on refactor because it checks internals, private methods, call order, or class layout.
 - Passing requires several services running, or a shared environment to be healthy.
 - Database/filesystem behavior mocked away.
-- Conditionals, loops, sleeps, or timeouts inside the test.
+- Unbounded sleeps/retries or conditionals that suppress failures.
 - A test changed in the same commit as the code it covers, with no explanation.
 
 ## Quality Bar

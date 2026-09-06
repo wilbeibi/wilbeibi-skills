@@ -1,5 +1,6 @@
 ---
 name: grill-me
+disable-model-invocation: true
 description: Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. Use when asked to "grill me," stress-test a design, or challenge assumptions before implementation.
 ---
 

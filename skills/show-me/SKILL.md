@@ -1,6 +1,6 @@
 ---
 name: show-me
-description: Answer with a compact visual — call tree, component tree, file tree, pseudocode, type signature, diff, or Mermaid — instead of a wall of prose. Use when the user says "show me", "draw", "sketch", "diagram", "visualize", or asks how something is wired, what shape an API should take, or what a change would look like. Do NOT use for whole-repo briefings (use grok-repo) or for charts and dashboards (use dataviz).
+description: Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. Use when a visual clarifies those relationships; whole-repo briefings belong to grok-repo.
 ---
 
 # show-me
@@ -23,16 +23,10 @@ One view per question; two if a second genuinely adds an axis. Never all of them
 
 ## Render target decides the format
 
-Terminals do not draw Mermaid — a ```mermaid block in a chat reply is source code the user
-has to compile in their head. ASCII trees render everywhere.
-
-- **Reply in the terminal** → indentation and box-drawing trees, pseudocode, diffs.
-- **Output lands in a file that renders** — Obsidian note, GitHub PR or issue, markdown doc →
-  Mermaid is worth it. Say where it will render.
-- **HTML** is the last resort, for layout, spatial comparison, or an interactive explainer.
-  Match the product's colors, type, and spacing; use real labels and real data. Write it
-  outside the project tree (`$TMPDIR`) unless the user asks to keep it, then open it:
-  `open $TMPDIR/show-me-<topic>.html`.
+- Use trees, pseudocode, or diffs in plain terminals. Use Mermaid when the actual destination renders it.
+- Use an interactive visualization or self-contained HTML when interaction or spatial layout adds value.
+  Follow the host's output-directory convention and return a link. Open the file only when requested,
+  using the available platform mechanism; do not assume macOS or a graphical session.
 
 ## Examples
 

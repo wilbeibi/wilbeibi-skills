@@ -82,18 +82,19 @@ Delete:
 
 ## Targeting
 
-Write for Claude Code at full power — its subagents, built-in skills, and tool syntax — not for
-the intersection of every agent. Codex is a secondary consumer; pick per-agent skill sets at
-install time (`npx skills add ... -a claude-code`), never by flattening a skill.
+Shared skills target Codex, Claude Code, and Pi. Keep task knowledge, acceptance criteria,
+and executable helpers shared. Prefer existing CLIs for repeatable operations.
+Isolate harness-specific behavior only where required, and declare its dependency explicitly.
+Do not prescribe another harness's tool names, subagent APIs, or compaction mechanism.
 
-Declare hard requirements instead of avoiding them. `compatibility` (≤500 chars) and
-`allowed-tools` are Agent Skills spec fields, and `metadata` takes arbitrary string keys that
-conforming runtimes ignore when unrecognized. Hooks and `context: fork` are Claude-Code-only and
-absent from the spec, so a skill using them declares:
+Keep names/descriptions brief and task-specific. Model-specific corrections belong in local
+settings or a relevant reference, supported by an observed failure rather than a universal rule.
+Use detailed sequences where order or safety matters; otherwise describe the outcome and boundaries.
 
-```yaml
-compatibility: Designed for Claude Code (or similar products)
-```
+When the user chooses explicit-only activation, use `disable-model-invocation: true` in frontmatter
+for Claude/Pi and `policy.allow_implicit_invocation: false` in `agents/openai.yaml` for Codex.
+Preserve existing metadata and local overrides. Invocation controls do not grant action permissions.
+Keep automatically useful operational skills discoverable; require approval at the actual restricted action.
 
 Cross-skill pointers: a negative one (`Do NOT use for charts (use dataviz)`) degrades harmlessly
 where the named skill is absent; a positive one (`run X first`) dangles, so those must name a
@@ -107,4 +108,4 @@ skill in `skills/`.
 - Helpers are invoked, not duplicated in prose.
 - Positive cross-skill pointers name a skill that exists in `skills/`.
 - Agent- or OS-only requirements are declared in `compatibility:`, not worked around.
-- README has one row.
+- Update the existing catalog row if the skill's purpose or invocation changes.
