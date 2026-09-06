@@ -1,0 +1,42 @@
+skills/code-review/COMPLEXITY.md
+  s_6e484c75cdb7d8::t_26af253be7b582 1,3,26
+skills/write-skill/SKILL.md
+  ai_agent 4
+skills/skill-curator/SKILL.md
+  ai_agent 4
+skills/hammerspoon/SKILL.md
+  ai_agent 3
+skills/code-review/SKILL.md
+  ai_agent 3
+skills/write-skill/agents/openai.yaml
+  s_6e484c75cdb7d8::t_8d81cbb9a84698 1-2
+skills/skill-curator/agents/openai.yaml
+  s_6e484c75cdb7d8::t_8d81cbb9a84698 1-2
+skills/code-review/COMPLEXITY-REFERENCE.md
+  s_6e484c75cdb7d8::t_26af253be7b582 1,3
+skills/obsidian-capture/SKILL.md
+  s_6e484c75cdb7d8::t_db7228d95b2ffd 3
+README.md
+  ai_agent 5
+  s_6e484c75cdb7d8::t_db7228d95b2ffd 18
+skills/grok-repo/SKILL.md
+  ai_agent 3
+skills/code-review/NEWCOMER.md
+  s_6e484c75cdb7d8::t_26af253be7b582 1,38-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "75a5653ee2a31451b14e935643a2b9ac620c79be",
+  "prompts": {},
+  "sessions": {
+    "s_6e484c75cdb7d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfe7d485-77f8-4a58-95ed-81b8ac972741",
+        "model": "unknown"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
