@@ -1,27 +1,31 @@
 ---
 name: code-review
-description: Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). Use when reviewing a change or dependency, auditing or polishing a package, or asking whether code is too complex, whether an API can panic or will age well, or whether a simpler version should ship. Do NOT use for gating complexity before you edit (use complexity-budget) or for onboarding-perspective review (use newcomer-lens-review).
+description: Review a diff, package, or API through one of five lenses (necessity and layering, honest invariants and costs, product-versus-library fit, a complexity gate before a design change, or newcomer clarity). Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.
 ---
 
 # code-review
 
 State the problem the code solves in one sentence before reviewing anything. If you cannot, ask — a review of code whose purpose you have guessed at is worse than no review.
 
-Then pick **one** lens and read only that file. They are different methods, not different vocabularies for the same method; running two produces findings that contradict each other on priority.
+Then pick **one** lens and read only that file (`/code-review <lens>` names it directly). They are different methods, not different vocabularies for the same method; running two produces findings that contradict each other on priority.
 
 | The question in front of you | Lens | Read |
 |---|---|---|
 | Should this exist at all? Is it at the right layer? Does the diff/package/dependency earn its maintenance cost? Asked to "audit", "polish", or "refactor" something | **Russ Cox** | [RUSS-COX.md](RUSS-COX.md) |
 | Will it behave as advertised? Can it panic, silently truncate, or cost more than it looks? Are the defaults and error contracts honest? Reviewing a library API or a patch that changes complexity | **BurntSushi** | [BURNTSUSHI.md](BURNTSUSHI.md) |
 | Is this being held to the right standard? Should the dumb version ship, or does this need to stay stable for years? Reviewing a public interface, a breaking change, or product code that looks over-engineered | **Mitsuhiko** | [MITSUHIKO.md](MITSUHIKO.md) |
+| Is a *proposed* change worth its complexity, and which layer owns it? Asked before a substantial design change, or when necessity is contested mid-review | **Complexity** | [COMPLEXITY.md](COMPLEXITY.md) |
+| What would a competent engineer who just joined fail to understand? Asked for an onboarding review, a handover check, or what to document first | **Newcomer** | [NEWCOMER.md](NEWCOMER.md) |
 
-Default to **Russ Cox** for an unqualified "review this diff." Reach for the others when the code is a library boundary (BurntSushi) or when the product/library call is itself in question (Mitsuhiko).
+Default to **Russ Cox** for an unqualified "review this diff." Reach for the others when the code is a library boundary (BurntSushi), when the product/library call is itself in question (Mitsuhiko), when the change does not exist yet (Complexity), or when the question is comprehension rather than correctness (Newcomer). The Complexity and Newcomer lenses are for explicit requests, not a ceremony before routine edits.
 
 In an established codebase, search for existing primitives before judging anything new — under any lens, the most common real finding is that a helper, interface, or package already does this.
 
-Not this skill: writing the commit or PR message (use `write-docs`), gauging complexity against value *before* you edit (use `complexity-budget`), or reviewing for what a newcomer would not understand (use `newcomer-lens-review`).
+Not this skill: writing the commit or PR message (use `write-docs`) or building your own understanding of an unfamiliar codebase (use `grok-repo`).
 
 ## Output contract — all lenses
+
+The Complexity lens reports decisions and unresolved tradeoffs rather than findings, and the Newcomer lens uses its own contract (see its file); everything else below applies to them too.
 
 Analyze freely first. This contract governs the final output only — do not begin emitting findings before you have read enough to know which ones matter.
 

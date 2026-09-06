@@ -1,6 +1,6 @@
 ---
 name: grok-repo
-description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or change-history reconstruction. Use when asked for a repo tour, how something works, where a value comes from, or why and how a feature or change was introduced. Do NOT use for repository health (use repo-eval) or diff review.
+description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).
 ---
 
 # grok-repo

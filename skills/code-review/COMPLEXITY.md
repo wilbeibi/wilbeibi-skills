@@ -1,10 +1,6 @@
----
-name: complexity-budget
-description: Assess ownership, coupling, and value before a substantial design change when explicitly requested. Use code-review for completed changes.
-disable-model-invocation: true
----
+# Lens: Complexity gate — ownership, coupling, value
 
-# complexity-budget
+Use before a substantial design change, when explicitly asked, or when the product/necessity call is contested mid-review. This lens judges a *proposed* change; the other lenses judge a finished one.
 
 Identify the layer that owns the behavior, then assess whether the proposed complexity earns its cost.
 Use this lens for contested design choices; it is not a ceremony before routine edits.
@@ -27,4 +23,4 @@ or explaining the concrete outcome that justifies the addition.
 Report only material tradeoffs or unresolved choices. Do not require spoken answers to every criterion,
 a fixed output template, or unrelated refactoring.
 
-For deeper analysis of a contested decision, read [REFERENCE.md](REFERENCE.md).
+For deeper analysis of a contested decision, read [COMPLEXITY-REFERENCE.md](COMPLEXITY-REFERENCE.md).

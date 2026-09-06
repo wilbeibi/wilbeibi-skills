@@ -1,9 +1,4 @@
----
-name: newcomer-lens-review
-description: Review code for rationale, domain terms, constraints, and assumptions missing to a newcomer, and produce a documentation backlog. Use when asked for an onboarding review, what would confuse a new hire, what a handover is missing, or which parts of a codebase need documenting first. Do NOT use to find defects (use code-review) or to build your own understanding of unfamiliar code (use grok-repo).
----
-
-# newcomer-lens-review
+# Lens: Newcomer — missing context
 
 Review as a competent engineer who just joined: general engineering knowledge, but no project-specific context — design decisions, domain terms, historical constraints, team conventions.
 
@@ -40,7 +35,9 @@ Review as a competent engineer who just joined: general engineering knowledge, b
 - Anything inferable from immediate surrounding code.
 - Style preferences.
 
-## Output contract
+## Output — this lens
+
+This lens replaces the router's finding block; there is no failure line because the defect is missing context, not wrong behavior.
 
 - Lead with `Context gaps`, grouped by file/component and ordered by onboarding risk.
 - Each finding names the category: design rationale, domain knowledge, historical context, or system constraint.

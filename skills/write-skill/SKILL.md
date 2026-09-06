@@ -1,6 +1,7 @@
 ---
 name: write-skill
 description: Author or update compact agent skills under skills/<name>/SKILL.md. Use when asked to write, add, or change a skill; not to audit a skill library.
+disable-model-invocation: true
 ---
 
 # write-skill
