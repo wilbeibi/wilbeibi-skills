@@ -1,6 +1,6 @@
 ---
 name: obsidian-capture
-description: Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes, and run the agent's own #agent-todo queue, via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, record a weekly reflection, or list/close the agent's assigned tasks ("看你的 todo", "干活", "what's on your todo list"). Do NOT use for searching notes (use obsidian-search) or for creating standalone long-form notes.
+description: Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent's #agent-todo queue via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, record a weekly reflection, or list or close the agent's tasks ("看你的 todo", "干活"). Not for searching notes (use obsidian-search) or standalone long-form notes.
 ---
 
 # obsidian-capture

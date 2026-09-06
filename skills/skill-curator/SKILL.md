@@ -1,6 +1,7 @@
 ---
 name: skill-curator
 description: Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. Use when cleaning, consolidating, or de-duplicating a skills tree.
+disable-model-invocation: true
 ---
 
 # skill-curator

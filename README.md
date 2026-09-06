@@ -2,7 +2,7 @@
 
 > A trillion-parameter brain to wash my digital dishes.
 
-23 skills for Claude Code and Codex, covering code review, research, documentation, visualization, human-in-the-loop review, and personal automation.
+21 skills for Claude Code and Codex, covering code review, research, documentation, visualization, human-in-the-loop review, and personal automation.
 Keep the full collection here; choose what to use on each machine and in each project.
 The [route-skill](skills/route-skill/SKILL.md) entrypoint recommends skills and loads them after you explicitly select one.
 
@@ -29,9 +29,7 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [obsidian-search](skills/obsidian-search/SKILL.md) | Search an Obsidian vault three-tier: Meilisearch for topic/fuzzy queries, ripgrep for exact matches, date-aware helper for natural-language dates and tasks. |
 | [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append quick todos (with due dates), log lines, learnings, and reflections to the right section of Obsidian daily and weekly notes; run the separate `#agent-todo` queue. |
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
-| [newcomer-lens-review](skills/newcomer-lens-review/SKILL.md) | Review code for missing context, onboarding gaps, and undocumented assumptions. |
-| [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). |
-| [complexity-budget](skills/complexity-budget/SKILL.md) | Explicit-only review of ownership, coupling, and value before a substantial design change. |
+| [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), product-versus-library fit (Mitsuhiko), a pre-change complexity gate, or newcomer clarity. |
 | [grill-me](skills/grill-me/SKILL.md) | Explicit-only design interview, one question at a time; capture durable terminology and decisions when useful. |
 | [questionnaire](skills/questionnaire/SKILL.md) | Batch a long discussion's open decisions into an offline HTML questionnaire (branching, autosaved drafts) whose answers come back as markdown keyed by stable question ids. |
 | [readback](skills/readback/SKILL.md) | Turn a plan or conversation transcript into an HTML review surface where the user highlights passages and labels each note a question, a change, or an aside, and return them as a follow-up prompt through a waiting local command. |

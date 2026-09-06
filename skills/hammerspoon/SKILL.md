@@ -1,6 +1,6 @@
 ---
 name: hammerspoon
-description: Operate macOS via Hammerspoon — run one-off `hs -c` Lua from the shell (launch/quit/focus apps, open/close/focus browser tabs, volume/wifi/caffeinate toggles, on-screen alerts, clipboard) or author persistent automations (hotkeys, watchers, menubar) in ~/.hammerspoon. Use when asked to open/close/focus an app or tab, control Mac system state, "keep my mac awake", notify on screen, or write a Hammerspoon module/hotkey — macOS only. Do NOT use for interacting with web page content (use browser tools) or cross-platform scripting.
+description: Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. Use when asked to control an app, tab, or Mac system state, keep the Mac awake, or write a Hammerspoon module. Not for web page content.
 ---
 
 # hammerspoon

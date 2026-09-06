@@ -1,6 +1,6 @@
-# complexity-budget — deciding a contested call
+# Complexity gate — deciding a contested call
 
-Read this only when you're genuinely unsure whether a change is worth its complexity. The gate in [SKILL.md](SKILL.md) handles the clear cases; this is for the border.
+Read this only when you're genuinely unsure whether a change is worth its complexity. The gate in [COMPLEXITY.md](COMPLEXITY.md) handles the clear cases; this is for the border.
 
 ## Why the gate exists at all
 
