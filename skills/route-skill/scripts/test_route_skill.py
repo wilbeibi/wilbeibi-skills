@@ -158,6 +158,43 @@ class Scenarios(unittest.TestCase):
         self.assertEqual((self.project / ".agents/skills/chart").resolve(), root / "skills/chart")
         self.assertFalse((self.home / ".agents/skills/chart").exists())
 
+    def test_agents_frontmatter_restricts_links_to_named_agents(self):
+        root = self.home / "checkout"
+        skill = root / "skills/chart"
+        skill.mkdir(parents=True)
+        skill_md = skill / "SKILL.md"
+        skill_md.write_bytes(self.bodies["SKILL.md"])
+        self.checkout_mock.return_value = root
+        for d in (".claude/skills", ".codex/skills", ".pi/agent/skills"):
+            (self.home / d).mkdir(parents=True)
+
+        # Unrestricted: the shared dir and every agent dir.
+        self.run_cli("link", "chart")
+        self.assertTrue((self.home / ".agents/skills/chart").is_symlink())
+        self.assertTrue((self.home / ".claude/skills/chart").is_symlink())
+
+        # Restricting an already-linked skill prunes the mirrors it may no longer have,
+        # but keeps the canonical link so sync still knows this checkout owns it.
+        skill_md.write_bytes(b"---\nname: chart\nagents: [codex]\ndescription: Draw charts\n---\nBody.\n")
+        self.run_cli("link", "chart")
+        self.assertTrue((self.home / ".codex/skills/chart").is_symlink())
+        self.assertTrue((self.home / ".agents/skills/chart").is_symlink())
+        self.assertFalse((self.home / ".claude/skills/chart").exists())
+        self.assertFalse((self.home / ".pi/agent/skills/chart").exists())
+
+        # sync repairs the codex mirror without reviving the claude one.
+        (self.home / ".codex/skills/chart").unlink()
+        self.run_cli("sync")
+        self.assertTrue((self.home / ".codex/skills/chart").is_symlink())
+        self.assertFalse((self.home / ".claude/skills/chart").exists())
+
+        self.run_cli("unlink", "chart")
+        self.assertFalse((self.home / ".codex/skills/chart").is_symlink())
+
+        skill_md.write_bytes(b"---\nname: chart\nagents: [nope]\ndescription: Draw charts\n---\nBody.\n")
+        with self.assertRaisesRegex(ValueError, "unknown agents"):
+            self.run_cli("link", "chart")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -44,6 +44,10 @@ python3 scripts/route_skill.py link route-skill
 python3 scripts/route_skill.py unlink dataviz --project
 ```
 
+A skill may restrict itself with `agents:` frontmatter (`agents: [codex]`; known: claude, codex, pi, hermes).
+`link` then creates only those agent mirrors, prunes the ones it owns elsewhere, and keeps the canonical
+`.agents/skills` link so `sync` still tracks it. Omit the field to allow every agent.
+
 Links require a local checkout. Keep machine-specific project links out of commits.
 `sync` repairs only links owned by this checkout; it does not install new skills or edit other managers' lockfiles.
 Run `python3 scripts/route_skill.py --help` for source selection and other options.

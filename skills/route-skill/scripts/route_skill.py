@@ -152,20 +152,45 @@ def local_candidates(name):
     return sorted({p.resolve() for p in paths if (p / "SKILL.md").is_file()})
 
 
-def agent_dirs():
-    home = Path.home()
-    return [home / ".claude/skills", home / ".codex/skills",
-            home / ".pi/agent/skills", home / ".hermes/skills"]
+# Relative skills directory per agent; used for both home and project scope.
+AGENT_DIRS = {"claude": PurePosixPath(".claude/skills"),
+              "codex": PurePosixPath(".codex/skills"),
+              "pi": PurePosixPath(".pi/agent/skills"),
+              "hermes": PurePosixPath(".hermes/skills")}
+
+
+def declared_agents(skill_dir):
+    """Agents named by `agents:` frontmatter. Empty means every agent."""
+    text = (skill_dir / "SKILL.md").read_text()
+    if not text.startswith("---"):
+        return frozenset()
+    match = re.search(r"^agents:[ \t]*(.*(?:\n[ \t]+-[ \t]*\S+)*)", text.split("---", 2)[1], re.MULTILINE)
+    if not match:
+        return frozenset()
+    names = frozenset(re.findall(r"[a-z0-9-]+", match.group(1)))
+    unknown = names - set(AGENT_DIRS)
+    if unknown:
+        raise ValueError(f"unknown agents {sorted(unknown)} in {skill_dir / 'SKILL.md'}; known: {sorted(AGENT_DIRS)}")
+    if not names:
+        raise ValueError(f"empty agents list in {skill_dir / 'SKILL.md'}; omit the field to allow every agent")
+    return names
 
 
 def owned(path, root):
     return path.is_symlink() and path.resolve().parent == root / "skills"
 
 
-def link_paths(name, project):
+def link_paths(name, project, agents=frozenset()):
+    """Where `name` may be linked. `agents` restricts the agent mirrors, never the
+    canonical .agents/skills link, which is how sync finds what this checkout owns."""
     if project:
-        return [Path.cwd() / d / "skills" / name for d in (".agents", ".claude")]
-    return [Path.home() / ".agents/skills" / name] + [d / name for d in agent_dirs() if d.parent.is_dir()]
+        paths = [Path.cwd() / ".agents/skills" / name]
+        if not agents or "claude" in agents:
+            paths.append(Path.cwd() / ".claude/skills" / name)
+        return paths
+    home = Path.home()
+    mirrors = [home / AGENT_DIRS[a] for a in (sorted(agents) if agents else AGENT_DIRS)]
+    return [home / ".agents/skills" / name] + [d / name for d in mirrors if d.parent.is_dir()]
 
 
 def change_links(root, names, project, remove=False):
@@ -177,7 +202,9 @@ def change_links(root, names, project, remove=False):
         target = root / "skills" / name
         if not remove and not (target / "SKILL.md").is_file():
             raise ValueError(f"no local skill {name!r}")
-        for path in link_paths(name, project):
+        agents = declared_agents(target) if not remove else frozenset()
+        wanted = link_paths(name, project, agents)
+        for path in wanted:
             if path.exists() or path.is_symlink():
                 if not owned(path, root) or path.resolve() != target:
                     raise ValueError(f"unmanaged target; leaving unchanged: {path}")
@@ -185,6 +212,10 @@ def change_links(root, names, project, remove=False):
                     operations.append((path, None))
             elif not remove:
                 operations.append((path, target))
+        # A restriction added after linking leaves links behind; drop the ones we own.
+        for path in link_paths(name, project) if agents else []:
+            if path not in wanted and owned(path, root) and path.resolve() == target:
+                operations.append((path, None))
     for path, target in operations:
         if target is None:
             path.unlink()
@@ -236,7 +267,8 @@ def main():
             name = valid_name(row["name"])
             local = local_candidates(name)
             status = "local: " + ", ".join(map(str, local)) if local else "catalog"
-            print(f"{name}: {row['description']}\n  [{status}] requires: {row.get('compatibility') or 'see skill instructions'}")
+            scope = f" agents: {', '.join(sorted(row['agents']))} only" if row.get("agents") else ""
+            print(f"{name}: {row['description']}\n  [{status}] requires: {row.get('compatibility') or 'see skill instructions'}{scope}")
         print(f"route-skill: {args.repo}@{revision}", file=sys.stderr)
     elif args.command in ("link", "unlink"):
         change_links(store.root, args.names, args.project, args.command == "unlink")

@@ -1,5 +1,6 @@
 ---
 name: dataviz
+agents: [codex]
 description: Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. Use when asked for a benchmark graph, data illustration, performance chart, tradeoff plot, small multiple, or an editorial chart in React/Recharts or a static plotting stack. Do NOT use for text-only diagrams (use show-me), hand-drawn conceptual art (use sketch-concept), or dashboard UI design.
 ---
 
