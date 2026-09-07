@@ -77,6 +77,7 @@ main{padding:20px 28px 120px;min-width:0}
 .entry,.sec,.body h1,.body h2,.body h3,.body h4,.body h5,.body h6{scroll-margin-top:calc(var(--top) + 12px)}
 .doc{max-width:none;margin:0}
 body.has-annotations .doc{width:calc(100% - 154px);margin-left:0}
+body.selection-editing .doc{width:calc(100% - 294px);margin-left:0}
 body.nav-off #nav{display:none}
 body.nav-off .cols{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1080px){
@@ -161,6 +162,11 @@ summary .caret{display:inline-block;transition:transform 120ms}
 #sel-menu{position:fixed;z-index:40;display:flex;gap:6px;background:var(--card);
   border:1px solid var(--edge);border-radius:10px;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 #sel-menu.warn{max-width:280px;display:block;font-size:.82rem;color:var(--muted);padding:8px 10px}
+#sel-menu.editor{display:block;width:280px;padding:10px}
+.sel-kicker{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.sel-quote{margin:6px 0;color:var(--muted);font-size:.82rem;line-height:1.4;max-height:4.2em;overflow:hidden}
+#sel-menu.editor textarea{min-height:84px;margin:6px 0 2px}
+#sel-menu.editor .sel-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
 /* an author-origin `display` outranks the UA `[hidden]{display:none}` whatever the
    specificity, so `hidden` is inert here unless it is restated. */
 #sel-menu[hidden]{display:none}
@@ -202,6 +208,7 @@ textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:v
   #ann-list{display:grid;gap:8px}
   #ann-list li{position:static;width:auto;box-shadow:none}
   body.has-annotations .doc{width:auto}
+  body.selection-editing .doc{width:auto}
   .followup{margin-top:42px}
 }
 
