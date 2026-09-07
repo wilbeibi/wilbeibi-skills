@@ -610,6 +610,7 @@ function hideMenu() {
   menu.hidden = true;
   menu.className = "";
   menu.textContent = "";   // the buttons go with it, so no stale handler survives
+  document.body.classList.remove("selection-editing");
   pendingSel = null;
 }
 /* Acting on a selection consumes it. Without this the mouseup that follows the
@@ -621,6 +622,60 @@ function consumeSelection() {
 function headerInset() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--top");
   return parseFloat(v) || 0;
+}
+function selectionRect(fallback) {
+  const s = window.getSelection();
+  if (s && s.rangeCount) {
+    const rects = s.getRangeAt(0).getClientRects();
+    if (rects.length) return rects[rects.length - 1];
+  }
+  return fallback;
+}
+function placeMenu(menu, rect) {
+  const w = menu.offsetWidth, h = menu.offsetHeight;
+  const side = !narrowLayout() ? marginLeft(w) : null;
+  let left = side;
+  if (left == null) {
+    left = rect.left + rect.width / 2 - w / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  }
+  const floor = headerInset() + 8;
+  const desiredTop = side == null ? rect.bottom + 8 : rect.top;
+  const top = Math.max(floor, Math.min(desiredTop, window.innerHeight - h - 8));
+  menu.style.left = left + "px";
+  menu.style.top = top + "px";
+}
+function openSelectionEditor(sel, rect) {
+  const menu = $("sel-menu");
+  pendingSel = sel;
+  document.body.classList.add("selection-editing");
+  menu.className = "editor";
+  menu.textContent = "";
+  menu.appendChild(el("div", "sel-kicker", "Comment on this passage"));
+  menu.appendChild(el("div", "sel-quote", "\u201c" + excerpt(sel.quote, 180) + "\u201d"));
+  const input = el("textarea");
+  input.rows = 3;
+  input.placeholder = "What should change? (optional)";
+  input.setAttribute("aria-label", "Comment on selected passage");
+  menu.appendChild(input);
+  const actions = el("div", "sel-actions");
+  const cancel = el("button", null, "Cancel");
+  cancel.type = "button";
+  cancel.onclick = function () { consumeSelection(); hideMenu(); };
+  const save = el("button", "primary", "Add comment");
+  save.type = "button";
+  save.onclick = function () {
+    addFromSelection(sel, input.value);
+    consumeSelection(); hideMenu(); afterChange();
+  };
+  actions.appendChild(cancel);
+  actions.appendChild(save);
+  menu.appendChild(actions);
+  menu.hidden = false;
+  requestAnimationFrame(function () {
+    placeMenu(menu, selectionRect(rect));
+    input.focus();
+  });
 }
 function showMenu(fromKeyboard) {
   const sel = readSelection();
@@ -640,28 +695,21 @@ function showMenu(fromKeyboard) {
   } else {
     menu.className = "";
     pendingSel = sel;
-    const note = el("button", "primary", "Add note");
-    note.type = "button";
-    note.onclick = function () {
+    const highlight = el("button", null, "Highlight");
+    highlight.type = "button";
+    highlight.onclick = function () {
       const a = addFromSelection(sel, "");
       consumeSelection(); hideMenu(); afterChange(); focusComment(a.id);
     };
-    menu.appendChild(note);
-    first = note;
+    const comment = el("button", "primary", "Comment");
+    comment.type = "button";
+    comment.onclick = function () { openSelectionEditor(sel, rect); };
+    menu.appendChild(highlight);
+    menu.appendChild(comment);
+    first = highlight;
   }
   menu.hidden = false;
-  const w = menu.offsetWidth, h = menu.offsetHeight;
-  const side = !narrowLayout() ? marginLeft(w) : null;
-  let left = side;
-  if (left == null) {
-    left = rect.left + rect.width / 2 - w / 2;
-    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
-  }
-  const floor = headerInset() + 8;          // clear of the sticky header, not just the viewport
-  const desiredTop = side == null ? rect.bottom + 8 : rect.top;
-  const top = Math.max(floor, Math.min(desiredTop, window.innerHeight - h - 8));
-  menu.style.left = left + "px";
-  menu.style.top = top + "px";
+  placeMenu(menu, rect);
   /* a keyboard selection has no pointer to reach the menu with */
   if (fromKeyboard && first) first.focus();
 }
