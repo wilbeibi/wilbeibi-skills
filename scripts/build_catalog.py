@@ -9,6 +9,9 @@ import json
 from pathlib import Path
 import yaml
 
+# Keep in sync with AGENT_DIRS in skills/route-skill/scripts/route_skill.py.
+AGENTS = {"claude", "codex", "pi", "hermes"}
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -29,7 +32,13 @@ def main():
                 raise ValueError(f"catalog does not support symlinks: {path}")
             if path.is_file():
                 files.append({"path": path.relative_to(skill).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "executable": bool(path.stat().st_mode & 0o111)})
-        rows.append({"name": data["name"], "description": data["description"], "compatibility": data.get("compatibility", ""), "path": f"skills/{skill.name}", "files": files})
+        agents = data.get("agents") or []
+        if isinstance(agents, str):
+            agents = [agents]
+        unknown = set(agents) - AGENTS
+        if unknown:
+            raise ValueError(f"unknown agents {sorted(unknown)} in {md}; known: {sorted(AGENTS)}")
+        rows.append({"name": data["name"], "description": data["description"], "compatibility": data.get("compatibility", ""), "agents": sorted(agents), "path": f"skills/{skill.name}", "files": files})
         if data["name"] != skill.name:
             raise ValueError(f"name must match directory: {skill}")
     text = json.dumps({"schema": 1, "skills": rows}, indent=2, ensure_ascii=False) + "\n"

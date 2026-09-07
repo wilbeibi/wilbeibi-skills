@@ -1,5 +1,6 @@
 ---
 name: sketch-concept
+agents: [codex]
 description: Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me) or for charts of real data (use dataviz).
 ---
 
