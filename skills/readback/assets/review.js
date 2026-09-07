@@ -558,12 +558,14 @@ function jumpTo(a) {
   renderAnnotations();
 }
 
-function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
+function narrowLayout() { return window.matchMedia("(max-width:1199px)").matches; }
 function marginLeft(width) {
   const doc = $("doc-body").getBoundingClientRect();
   const nav = $("nav").getBoundingClientRect();
-  const left = doc.left - width - 16;
-  return left >= nav.right + 12 ? left : null;
+  const right = doc.right + 12;
+  if (right + width <= window.innerWidth - 8) return right;
+  const left = doc.left - width - 12;
+  return left >= nav.right + 8 ? left : null;
 }
 function layoutMarginalia() {
   const cards = $("ann-list").children;
@@ -592,7 +594,7 @@ function layoutMarginalia() {
     } else if (a.scope !== "document") {
       visible = false;
     }
-    const left = marginLeft(card.offsetWidth || 184);
+    const left = marginLeft(card.offsetWidth || 142);
     if (!visible || left == null) { card.hidden = true; continue; }
     card.hidden = false;
     card.style.left = left + "px";
@@ -637,18 +639,14 @@ function showMenu(fromKeyboard) {
   } else {
     menu.className = "";
     pendingSel = sel;
-    const hl = el("button", null, "Highlight");
-    hl.type = "button";
-    hl.onclick = function () { addFromSelection(sel, ""); consumeSelection(); hideMenu(); afterChange(); };
-    const cm = el("button", "primary", "Comment");
-    cm.type = "button";
-    cm.onclick = function () {
+    const note = el("button", "primary", "Add note");
+    note.type = "button";
+    note.onclick = function () {
       const a = addFromSelection(sel, "");
       consumeSelection(); hideMenu(); afterChange(); focusComment(a.id);
     };
-    menu.appendChild(hl);
-    menu.appendChild(cm);
-    first = hl;
+    menu.appendChild(note);
+    first = note;
   }
   menu.hidden = false;
   const w = menu.offsetWidth, h = menu.offsetHeight;
@@ -658,12 +656,7 @@ function showMenu(fromKeyboard) {
     left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
   }
   const floor = headerInset() + 8;          // clear of the sticky header, not just the viewport
-  const above = rect.top - h - 8;
-  const below = rect.bottom + 8;
-  let top;
-  if (above >= floor) top = above;
-  else if (below + h <= window.innerHeight - 8) top = below;
-  else top = Math.max(floor, window.innerHeight - h - 8);
+  const top = Math.max(floor, Math.min(rect.top, window.innerHeight - h - 8));
   menu.style.left = left + "px";
   menu.style.top = top + "px";
   /* a keyboard selection has no pointer to reach the menu with */
