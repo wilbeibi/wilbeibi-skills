@@ -272,6 +272,75 @@
       ]
     },
     {
+      "name": "readback",
+      "description": "Turn a plan, Markdown document, or conversation transcript into an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when the user wants to mark up or annotate a document, react to a long session in the browser, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions (use questionnaire) or to interview the user one question at a time (use grill-me).",
+      "compatibility": "Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can hold a foreground command open.",
+      "agents": [],
+      "path": "skills/readback",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "e35d4633940b863820cd261b07fa038bee15c578ba1f16987426fe44f946755a",
+          "executable": false
+        },
+        {
+          "path": "assets/review.css",
+          "sha256": "53357af4c4894918385496ec0f972d796cfcb59cd86577403533bdd9975bbaac",
+          "executable": false
+        },
+        {
+          "path": "assets/review.html",
+          "sha256": "11838d9d9a59a451036f478305d6b464612c64e583e68a98acd921c82ff82a9a",
+          "executable": false
+        },
+        {
+          "path": "assets/review.js",
+          "sha256": "3a704aa78ecaa478a1d01816bc8b01801c0d577593702d53388bf5474d0d6799",
+          "executable": false
+        },
+        {
+          "path": "assets/vendor/README.md",
+          "sha256": "8a7026fd5c4009b3a0b9e0ae9342945145b40f2f9b346c052d191ffc5622d034",
+          "executable": false
+        },
+        {
+          "path": "assets/vendor/markdown-it.LICENSE",
+          "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473",
+          "executable": false
+        },
+        {
+          "path": "assets/vendor/markdown-it.min.js",
+          "sha256": "38c70a1e7ca91ab40e2d9e6e60129851a717ed1c7d4acbbdd41bf9503791cf68",
+          "executable": false
+        },
+        {
+          "path": "scripts/readback.py",
+          "sha256": "e32e859556ca8993a79e1a59036073da249df59cb523fc11553af036c33afdc9",
+          "executable": false
+        },
+        {
+          "path": "scripts/test_readback.py",
+          "sha256": "7148f0ce7519fea6efc7138b38b828522ee1cf1a04709e2f02dcd4993c575404",
+          "executable": false
+        },
+        {
+          "path": "tests/fixtures/conversation.json",
+          "sha256": "b526844368070dae83a73ddce55d5d736ab8a0eae2b3fb021bfd3278d2ba5d1a",
+          "executable": false
+        },
+        {
+          "path": "tests/fixtures/hostile.md",
+          "sha256": "312f869e12ac8ca02c75faa43e6cf08056251563f4018ab1755b947841abde47",
+          "executable": false
+        },
+        {
+          "path": "tests/fixtures/plan.md",
+          "sha256": "f8b11c41a0c888400f4e583789cb38b04abb016da280732566bfbf191ffde044",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "repo-eval",
       "description": "Evaluate a public GitHub repository's momentum and maintenance health. Use when asked whether a repository is healthy, growing, declining, abandoned, or well maintained, or when vetting dependencies and OSS projects. Do NOT use for code or architecture review.",
       "compatibility": "",
