@@ -1,0 +1,10 @@
+#!/bin/sh
+# Refresh this checkout and repair checkout-owned global links.
+# Which skills are linked is decided per host with `route_skill.py link/unlink`, never by this repo.
+set -e
+root=$(cd "$(dirname "$0")/.." && pwd)
+if [ "${1:-}" = "--pull" ]; then
+    git -C "$root" pull --ff-only
+    shift
+fi
+exec python3 "$root/skills/route-skill/scripts/route_skill.py" "${@:-sync}"

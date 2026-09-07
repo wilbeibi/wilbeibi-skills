@@ -1,0 +1,486 @@
+{
+  "schema": 1,
+  "skills": [
+    {
+      "name": "code-review",
+      "description": "Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). Use when reviewing a change or dependency, auditing or polishing a package, or asking whether code is too complex, whether an API can panic or will age well, or whether a simpler version should ship. Do NOT use for gating complexity before you edit (use complexity-budget) or for onboarding-perspective review (use newcomer-lens-review).",
+      "compatibility": "",
+      "path": "skills/code-review",
+      "files": [
+        {
+          "path": "BURNTSUSHI-REFERENCE.md",
+          "sha256": "ee6281df5f2d1f377496e7e463de504e23422241f6217c59d319c59141ab5fe2",
+          "executable": false
+        },
+        {
+          "path": "BURNTSUSHI.md",
+          "sha256": "23f3eefa7bbbbf2bba51e2772074eb7396db2aa2e723d4a5860f927ffe6cb695",
+          "executable": false
+        },
+        {
+          "path": "MITSUHIKO-PRINCIPLES.md",
+          "sha256": "874fcaac3b5b2875cc8f4196e6da50a8d321f394ad2bda6c6ad15ee65fcc4da2",
+          "executable": false
+        },
+        {
+          "path": "MITSUHIKO.md",
+          "sha256": "4bbaa8d17065045a050c1fa34e10712c0509a998745bcfd62ef98bb31205e33c",
+          "executable": false
+        },
+        {
+          "path": "RUSS-COX-REFERENCE.md",
+          "sha256": "e1bcd76ec8f3e9d245df6e562d8bee451e9c708e9d24e5708eaf52c1b40b5260",
+          "executable": false
+        },
+        {
+          "path": "RUSS-COX.md",
+          "sha256": "0fb6484be62f8c990dfc6d81d70a068da3ef7bf0ebd76b1e1854bd0da400d4d6",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "1cdb935ec66c278b4caf2af325106a5eabe90505759b1781f56964d1444e2c85",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "complexity-budget",
+      "description": "Assess ownership, coupling, and value before a substantial design change when explicitly requested. Use code-review for completed changes.",
+      "compatibility": "",
+      "path": "skills/complexity-budget",
+      "files": [
+        {
+          "path": "REFERENCE.md",
+          "sha256": "717ee811d8942e7c736f86920f467ff5edbbdbb4460a44173208327ea0b6ecf8",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "f9431e5ef58344b5951220c106c61b23d957acd7373150ef1fe90eb7db85fbfe",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "dataviz",
+      "description": "Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. Use when asked for a benchmark graph, data illustration, performance chart, tradeoff plot, small multiple, or an editorial chart in React/Recharts or a static plotting stack. Do NOT use for text-only diagrams (use show-me), hand-drawn conceptual art (use sketch-concept), or dashboard UI design.",
+      "compatibility": "",
+      "path": "skills/dataviz",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "5b56cca2948655cc5a7bef48b585853310e8b043843dd3daeee629a75fe8d6a9",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "grill-me",
+      "description": "Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. Use when asked to \"grill me,\" stress-test a design, or challenge assumptions before implementation.",
+      "compatibility": "",
+      "path": "skills/grill-me",
+      "files": [
+        {
+          "path": "ADR-FORMAT.md",
+          "sha256": "bd01fdc48ad5e39a4f065db6abbd524658512d5e6e81e1a08ffc2cb98b5ed069",
+          "executable": false
+        },
+        {
+          "path": "CONTEXT-FORMAT.md",
+          "sha256": "00c70fb2c97717f1119d6c5c3f0269d65c2ccc040b376e124e62352c2fa36de5",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "055e1eb9b9ec4448a95f103d15e9ee983be457c7ccaf764e29993553b1fe0474",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "grok-repo",
+      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or change-history reconstruction. Use when asked for a repo tour, how something works, where a value comes from, or why and how a feature or change was introduced. Do NOT use for repository health (use repo-eval) or diff review.",
+      "compatibility": "",
+      "path": "skills/grok-repo",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "c50933065e6dc800731d327fca64f467181a4cd9c9b6d630b7ef2994923dbd21",
+          "executable": false
+        },
+        {
+          "path": "scripts/archaeology.sh",
+          "sha256": "89a2061e08f4a0da6dec67417a794b8d2722b7428ec5aff7576a0f8bef689a94",
+          "executable": true
+        },
+        {
+          "path": "scripts/test_archaeology.sh",
+          "sha256": "d57bce99f7e835aba3bba8859f87b04738c4bde5af7b786d1580fcfc674f035c",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "hammerspoon",
+      "description": "Operate macOS via Hammerspoon — run one-off `hs -c` Lua from the shell (launch/quit/focus apps, open/close/focus browser tabs, volume/wifi/caffeinate toggles, on-screen alerts, clipboard) or author persistent automations (hotkeys, watchers, menubar) in ~/.hammerspoon. Use when asked to open/close/focus an app or tab, control Mac system state, \"keep my mac awake\", notify on screen, or write a Hammerspoon module/hotkey — macOS only. Do NOT use for interacting with web page content (use browser tools) or cross-platform scripting.",
+      "compatibility": "",
+      "path": "skills/hammerspoon",
+      "files": [
+        {
+          "path": "REFERENCE.md",
+          "sha256": "dcdb14dd921d36ac4f7425a7dd566639a149fa648c39af44a350fa4f6d733c5a",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "7eb1b7adce7725a745d3dfa41a397924692ba39eb634aa56be2f1c94c11ce7bc",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "karpathy-planning",
+      "description": "Develop a scoped implementation plan when explicitly asked to plan a coding task. Use grill-me for a deliberate design interview.",
+      "compatibility": "",
+      "path": "skills/karpathy-planning",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "98bbef9e8dd90ce8488e8e3f08a79ba4fb970b68b5dff6c382103c9b622b494e",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "newcomer-lens-review",
+      "description": "Review code for rationale, domain terms, constraints, and assumptions missing to a newcomer, and produce a documentation backlog. Use when asked for an onboarding review, what would confuse a new hire, what a handover is missing, or which parts of a codebase need documenting first. Do NOT use to find defects (use code-review) or to build your own understanding of unfamiliar code (use grok-repo).",
+      "compatibility": "",
+      "path": "skills/newcomer-lens-review",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "71f6946ccd99b2eb55b42d380278c7afbb0751e9332e6b3ba16e0520720d6219",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "obsidian-capture",
+      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes, and run the agent's own",
+      "compatibility": "",
+      "path": "skills/obsidian-capture",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "3950011b6ded2e9c6e0f307257c63836ba946f8b639e1a3b36028e3c13386f7b",
+          "executable": false
+        },
+        {
+          "path": "scripts/capture.py",
+          "sha256": "ed7bcff89577942f51cea94d9b00427dc612fb59c46af355ac77d06043d7b78f",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "obsidian-search",
+      "description": "Search an Obsidian vault for topics, exact text, tags, recent notes, and tasks. Use when fuzzy, date-aware, due, or overdue note retrieval is needed.",
+      "compatibility": "",
+      "path": "skills/obsidian-search",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "e3eabfe3d92a9833b39ce87342eb9e2267d703a92bf226815fab4daa743c48b7",
+          "executable": false
+        },
+        {
+          "path": "scripts/meili_search.py",
+          "sha256": "1ccb812fb60cd1b943265fafde57b7ebef80f86a4ce2e87c94623e5a67a19678",
+          "executable": false
+        },
+        {
+          "path": "scripts/vault_search.py",
+          "sha256": "5c36578f955fcadf387c4def1b098610d8bc9e020463dd11cbc0e3f610c4a3f1",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "paper-search",
+      "description": "Find and rank research papers by recency and field-adjusted impact. Use when searching literature, recent or superseding work, or evidence for AI/ML/systems claims. Do NOT use for general web search or GitHub repository evaluation.",
+      "compatibility": "",
+      "path": "skills/paper-search",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "15c5a84e28aeb70ae0544da688df8069fe352290ecdd98d49abcef38555b6d0a",
+          "executable": false
+        },
+        {
+          "path": "scripts/paper_search.py",
+          "sha256": "cd0662640d5a7c525c815884065834129a6343c8aaf0ff3124226f7e8e0019fb",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "questionnaire",
+      "description": "Turn the open decisions from a long discussion into a self-contained offline HTML questionnaire the user fills at their own pace, whose answers come back as markdown keyed by stable question ids. Use when the user wants to finalize or confirm a design, align on accumulated decisions, review assumptions from notes/memory, or asks for a survey or questionnaire. Do NOT use for live one-question-at-a-time interviews (use grill-me).",
+      "compatibility": "",
+      "path": "skills/questionnaire",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "0677ee7844b07838032eb593ae4083486cda565adb8f0ea489d4275746247970",
+          "executable": false
+        },
+        {
+          "path": "scripts/build.py",
+          "sha256": "38aaccd68f023fba4cf5e5bba7dc1760d1b560e567825b9f121273aea1b2062e",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "repo-eval",
+      "description": "Evaluate a public GitHub repository's momentum and maintenance health. Use when asked whether a repository is healthy, growing, declining, abandoned, or well maintained, or when vetting dependencies and OSS projects. Do NOT use for code or architecture review.",
+      "compatibility": "",
+      "path": "skills/repo-eval",
+      "files": [
+        {
+          "path": "REFERENCE.md",
+          "sha256": "2f044f8154bf2445b678378ca460635e9a4c865968d3f8ca38491befe4271291",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "d12940f2f425c549bdd29eb96b81ac90a7bcc224fccbc90feee77c48340e1469",
+          "executable": false
+        },
+        {
+          "path": "scripts/repo_eval.py",
+          "sha256": "6f0ed26797e8f6f38a046325da8f2635664a11ae57399a74a05c036753bffbce",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "route-skill",
+      "description": "Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. Use when asked to use an unavailable skill by name, find a suitable skill, or when no available skill clearly fits a substantive task. Do NOT treat a question about a skill as permission to use it.",
+      "compatibility": "Python 3.10+; network access only for uncached catalog entries or skills and explicit refreshes.",
+      "path": "skills/route-skill",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "98c439ea5e19c70c628dcca585c515230beab81923e12fc1e127f2ad87dc610c",
+          "executable": false
+        },
+        {
+          "path": "scripts/route_skill.py",
+          "sha256": "9c9ca86458c495dd6a3dd096ecde0f3c4e641024b9f8522e93793949c0b8b267",
+          "executable": false
+        },
+        {
+          "path": "scripts/test_route_skill.py",
+          "sha256": "d4515333632ea58c194963f9a37d99400b55cf9e9345470feb67dca77a20ce18",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "sherlock",
+      "description": "Work an open question like a case — graded clues, competing theories in a consistency matrix, eliminate by evidence, backtrack, converge, with a casebook on disk for long cases. Use for puzzling bugs, reverse-engineering how a product works from public signals, or \"what actually happened here\". Do NOT use for planning (use karpathy-planning), repo tours (use grok-repo), or diff review.",
+      "compatibility": "",
+      "path": "skills/sherlock",
+      "files": [
+        {
+          "path": "CASEBOOK-FORMAT.md",
+          "sha256": "356ba5ce0d0685d486e52dafc8e5c0a589dd3ddeb9d364404147e03ff4b6191e",
+          "executable": false
+        },
+        {
+          "path": "REFERENCE.md",
+          "sha256": "42830ce951ea95b598c999be12134f5f3fba4db39246189e19b0ae8b6132a09a",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "aa61b90c6d5d28082434b248b56ea8c7fc160701b3afee6405ec220f3164b896",
+          "executable": false
+        },
+        {
+          "path": "scripts/fingerprint.sh",
+          "sha256": "f41ca2ecb4408385ea0469ce500acd09df68e678f3ec91bce1aa24a4ee1484fb",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "name": "show-me",
+      "description": "Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. Use when a visual clarifies those relationships; whole-repo briefings belong to grok-repo.",
+      "compatibility": "",
+      "path": "skills/show-me",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "d6a152f3226eacca3aa3779dba2e158d9568d58dda8a85a10c9ef66cbd229498",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "sketch-concept",
+      "description": "Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me) or for charts of real data (use dataviz).",
+      "compatibility": "",
+      "path": "skills/sketch-concept",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "2f46c9c0199029d39eca0b9a18d06f62b1226224773ada260ae283ba13b4a0f3",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "skill-curator",
+      "description": "Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. Use when cleaning, consolidating, or de-duplicating a skills tree.",
+      "compatibility": "",
+      "path": "skills/skill-curator",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "270a129fedad4400674eb4c4986f74f5983737d532651761906b04d5e80fa5f1",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "test-writing",
+      "description": "Write and repair tests that verify observable behavior, not implementation. Use when writing or reviewing tests, choosing test scope or mocks, fixing brittle tests, or deciding whether a failing test means the code is wrong or the test is.",
+      "compatibility": "",
+      "path": "skills/test-writing",
+      "files": [
+        {
+          "path": "REFERENCE.md",
+          "sha256": "cc0fd06c510c2f7203d2591ffcf8d206237d27638b963fb4519662a45d7db434",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "e2c730349771cb1bf8c344f048aba9f0122d3cc4b09623b94dc9fde0b8f98847",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "web-recap",
+      "description": "Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity.",
+      "compatibility": "",
+      "path": "skills/web-recap",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "2dc9961fcf90398df810abd5f876c502fbbc186c0b5216b8820e362383ee7f8b",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "write-docs",
+      "description": "Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for design docs or internal wikis.",
+      "compatibility": "",
+      "path": "skills/write-docs",
+      "files": [
+        {
+          "path": "AGENTSMD-REFERENCE.md",
+          "sha256": "cce097c49ff40b9331e95d1f6bc3be12720c72a76eaec3c8958772845e67e0c4",
+          "executable": false
+        },
+        {
+          "path": "AGENTSMD.md",
+          "sha256": "bb060f919a3b94ea8069fa4053179927f369d8c0b3908ee4735d3e0330a2e2ae",
+          "executable": false
+        },
+        {
+          "path": "CLARITY-REFERENCE.md",
+          "sha256": "66cba372af3086fec15819c22b2a61f72cf3dd2bef5f8ed54ca57617096d0e0a",
+          "executable": false
+        },
+        {
+          "path": "CLI.md",
+          "sha256": "58f839797fad81d344b76e8d47edefff6ad5b0e18f72b8ba26dd4bbcbb92659f",
+          "executable": false
+        },
+        {
+          "path": "COMMENTS.md",
+          "sha256": "493b8a2a948970dd54e685f667a6be4b68956a939a3b4b95dae3c2e5cecb86f2",
+          "executable": false
+        },
+        {
+          "path": "GUIDES.md",
+          "sha256": "ce8e73b313adad64f9be1d3d918d48bccd1e8f4614e24a6ff54e33a12b5ad61d",
+          "executable": false
+        },
+        {
+          "path": "PR.md",
+          "sha256": "1139ac87f3c266b8671c0122311793ffc91a0ab154b9bb957a02c00f83b5175c",
+          "executable": false
+        },
+        {
+          "path": "READMES-REFERENCE.md",
+          "sha256": "e6f2e517fc1b791c5da3b503c5926f397a7462c0bdb939fce733d15ff1179be8",
+          "executable": false
+        },
+        {
+          "path": "READMES.md",
+          "sha256": "5d0eee7fb633deb0588d08f189e1dcd606682a972bfa08465cbc0b29474f7da9",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "f428e2edd8591198b29ee628bdad56f0d7e13a48553921aff1f2f5c2e6443a1c",
+          "executable": false
+        },
+        {
+          "path": "scripts/prose_lint.py",
+          "sha256": "421d0dac5362388e26b7e8c3e2933b6015e5dd3aa375174f4f68c1749065d0e1",
+          "executable": false
+        },
+        {
+          "path": "scripts/test_prose_lint.py",
+          "sha256": "2a864cff49f5ed03811f61145ad2b7cb9c130d082f5d5fbe3ec475934a187ae2",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "write-skill",
+      "description": "Author or update compact agent skills under skills/<name>/SKILL.md. Use when asked to write, add, or change a skill; not to audit a skill library.",
+      "compatibility": "",
+      "path": "skills/write-skill",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "534fc2e26e86f331f9e5f2a2863375a20e4cf1915daa145f2d6647c004542548",
+          "executable": false
+        }
+      ]
+    }
+  ]
+}
