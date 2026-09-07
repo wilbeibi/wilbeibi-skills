@@ -128,6 +128,13 @@ function sectionize(rendered) {
   }
   return out;
 }
+/* YAML frontmatter is metadata, not prose: markdown-it would render the closing
+   `---` as a setext h2 swallowing the whole block. Peel it off and show it as-is. */
+function splitFrontmatter(text) {
+  const m = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(text || "");
+  if (!m) return { meta: null, body: text || "" };
+  return { meta: m[1], body: (text || "").slice(m[0].length) };
+}
 function renderMarkdownInto(host, text) {
   const holder = el("div");
   holder.innerHTML = md.render(text || "");
@@ -139,7 +146,9 @@ function renderEntry(entry, ordinal) {
   if (DOC.kind === "markdown") {
     const art = el("article", "entry k-document");
     art.dataset.entry = entry.id;
-    renderMarkdownInto(art, entry.text);
+    const split = splitFrontmatter(entry.text);
+    if (split.meta) art.appendChild(el("pre", "plain frontmatter", split.meta));
+    renderMarkdownInto(art, split.body);
     return art;
   }
   const box = el("details", "entry k-" + kind.replace(/[^a-z0-9_-]/gi, ""));
@@ -452,7 +461,10 @@ function renderAnnotations() {
     acts.appendChild(edit);
     const del = el("button", "link", "delete");
     del.type = "button";
-    del.onclick = function () { removeAnnotation(a.id); };
+    del.onclick = function () {
+      if (a.comment.trim() && !window.confirm("Delete this note? The comment goes with it.")) return;
+      removeAnnotation(a.id);
+    };
     acts.appendChild(del);
     head.appendChild(acts);
     li.appendChild(head);
@@ -573,14 +585,34 @@ function jumpTo(a) {
 }
 
 /* ---- selection menu --------------------------------------------------- */
-function hideMenu() { $("sel-menu").hidden = true; $("sel-menu").className = ""; pendingSel = null; }
-function showMenu() {
+function hideMenu() {
+  const menu = $("sel-menu");
+  menu.hidden = true;
+  menu.className = "";
+  menu.textContent = "";   // the buttons go with it, so no stale handler survives
+  pendingSel = null;
+}
+/* Acting on a selection consumes it. Without this the mouseup that follows the
+   click would re-read the same range and put the menu straight back. */
+function consumeSelection() {
+  const s = window.getSelection();
+  if (s && s.removeAllRanges) s.removeAllRanges();
+}
+function headerInset() {
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--top");
+  return parseFloat(v) || 0;
+}
+function showMenu(fromKeyboard) {
   const sel = readSelection();
   const menu = $("sel-menu");
   if (!sel) { hideMenu(); return; }
   const range = window.getSelection().getRangeAt(0);
-  const rect = range.getBoundingClientRect();
+  const rects = range.getClientRects();
+  /* the last line, not the union: a multi-line selection's bounding box is
+     centred over text the reader is still looking at. */
+  const rect = rects.length ? rects[rects.length - 1] : range.getBoundingClientRect();
   menu.textContent = "";
+  let first = null;
   if (sel.error) {
     menu.className = "warn";
     menu.textContent = sel.error;
@@ -590,22 +622,29 @@ function showMenu() {
     pendingSel = sel;
     const hl = el("button", null, "Highlight");
     hl.type = "button";
-    hl.onclick = function () { addFromSelection(sel, ""); hideMenu(); afterChange(); };
+    hl.onclick = function () { addFromSelection(sel, ""); consumeSelection(); hideMenu(); afterChange(); };
     const cm = el("button", "primary", "Comment");
     cm.type = "button";
-    cm.onclick = function () { hideMenu(); openEditor({ sel: sel }); };
+    cm.onclick = function () { consumeSelection(); hideMenu(); openEditor({ sel: sel }); };
     menu.appendChild(hl);
     menu.appendChild(cm);
+    first = hl;
   }
   menu.hidden = false;
   const w = menu.offsetWidth, h = menu.offsetHeight;
   let left = rect.left + rect.width / 2 - w / 2;
   left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
-  let top = rect.top - h - 8;
-  if (top < 8) top = rect.bottom + 8;
-  top = Math.max(8, Math.min(top, window.innerHeight - h - 8));
+  const floor = headerInset() + 8;          // clear of the sticky header, not just the viewport
+  const above = rect.top - h - 8;
+  const below = rect.bottom + 8;
+  let top;
+  if (above >= floor) top = above;
+  else if (below + h <= window.innerHeight - 8) top = below;
+  else top = Math.max(floor, window.innerHeight - h - 8);
   menu.style.left = left + "px";
   menu.style.top = top + "px";
+  /* a keyboard selection has no pointer to reach the menu with */
+  if (fromKeyboard && first) first.focus();
 }
 
 /* ---- search ----------------------------------------------------------- */
@@ -933,12 +972,20 @@ function boot() {
   }
 
   /* events */
-  document.addEventListener("mouseup", function () { setTimeout(showMenu, 0); });
+  const inChrome = function (node) {
+    return node instanceof Element && !!node.closest("#sel-menu,#panel,#nav,.top,.notice");
+  };
+  document.addEventListener("mouseup", function (ev) {
+    if (editing || inChrome(ev.target)) return;
+    setTimeout(showMenu, 0);
+  });
   document.addEventListener("keyup", function (ev) {
-    if (ev.shiftKey || ev.key === "Shift") setTimeout(showMenu, 0);
+    if (editing || inChrome(ev.target)) return;
+    if (ev.shiftKey || ev.key === "Shift") setTimeout(function () { showMenu(true); }, 0);
   });
   document.addEventListener("mousedown", function (ev) {
-    if (!ev.target.closest("#sel-menu")) hideMenu();
+    const t = ev.target;
+    if (!(t instanceof Element) || !t.closest("#sel-menu")) hideMenu();
   });
   document.addEventListener("scroll", hideMenu, true);
   document.addEventListener("keydown", function (ev) {
@@ -994,7 +1041,8 @@ function boot() {
     closedForPrint = null;
   });
   window.addEventListener("beforeunload", function (ev) {
-    if (sent || cancelled || !LIVE) return;
+    /* offline is where losing the draft is unrecoverable, so it is guarded too */
+    if (sent || cancelled) return;
     if (!anns.length && !$("prompt").value.trim()) return;
     ev.preventDefault();
     ev.returnValue = "";

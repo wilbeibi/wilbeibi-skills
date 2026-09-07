@@ -1,17 +1,23 @@
 /* Readback review surface. Reading column first; controls stay out of the text. */
 :root{
-  --bg:#f7f5f0; --card:#fffdf8; --sunk:#efece4; --ink:#1b2330; --muted:#66707e;
+  --bg:#f7f5f0; --card:#fffdf8; --sunk:#efece4; --ink:#1b2330; --muted:#5b6472;  /* 5.07:1 on --sunk */
   --line:#ddd7ca; --line-soft:#e8e3d8; --accent:#8a5a2a; --accent-soft:#f3e7d6;
+  --edge:#8b8577;          /* control borders: >=3:1 on --bg, per WCAG 1.4.11 */
+  --on-accent:#fff;        /* text on --accent */
   --good:#2f6b4f; --warn:#8a5b00; --warn-soft:#fbf1d8; --bad:#a03027;
   --mark:#ffe6a8; --mark-active:#ffcf5c; --find:#bcdcff; --find-on:#6fb4ff;
+  --on-find:#08243d;       /* text on --find-on */
   --top:64px;   /* replaced with the measured header height at runtime */
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#12151c; --card:#1a1e27; --sunk:#161a22; --ink:#e7e5e0; --muted:#98a1ae;
     --line:#2d3340; --line-soft:#242a35; --accent:#d3a469; --accent-soft:#2b2418;
+    --edge:#656d7c;
+    --on-accent:#17140d;
     --good:#7fc6a4; --warn:#d8b169; --warn-soft:#2a2415; --bad:#e08a80;
     --mark:#5a4a16; --mark-active:#8a6c12; --find:#1d3d5e; --find-on:#2f6ea8;
+    --on-find:#fff;
   }
 }
 *{box-sizing:border-box}
@@ -33,14 +39,14 @@ button,input,textarea{font:inherit;color:inherit}
 .top-main{min-width:220px;flex:1 1 320px}
 #source-note{margin:2px 0 0;font-size:.8rem}
 .top-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-button{min-height:32px;border:1px solid var(--line);border-radius:8px;padding:4px 10px;
+button{min-height:32px;border:1px solid var(--edge);border-radius:8px;padding:4px 10px;
   background:var(--card);font-size:.85rem;font-weight:600;cursor:pointer}
 button:hover:not(:disabled){border-color:var(--accent)}
 button:disabled{opacity:.5;cursor:default}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 button.link{border:0;background:none;padding:2px 4px;font-weight:400;
   color:var(--muted);text-decoration:underline;min-height:0}
-.search{display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;
+.search{display:flex;align-items:center;gap:4px;border:1px solid var(--edge);border-radius:8px;
   background:var(--card);padding:2px 4px 2px 8px}
 .search input{border:0;background:none;padding:4px 0;width:170px;font-size:.85rem}
 .search input:focus{outline:none}
@@ -76,7 +82,7 @@ body.nav-off #nav,body.panel-off #panel{display:none}
 body.nav-off .cols{grid-template-columns:minmax(0,1fr) 360px}
 body.panel-off .cols{grid-template-columns:250px minmax(0,1fr)}
 body.nav-off.panel-off .cols{grid-template-columns:minmax(0,1fr)}
-@media (max-width:1180px){
+@media (max-width:1080px){
   .cols{grid-template-columns:minmax(0,1fr)}
   #nav,#panel{position:static;max-height:none;border:0;border-top:1px solid var(--line);
     padding:14px 18px 20px;max-width:900px;margin:0 auto;width:100%}
@@ -111,7 +117,12 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .toolline{font-size:.78rem;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   padding:0 4px 4px 22px;word-break:break-word}
 .sec{margin:0}
-.sec>summary h1,.sec>summary h2,.sec>summary h3{margin:0}
+/* headings are lifted into the summary by sectionize(); the scale lives here */
+.sec>summary :is(h1,h2,h3,h4,h5,h6){margin:0;line-height:1.3}
+.sec>summary h1{font-size:1.5rem}
+.sec>summary h2{font-size:1.25rem}
+.sec>summary h3{font-size:1.08rem}
+.sec>summary :is(h4,h5,h6){font-size:.95rem}
 
 .body h1,.body h2,.body h3,.body h4,.body h5,.body h6{line-height:1.3;margin:1.4em 0 .5em}
 .body h1{font-size:1.5rem}
@@ -141,16 +152,21 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .plain{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.86rem;background:var(--sunk);border-radius:8px;padding:10px 12px}
 .empty{color:var(--muted);font-style:italic;padding:20px 4px}
+/* YAML frontmatter: shown as the metadata it is, not rendered as a giant heading */
+.frontmatter{font-size:.8rem;color:var(--muted);margin:0 0 20px}
 
 ::highlight(rb-mark){background:var(--mark)}
 ::highlight(rb-active){background:var(--mark-active)}
 ::highlight(rb-find){background:var(--find)}
-::highlight(rb-find-on){background:var(--find-on);color:#fff}
+::highlight(rb-find-on){background:var(--find-on);color:var(--on-find)}
 
 /* ---- selection menu --------------------------------------------------- */
 #sel-menu{position:fixed;z-index:40;display:flex;gap:6px;background:var(--card);
-  border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  border:1px solid var(--edge);border-radius:10px;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 #sel-menu.warn{max-width:280px;display:block;font-size:.82rem;color:var(--muted);padding:8px 10px}
+/* an author-origin `display` outranks the UA `[hidden]{display:none}` whatever the
+   specificity, so `hidden` is inert here unless it is restated. */
+#sel-menu[hidden]{display:none}
 
 /* ---- review panel ----------------------------------------------------- */
 .block{margin:0 0 22px}
@@ -171,7 +187,7 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .a-none{color:var(--muted);font-style:italic;margin:4px 0 0}
 .a-acts{display:flex;gap:2px;flex:none}
 .a-flag{color:var(--warn);font-size:.76rem;margin-top:4px}
-textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--card);
+textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:var(--card);
   padding:8px 10px;font-size:.88rem;resize:vertical}
 #editor textarea{min-height:76px}
 #prompt{min-height:260px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem;
