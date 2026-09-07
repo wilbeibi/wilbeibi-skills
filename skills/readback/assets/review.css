@@ -75,7 +75,8 @@ button.link{border:0;background:none;padding:2px 4px;font-weight:400;
 main{padding:20px 28px 120px;min-width:0}
 /* nothing lands under the sticky header when scrolled to */
 .entry,.sec,.body h1,.body h2,.body h3,.body h4,.body h5,.body h6{scroll-margin-top:calc(var(--top) + 12px)}
-.doc{max-width:65ch;margin:0 auto}
+.doc{max-width:none;margin:0}
+body.has-annotations .doc{width:calc(100% - 154px);margin-left:0}
 body.nav-off #nav{display:none}
 body.nav-off .cols{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1080px){
@@ -196,10 +197,11 @@ textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:v
 #prompt-state,#send-state,#store-state{font-size:.8rem;margin:6px 0 0}
 #send-state.ok{color:var(--good);font-weight:600}
 #send-state.err{color:var(--bad)}
-@media (max-width:1199px){
+@media (max-width:1080px){
   #marginalia{position:static;pointer-events:auto;max-width:74ch;margin:0 auto;padding:0 18px}
   #ann-list{display:grid;gap:8px}
   #ann-list li{position:static;width:auto;box-shadow:none}
+  body.has-annotations .doc{width:auto}
   .followup{margin-top:42px}
 }
 

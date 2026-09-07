@@ -424,6 +424,7 @@ function renderAnnotations() {
   const list = $("ann-list");
   list.textContent = "";
   const items = ordered();
+  document.body.classList.toggle("has-annotations", items.length > 0);
   const lost = items.filter(function (a) { return UNRESOLVED.has(a.id); }).length;
   const warn = $("anchor-warn");
   warn.hidden = lost === 0;
@@ -558,7 +559,7 @@ function jumpTo(a) {
   renderAnnotations();
 }
 
-function narrowLayout() { return window.matchMedia("(max-width:1199px)").matches; }
+function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
 function marginLeft(width) {
   const doc = $("doc-body").getBoundingClientRect();
   const nav = $("nav").getBoundingClientRect();
@@ -650,13 +651,15 @@ function showMenu(fromKeyboard) {
   }
   menu.hidden = false;
   const w = menu.offsetWidth, h = menu.offsetHeight;
-  let left = !narrowLayout() ? marginLeft(w) : null;
+  const side = !narrowLayout() ? marginLeft(w) : null;
+  let left = side;
   if (left == null) {
     left = rect.left + rect.width / 2 - w / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
   }
   const floor = headerInset() + 8;          // clear of the sticky header, not just the viewport
-  const top = Math.max(floor, Math.min(rect.top, window.innerHeight - h - 8));
+  const desiredTop = side == null ? rect.bottom + 8 : rect.top;
+  const top = Math.max(floor, Math.min(desiredTop, window.innerHeight - h - 8));
   menu.style.left = left + "px";
   menu.style.top = top + "px";
   /* a keyboard selection has no pointer to reach the menu with */
