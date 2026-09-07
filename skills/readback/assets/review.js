@@ -776,26 +776,25 @@ function sourceLine() {
 function composePrompt() {
   const items = ordered();
   const out = [];
-  out.push('Please address the following feedback on "' + DOC.title + '".');
+  out.push('Task: Apply the feedback below to "' + DOC.title + '".');
   out.push("");
   out.push("Source: " + sourceLine());
   if (DOC.scope) out.push("Source scope: " + DOC.scope);
   out.push("");
+  out.push("Rules: Target is an exact location anchor, not replacement text. Apply Request only and preserve unrelated behavior. If Request is empty, inspect and report; do not invent a change.");
+  out.push("");
   items.forEach(function (a, i) {
-    let head = (i + 1) + ". " + (a.scope === "document" ? "Whole document" : a.where);
-    if (UNRESOLVED.has(a.id)) head += " (anchor unresolved; quote saved from the original selection)";
-    out.push(head);
+    out.push((i + 1) + ". Location: " + (a.scope === "document" ? "Whole document" : a.where));
+    if (UNRESOLVED.has(a.id)) out.push("Status: anchor unresolved");
     if (a.scope !== "document") {
-      out.push("Original passage:");
-      a.quote.split("\n").forEach(function (line) { out.push("> " + line); });
+      out.push("Target (exact; locating only):");
+      out.push("<<<");
+      out.push(a.quote);
+      out.push(">>>");
     }
-    if (a.comment.trim()) {
-      out.push("");
-      out.push("My comment:");
-      out.push(a.comment.replace(/\s+$/, ""));
-    } else {
-      out.push("Marked for attention (no comment)");
-    }
+    out.push("Request: " + (a.comment.trim()
+      ? a.comment.replace(/\s+$/, "")
+      : "None provided; inspect and report whether action is needed."));
     out.push("");
   });
   return out.join("\n").replace(/\n+$/, "\n");
