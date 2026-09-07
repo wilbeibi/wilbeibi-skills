@@ -25,7 +25,8 @@
     <button id="expand-all" type="button">Expand all</button>
     <button id="collapse-all" type="button">Collapse all</button>
     <button id="toggle-nav" type="button" aria-expanded="true">Contents</button>
-    <button id="toggle-panel" type="button" aria-expanded="true">Review</button>
+    <button id="doc-note" type="button">Note on document</button>
+    <button id="go-followup" type="button">Follow-up</button>
   </div>
 </header>
 
@@ -36,60 +37,30 @@
 <div class="cols">
   <nav id="nav" aria-label="Contents"><ol id="nav-list"></ol></nav>
 
-  <main id="doc" tabindex="-1"><div class="doc" id="doc-body"></div></main>
-
-  <aside id="panel" aria-label="Review and follow-up">
-    <section class="block">
-      <h2>Annotations <span id="ann-count" class="muted"></span></h2>
-      <div class="row">
-        <button id="doc-note" type="button">Note on whole document</button>
-      </div>
-      <div id="editor" hidden>
-        <p class="a-where" id="edit-where"></p>
-        <div class="a-quote" id="edit-quote" hidden></div>
-        <label class="muted" for="edit-text">Comment (optional)</label>
-        <textarea id="edit-text" spellcheck="true"></textarea>
-        <div class="row">
-          <button id="edit-save" class="primary" type="button">Save</button>
-          <button id="edit-cancel" type="button">Cancel</button>
-        </div>
-      </div>
-      <ol id="ann-list"></ol>
-      <p id="ann-empty" class="muted">Select text in the document to highlight or comment on it.</p>
-    </section>
-
-    <section class="block">
-      <h2>Follow-up prompt</h2>
-      <div class="row">
-        <button id="build-prompt" type="button">Build prompt</button>
-        <button id="rebuild-prompt" type="button" hidden>Rebuild from annotations</button>
-      </div>
+  <main id="doc" tabindex="-1">
+    <div class="doc" id="doc-body"></div>
+    <section id="followup" class="followup" aria-labelledby="followup-title">
+      <h2 id="followup-title">Follow-up</h2>
       <p id="prompt-state" class="muted" aria-live="polite"></p>
-      <label class="muted" for="prompt">Sent exactly as it reads here. Edit freely.</label>
-      <textarea id="prompt" spellcheck="true" placeholder="Build from your annotations, or write the follow-up yourself."></textarea>
+      <pre id="prompt-preview" tabindex="0" aria-label="Generated follow-up prompt"></pre>
       <div class="row">
         <button id="send" class="primary" type="button" hidden>Confirm &amp; send</button>
         <button id="copy" type="button">Copy</button>
         <button id="download" type="button">Download .md</button>
       </div>
       <p id="send-state" role="status" aria-live="polite"></p>
-      <div class="row">
-        <button id="cancel-review" class="link" type="button" hidden>Cancel review without sending</button>
-      </div>
+      <div class="row"><button id="cancel-review" class="link" type="button" hidden>Cancel review without sending</button></div>
       <p id="store-state" class="muted"></p>
-    </section>
-
-    <section class="block">
-      <h2>Source</h2>
-      <div class="row">
+      <div class="source-actions">
         <button id="copy-source" type="button">Copy original</button>
         <button id="download-source" type="button">Download original</button>
+        <span class="muted" id="scope-note"></span>
       </div>
-      <p class="muted" id="scope-note"></p>
     </section>
-  </aside>
+  </main>
 </div>
 
+<aside id="marginalia" aria-label="Annotations in the margin"><ol id="ann-list"></ol></aside>
 <div id="sel-menu" role="group" aria-label="Selection actions" aria-live="polite" hidden></div>
 
 <script>window.RB_PAYLOAD={{PAYLOAD}};window.RB_LIVE={{LIVE}};</script>

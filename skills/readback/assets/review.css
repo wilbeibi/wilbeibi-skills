@@ -55,13 +55,13 @@ button.link{border:0;background:none;padding:2px 4px;font-weight:400;
 #search-count{font-size:.76rem;white-space:nowrap;min-width:4.5em;text-align:right}
 
 /* ---- notices ---------------------------------------------------------- */
-.notice{border:1px solid var(--line);border-left:3px solid var(--warn);background:var(--warn-soft);
+.notice{border:1px solid var(--warn);background:var(--warn-soft);
   border-radius:8px;padding:8px 12px;margin:10px 18px 0;font-size:.85rem}
 .notice ul{margin:4px 0 0;padding-left:20px}
-.notice.bad{border-left-color:var(--bad)}
+.notice.bad{border-color:var(--bad)}
 
-/* ---- three columns ---------------------------------------------------- */
-.cols{display:grid;grid-template-columns:250px minmax(0,1fr) 360px;gap:0;align-items:start}
+/* ---- reader and proofing margin -------------------------------------- */
+.cols{display:grid;grid-template-columns:250px minmax(0,1fr);gap:0;align-items:start}
 #nav{position:sticky;top:var(--top);max-height:calc(100vh - var(--top));overflow:auto;
   border-right:1px solid var(--line-soft);padding:14px 10px 40px;font-size:.85rem}
 #nav ol{list-style:none;margin:0;padding:0}
@@ -72,19 +72,17 @@ button.link{border:0;background:none;padding:2px 4px;font-weight:400;
 #nav a.h3{padding-left:32px;color:var(--muted)}
 #nav .who{color:var(--accent);font-weight:600}
 #nav .n{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:4px}
-main{padding:20px 28px 120px;min-width:0}
+/* This inset is intentional empty paper: the proofing notes live beside their passage,
+   not in a second application rail. */
+main{padding:20px 28px 120px 228px;min-width:0}
 /* nothing lands under the sticky header when scrolled to */
 .entry,.sec,.body h1,.body h2,.body h3,.body h4,.body h5,.body h6{scroll-margin-top:calc(var(--top) + 12px)}
 .doc{max-width:74ch;margin:0 auto}
-#panel{position:sticky;top:var(--top);max-height:calc(100vh - var(--top));overflow:auto;
-  border-left:1px solid var(--line-soft);padding:14px 14px 40px}
-body.nav-off #nav,body.panel-off #panel{display:none}
-body.nav-off .cols{grid-template-columns:minmax(0,1fr) 360px}
-body.panel-off .cols{grid-template-columns:250px minmax(0,1fr)}
-body.nav-off.panel-off .cols{grid-template-columns:minmax(0,1fr)}
+body.nav-off #nav{display:none}
+body.nav-off .cols{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1080px){
   .cols{grid-template-columns:minmax(0,1fr)}
-  #nav,#panel{position:static;max-height:none;border:0;border-top:1px solid var(--line);
+  #nav{position:static;max-height:none;border:0;border-top:1px solid var(--line);
     padding:14px 18px 20px;max-width:900px;margin:0 auto;width:100%}
   #nav{order:-1}
   main{padding:16px 18px 60px}
@@ -110,7 +108,7 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .entry .body,.sec .body{padding:0 4px 0 22px}
 .entry.k-compaction>summary .who,.entry.k-branch>summary .who{color:var(--muted)}
 .entry.k-compaction,.entry.k-branch{background:var(--sunk);border-radius:10px;padding:2px 8px 8px}
-.entry.k-failure{border-left:3px solid var(--bad);border-radius:0;padding-left:10px}
+.entry.k-failure{border:1px solid var(--bad);border-radius:8px;padding:2px 10px 10px}
 .entry.k-failure>summary .who{color:var(--bad)}
 .kindtag{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);
   border-radius:99px;padding:0 7px;color:var(--muted);flex:none}
@@ -131,7 +129,7 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .body h4,.body h5,.body h6{font-size:1rem}
 .body p,.body ul,.body ol,.body blockquote,.body table,.body pre{margin:.7em 0}
 .body li{margin:.25em 0}
-.body blockquote{border-left:3px solid var(--line);margin-left:0;padding:0 0 0 14px;color:var(--muted)}
+.body blockquote{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-left:0;padding:8px 0;color:var(--muted)}
 .body a{color:var(--accent)}
 .body a.dead{color:var(--muted);text-decoration:line-through}
 .body code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;
@@ -168,16 +166,15 @@ summary .caret{display:inline-block;transition:transform 120ms}
    specificity, so `hidden` is inert here unless it is restated. */
 #sel-menu[hidden]{display:none}
 
-/* ---- review panel ----------------------------------------------------- */
-.block{margin:0 0 22px}
-.block h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
-  margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0}
+/* ---- marginalia and read-back ---------------------------------------- */
+#marginalia{position:fixed;inset:0;z-index:10;pointer-events:none}
 #ann-list{list-style:none;margin:0;padding:0}
-#ann-list li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 8px;
-  background:var(--card);font-size:.85rem}
-#ann-list li.on{border-color:var(--accent)}
-#ann-list li.unresolved{border-left:3px solid var(--warn)}
+#ann-list li{position:fixed;width:184px;pointer-events:auto;border:1px solid var(--line);
+  border-radius:12px;padding:8px 10px;background:var(--card);font-size:.81rem;line-height:1.42}
+#ann-list li.on{border-color:var(--accent);background:var(--accent-soft)}
+#ann-list li.unresolved{border-left:1px solid var(--warn)}
+.a-number{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:700;margin-right:5px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .a-head{display:flex;gap:6px;align-items:baseline;justify-content:space-between}
 .a-where{font-weight:700;font-size:.74rem;color:var(--accent);text-transform:uppercase;
   letter-spacing:.04em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -189,19 +186,28 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .a-flag{color:var(--warn);font-size:.76rem;margin-top:4px}
 textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:var(--card);
   padding:8px 10px;font-size:.88rem;resize:vertical}
-#editor textarea{min-height:76px}
-#prompt{min-height:260px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem;
-  line-height:1.5}
-#editor{border:1px solid var(--accent);border-radius:10px;padding:8px 10px;margin:0 0 10px;
-  background:var(--card)}
+#ann-list textarea{min-height:64px;margin-top:7px;line-height:1.42;font-size:.82rem}
+.followup{max-width:74ch;margin:56px auto 0;padding-top:20px;border-top:1px solid var(--line)}
+.followup h2{font-size:1.25rem;margin:0 0 4px}
+#prompt-preview{min-height:7em;max-height:34em;overflow:auto;margin:12px 0 4px;padding:14px;
+  border:1px solid var(--line);border-radius:12px;background:var(--sunk);white-space:pre-wrap;
+  overflow-wrap:anywhere;font:inherit;font-size:.88rem;line-height:1.55}
+#prompt-preview:empty:before{content:"Mark a passage or add a document note to compose the follow-up.";color:var(--muted)}
+.source-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:28px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.source-actions .muted{font-size:.8rem}
 #prompt-state,#send-state,#store-state{font-size:.8rem;margin:6px 0 0}
 #send-state.ok{color:var(--good);font-weight:600}
 #send-state.err{color:var(--bad)}
-#prompt-state.stale{color:var(--warn)}
+@media (max-width:1080px){
+  #marginalia{position:static;pointer-events:auto;max-width:74ch;margin:0 auto;padding:0 18px}
+  #ann-list{display:grid;gap:8px}
+  #ann-list li{position:static;width:auto;box-shadow:none}
+  .followup{margin-top:42px}
+}
 
 /* ---- print ------------------------------------------------------------ */
 @media print{
-  .top,#nav,#panel,#sel-menu,.notice,.skip{display:none!important}
+  .top,#nav,#marginalia,#sel-menu,.notice,.skip{display:none!important}
   body{background:#fff;color:#000;font-size:11pt}
   .cols{display:block}
   main{padding:0}
