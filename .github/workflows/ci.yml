@@ -26,3 +26,9 @@ jobs:
 
       - name: Test repository archaeology report
         run: bash skills/grok-repo/scripts/test_archaeology.sh
+
+      - name: Check catalog
+        run: uv run scripts/build_catalog.py --check
+
+      - name: Test route-skill
+        run: python3 skills/route-skill/scripts/test_route_skill.py
