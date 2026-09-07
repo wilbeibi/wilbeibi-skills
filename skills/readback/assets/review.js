@@ -21,10 +21,7 @@ const UNRESOLVED = new Set();        // annotation ids whose anchor failed verif
 const indexes = new Map();           // entry id -> canonical text index
 const entryEls = new Map();          // entry id -> [data-entry] element
 let activeId = null;
-let editing = null;                  // {id} | {sel} | {scope:"document"}
 let pendingSel = null;               // selection captured for the menu
-let promptBuilt = null;              // last mechanically built text
-let promptStale = false;
 let sent = false;
 let cancelled = false;
 let submissionId = null;
@@ -391,8 +388,7 @@ function save() {
   if (!storageOK) return;
   try {
     localStorage.setItem(KEY, JSON.stringify({
-      v: 1, anns: anns, prompt: $("prompt").value, built: promptBuilt,
-      stale: promptStale, sent: sent, submissionId: submissionId,
+      v: 2, anns: anns, sent: sent, submissionId: submissionId,
       savedAt: new Date().toISOString(),
     }));
     $("store-state").textContent = "Draft saved in this browser.";
@@ -415,10 +411,7 @@ function restore() {
   try { data = JSON.parse(raw); } catch (e) { return; }
   if (!data || !Array.isArray(data.anns)) return;
   anns = data.anns.filter(function (a) { return a && a.id && typeof a.comment === "string"; });
-  promptBuilt = typeof data.built === "string" ? data.built : null;
-  promptStale = !!data.stale;
   submissionId = data.submissionId || null;
-  if (typeof data.prompt === "string") $("prompt").value = data.prompt;
   if (data.sent) markSent(null, true);
 }
 
@@ -431,8 +424,6 @@ function renderAnnotations() {
   const list = $("ann-list");
   list.textContent = "";
   const items = ordered();
-  $("ann-count").textContent = items.length ? String(items.length) : "";
-  $("ann-empty").hidden = items.length > 0;
   const lost = items.filter(function (a) { return UNRESOLVED.has(a.id); }).length;
   const warn = $("anchor-warn");
   warn.hidden = lost === 0;
@@ -441,13 +432,16 @@ function renderAnnotations() {
       " no longer anchored to a passage in this document — the document may have changed since the review was saved. " +
       "The saved quotes are still included in the prompt.";
   }
-  items.forEach(function (a) {
+  items.forEach(function (a, i) {
     const li = el("li");
     li.dataset.ann = a.id;
     if (a.id === activeId) li.classList.add("on");
     if (UNRESOLVED.has(a.id)) li.classList.add("unresolved");
     const head = el("div", "a-head");
-    head.appendChild(el("span", "a-where", a.scope === "document" ? "Whole document" : a.where));
+    const where = el("span", "a-where");
+    where.appendChild(el("span", "a-number", String(i + 1) + "."));
+    where.appendChild(document.createTextNode(a.scope === "document" ? "Whole document" : a.where));
+    head.appendChild(where);
     const acts = el("div", "a-acts");
     if (a.scope !== "document") {
       const jump = el("button", "link", "jump");
@@ -455,10 +449,6 @@ function renderAnnotations() {
       jump.onclick = function () { jumpTo(a); };
       acts.appendChild(jump);
     }
-    const edit = el("button", "link", "edit");
-    edit.type = "button";
-    edit.onclick = function () { openEditor({ id: a.id }); };
-    acts.appendChild(edit);
     const del = el("button", "link", "delete");
     del.type = "button";
     del.onclick = function () {
@@ -469,64 +459,50 @@ function renderAnnotations() {
     head.appendChild(acts);
     li.appendChild(head);
     if (a.scope !== "document") li.appendChild(el("div", "a-quote", excerpt(a.quote, 220)));
-    if (a.comment.trim()) li.appendChild(el("p", "a-comment", a.comment));
-    else li.appendChild(el("p", "a-none", "Marked for attention (no comment)"));
+    const input = el("textarea");
+    input.rows = 3;
+    input.placeholder = "Add a comment (optional)";
+    input.setAttribute("aria-label", "Comment for annotation " + (i + 1));
+    input.value = a.comment;
+    input.oninput = function () {
+      a.comment = input.value;
+      renderReadback();
+      saveSoon();
+      requestAnimationFrame(layoutMarginalia);
+    };
+    li.appendChild(input);
     if (UNRESOLVED.has(a.id)) {
       li.appendChild(el("p", "a-flag",
         "Anchor unresolved — this passage was not found in the document as loaded. " +
         "The saved quote is still used in the prompt."));
     }
     li.onclick = function (ev) {
-      if (ev.target.closest("button")) return;
+      if (ev.target.closest("button,textarea")) return;
       activeId = a.id; paint(); renderAnnotations();
     };
     list.appendChild(li);
   });
+  requestAnimationFrame(layoutMarginalia);
 }
-function openEditor(target) {
-  editing = target;
-  const box = $("editor");
-  const quote = $("edit-quote");
-  let where = "", text = "", q = null;
-  if (target.id) {
-    const a = anns.find(function (x) { return x.id === target.id; });
-    if (!a) return;
-    where = a.scope === "document" ? "Note on whole document" : a.where;
-    text = a.comment;
-    q = a.scope === "document" ? null : a.quote;
-  } else if (target.scope === "document") {
-    where = "Note on whole document";
-  } else {
-    where = labelFor(target.sel.entryId, target.sel.start);
-    q = target.sel.quote;
-  }
-  $("edit-where").textContent = where;
-  quote.hidden = q == null;
-  quote.textContent = q == null ? "" : excerpt(q, 400);
-  $("edit-text").value = text;
-  box.hidden = false;
-  $("edit-text").focus();
+function focusComment(id) {
+  requestAnimationFrame(function () {
+    const card = document.querySelector('[data-ann="' + id + '"]');
+    const input = card && card.querySelector("textarea");
+    if (input) input.focus();
+  });
 }
-function closeEditor() { editing = null; $("editor").hidden = true; }
-function saveEditor() {
-  const comment = $("edit-text").value;
-  if (editing && editing.id) {
-    const a = anns.find(function (x) { return x.id === editing.id; });
-    if (a) a.comment = comment;
-  } else if (editing && editing.scope === "document") {
-    if (!comment.trim()) { closeEditor(); return; }
-    anns.push({
-      id: "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      order: nextOrder(), fingerprint: DOC.fingerprint, anchorVersion: ANCHOR,
-      scope: "document", entryId: null, where: "Whole document",
-      start: 0, end: 0, quote: "", before: "", after: "",
-      comment: comment, createdAt: new Date().toISOString(),
-    });
-  } else if (editing && editing.sel) {
-    addFromSelection(editing.sel, comment);
-  }
-  closeEditor();
+function addDocumentNote() {
+  const a = {
+    id: "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    order: nextOrder(), fingerprint: DOC.fingerprint, anchorVersion: ANCHOR,
+    scope: "document", entryId: null, where: "Whole document",
+    start: 0, end: 0, quote: "", before: "", after: "",
+    comment: "", createdAt: new Date().toISOString(),
+  };
+  anns.push(a);
+  activeId = a.id;
   afterChange();
+  focusComment(a.id);
 }
 function addFromSelection(sel, comment) {
   const idx = indexes.get(sel.entryId);
@@ -549,15 +525,13 @@ function removeAnnotation(id) {
   RANGES.delete(id);
   UNRESOLVED.delete(id);
   if (activeId === id) activeId = null;
-  if (editing && editing.id === id) closeEditor();
   afterChange();
 }
 function afterChange() {
   anns.forEach(function (a) { if (!RANGES.has(a.id) && !UNRESOLVED.has(a.id)) anchor(a); });
   renderAnnotations();
   paint();
-  if (promptBuilt !== null) { promptStale = true; }
-  refreshPromptState();
+  renderReadback();
   saveSoon();
 }
 function openAncestors(node) {
@@ -582,6 +556,49 @@ function jumpTo(a) {
   activeId = a.id;
   paint();
   renderAnnotations();
+}
+
+function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
+function marginLeft(width) {
+  const doc = $("doc-body").getBoundingClientRect();
+  const nav = $("nav").getBoundingClientRect();
+  const left = doc.left - width - 16;
+  return left >= nav.right + 12 ? left : null;
+}
+function layoutMarginalia() {
+  const cards = $("ann-list").children;
+  if (narrowLayout()) {
+    for (let i = 0; i < cards.length; i++) {
+      cards[i].hidden = false;
+      cards[i].style.left = "";
+      cards[i].style.top = "";
+    }
+    return;
+  }
+  const floor = headerInset() + 10;
+  let nextTop = floor;
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const a = anns.find(function (x) { return x.id === card.dataset.ann; });
+    if (!a) continue;
+    let top = floor;
+    let visible = a.scope === "document";
+    const r = RANGES.get(a.id);
+    if (r) {
+      const rects = r.getClientRects();
+      const rect = rects.length ? rects[0] : r.getBoundingClientRect();
+      visible = rect.bottom >= floor && rect.top <= window.innerHeight - 8;
+      top = Math.max(floor, rect.top);
+    } else if (a.scope !== "document") {
+      visible = false;
+    }
+    const left = marginLeft(card.offsetWidth || 184);
+    if (!visible || left == null) { card.hidden = true; continue; }
+    card.hidden = false;
+    card.style.left = left + "px";
+    card.style.top = Math.max(top, nextTop) + "px";
+    nextTop = Math.max(top, nextTop) + card.offsetHeight + 8;
+  }
 }
 
 /* ---- selection menu --------------------------------------------------- */
@@ -625,15 +642,21 @@ function showMenu(fromKeyboard) {
     hl.onclick = function () { addFromSelection(sel, ""); consumeSelection(); hideMenu(); afterChange(); };
     const cm = el("button", "primary", "Comment");
     cm.type = "button";
-    cm.onclick = function () { consumeSelection(); hideMenu(); openEditor({ sel: sel }); };
+    cm.onclick = function () {
+      const a = addFromSelection(sel, "");
+      consumeSelection(); hideMenu(); afterChange(); focusComment(a.id);
+    };
     menu.appendChild(hl);
     menu.appendChild(cm);
     first = hl;
   }
   menu.hidden = false;
   const w = menu.offsetWidth, h = menu.offsetHeight;
-  let left = rect.left + rect.width / 2 - w / 2;
-  left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  let left = !narrowLayout() ? marginLeft(w) : null;
+  if (left == null) {
+    left = rect.left + rect.width / 2 - w / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  }
   const floor = headerInset() + 8;          // clear of the sticky header, not just the viewport
   const above = rect.top - h - 8;
   const below = rect.bottom + 8;
@@ -728,39 +751,18 @@ function composePrompt() {
   });
   return out.join("\n").replace(/\n+$/, "\n");
 }
-function refreshPromptState() {
+function promptText() { return anns.length ? composePrompt() : ""; }
+function renderReadback() {
   const state = $("prompt-state");
-  const edited = promptBuilt !== null && $("prompt").value !== promptBuilt;
-  $("rebuild-prompt").hidden = promptBuilt === null;
+  const preview = $("prompt-preview");
+  preview.textContent = promptText();
   state.className = "muted";
   if (sent) { state.textContent = "Sent. This prompt is final."; return; }
   if (cancelled) { state.textContent = "Review cancelled."; return; }
-  if (promptStale) {
-    state.className = "stale";
-    state.textContent = "Annotations changed after this prompt was built" +
-      (edited ? ", and you have edited it by hand." : ".");
-  } else if (edited) {
-    state.textContent = "Edited by hand. Sent exactly as written.";
-  } else if (promptBuilt !== null) {
-    state.textContent = "Built from " + anns.length + " annotation" + (anns.length === 1 ? "" : "s") + ".";
-  } else {
-    state.textContent = anns.length
-      ? anns.length + " annotation" + (anns.length === 1 ? "" : "s") + " ready to build into a prompt."
-      : "No annotations yet. You can still write a follow-up by hand.";
-  }
-}
-function doBuild(force) {
-  const box = $("prompt");
-  const edited = promptBuilt !== null && box.value !== promptBuilt;
-  const dirty = promptBuilt === null ? box.value.trim() !== "" : edited;
-  if (dirty && !force) {
-    if (!window.confirm("Rebuilding replaces the prompt text you edited. Discard your edits?")) return;
-  }
-  box.value = composePrompt();
-  promptBuilt = box.value;
-  promptStale = false;
-  refreshPromptState();
-  save();
+  $("send").hidden = !LIVE || !anns.length;
+  state.textContent = anns.length
+    ? "A live read-back of " + anns.length + " annotation" + (anns.length === 1 ? "." : "s.")
+    : "Mark a passage or add a document note; the follow-up is composed here as you work.";
 }
 
 /* ---- delivery --------------------------------------------------------- */
@@ -771,16 +773,13 @@ function say(msg, cls) {
 }
 function markSent(info, restored) {
   sent = true;
-  $("prompt").readOnly = true;
   $("send").disabled = true;
   $("send").textContent = "Sent";
-  $("build-prompt").disabled = true;
-  $("rebuild-prompt").disabled = true;
   $("cancel-review").hidden = true;
   const where = (info && info.savedTo) || (LIVE && LIVE.promptFile) || "the review directory";
   say(restored ? "Already sent from this browser. The agent has the prompt." :
     "Sent. Saved to " + where + ".", "ok");
-  refreshPromptState();
+  renderReadback();
 }
 function newSubmissionId() {
   return "s" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
@@ -796,7 +795,7 @@ async function postJSON(path, body) {
 }
 async function send() {
   if (sent || cancelled) return;
-  const text = $("prompt").value;
+  const text = promptText();
   if (!text.trim()) { say("Nothing to send — the prompt is empty.", "err"); return; }
   if (!submissionId) submissionId = newSubmissionId();
   const btn = $("send");
@@ -847,9 +846,10 @@ async function cancelReview() {
     await postJSON("cancel", { reason: "user cancelled" });
     cancelled = true;
     $("send").disabled = true;
+    $("send").hidden = true;
     $("cancel-review").hidden = true;
     say("Review cancelled. No feedback was sent. Your notes stay in this page.", "err");
-    refreshPromptState();
+    renderReadback();
   } catch (e) {
     say("Could not reach the review command to cancel it.", "err");
   }
@@ -872,8 +872,8 @@ async function copyText(text, box, label) {
     await navigator.clipboard.writeText(text);
     say(label + " copied to the clipboard.", "ok");
   } catch (e) {
-    if (box) { box.focus(); box.select(); }
-    say("Clipboard blocked here. The text is selected — copy it with the keyboard.", "err");
+    if (box && box.select) { box.focus(); box.select(); }
+    say("Clipboard blocked here. Download the prompt instead.", "err");
   }
 }
 
@@ -961,35 +961,36 @@ function boot() {
   anns.forEach(anchor);
   renderAnnotations();
   paint();
-  refreshPromptState();
+  renderReadback();
 
   if (LIVE) {
-    $("send").hidden = false;
-    $("cancel-review").hidden = false;
-    if (!sent) say("The review command is waiting. Nothing reaches the agent until you press Confirm & send.");
+    if (!sent) {
+      $("cancel-review").hidden = false;
+      say("The review command is waiting. Nothing reaches the agent until you press Confirm & send.");
+    }
   } else {
     say("Offline copy: no agent is listening. Use Copy or Download .md to hand the prompt back.");
   }
 
   /* events */
   const inChrome = function (node) {
-    return node instanceof Element && !!node.closest("#sel-menu,#panel,#nav,.top,.notice");
+    return node instanceof Element && !!node.closest("#sel-menu,#marginalia,#nav,.top,.notice,.followup");
   };
   document.addEventListener("mouseup", function (ev) {
-    if (editing || inChrome(ev.target)) return;
+    if (inChrome(ev.target)) return;
     setTimeout(showMenu, 0);
   });
   document.addEventListener("keyup", function (ev) {
-    if (editing || inChrome(ev.target)) return;
+    if (inChrome(ev.target)) return;
     if (ev.shiftKey || ev.key === "Shift") setTimeout(function () { showMenu(true); }, 0);
   });
   document.addEventListener("mousedown", function (ev) {
     const t = ev.target;
     if (!(t instanceof Element) || !t.closest("#sel-menu")) hideMenu();
   });
-  document.addEventListener("scroll", hideMenu, true);
+  document.addEventListener("scroll", function () { hideMenu(); requestAnimationFrame(layoutMarginalia); }, true);
   document.addEventListener("keydown", function (ev) {
-    if (ev.key === "Escape") { hideMenu(); if (editing) closeEditor(); return; }
+    if (ev.key === "Escape") { hideMenu(); return; }
     const inField = /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || ev.target.isContentEditable;
     if (ev.key === "/" && !inField && !ev.metaKey && !ev.ctrlKey) {
       ev.preventDefault();
@@ -1010,18 +1011,13 @@ function boot() {
   $("expand-all").onclick = function () { setFolds(true); };
   $("collapse-all").onclick = function () { setFolds(false); };
   $("toggle-nav").onclick = function () { toggleCol("nav-off", "toggle-nav"); };
-  $("toggle-panel").onclick = function () { toggleCol("panel-off", "toggle-panel"); };
-  $("doc-note").onclick = function () { openEditor({ scope: "document" }); };
-  $("edit-save").onclick = saveEditor;
-  $("edit-cancel").onclick = closeEditor;
-  $("build-prompt").onclick = function () { doBuild(false); };
-  $("rebuild-prompt").onclick = function () { doBuild(false); };
-  $("prompt").addEventListener("input", function () { refreshPromptState(); saveSoon(); });
+  $("doc-note").onclick = addDocumentNote;
+  $("go-followup").onclick = function () { $("followup").scrollIntoView({ block: "start", behavior: "smooth" }); };
   $("send").onclick = send;
   $("cancel-review").onclick = cancelReview;
-  $("copy").onclick = function () { copyText($("prompt").value, $("prompt"), "Prompt"); };
+  $("copy").onclick = function () { copyText(promptText(), null, "Prompt"); };
   $("download").onclick = function () {
-    download("followup.md", $("prompt").value, "text/markdown");
+    download("followup.md", promptText(), "text/markdown");
     say("Prompt downloaded as followup.md.", "");
   };
   $("copy-source").onclick = function () { copyText(PAYLOAD.raw, null, "Original source"); };
@@ -1043,18 +1039,19 @@ function boot() {
   window.addEventListener("beforeunload", function (ev) {
     /* offline is where losing the draft is unrecoverable, so it is guarded too */
     if (sent || cancelled) return;
-    if (!anns.length && !$("prompt").value.trim()) return;
+    if (!anns.length) return;
     ev.preventDefault();
     ev.returnValue = "";
   });
   measureTop();
-  window.addEventListener("resize", measureTop);
+  window.addEventListener("resize", function () { measureTop(); requestAnimationFrame(layoutMarginalia); });
   if (window.ResizeObserver) new ResizeObserver(measureTop).observe(document.querySelector(".top"));
   document.body.classList.remove("loading");
 }
 function measureTop() {
   const bar = document.querySelector(".top");
   if (bar) document.documentElement.style.setProperty("--top", bar.offsetHeight + "px");
+  requestAnimationFrame(layoutMarginalia);
 }
 let closedForPrint = null;    // folds the reader had closed, restored after printing
 function setFolds(open, printing) {
