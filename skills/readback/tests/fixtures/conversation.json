@@ -1,0 +1,82 @@
+{
+  "agent": "codex",
+  "session_id": "01JB3K7QF2",
+  "path": "/home/example/.codex/sessions/01JB3K7QF2.jsonl",
+  "updated_at": "2026-09-06T18:31:00Z",
+  "metadata": {
+    "title": "Cache design discussion",
+    "cwd": "/srv/app",
+    "branch": "main",
+    "unknown_future_field": {
+      "nested": true
+    }
+  },
+  "warnings": [
+    "3 oversized tool results were omitted by the exporter."
+  ],
+  "entries": [
+    {
+      "index": 1,
+      "kind": "message",
+      "role": "user",
+      "time": "2026-09-06T18:00:00Z",
+      "text": "How should cache expiry work?"
+    },
+    {
+      "index": 2,
+      "kind": "message",
+      "role": "assistant",
+      "time": "2026-09-06T18:00:04Z",
+      "text": "## Cache policy\n\ncache entries expire after 24 hours\n\nThat is the origin layer. Edge is 60s.\n\n```sql\nSELECT key, written_at FROM cache WHERE written_at < now() - interval '24 hours';\n```"
+    },
+    {
+      "index": 2,
+      "kind": "message",
+      "role": "user",
+      "time": "2026-09-06T18:01:00Z",
+      "text": "Duplicate source index on purpose — internal ids must not collide."
+    },
+    {
+      "kind": "message",
+      "role": "assistant",
+      "text": "No index and no timestamp on this one. Unicode: naïve café — 中文 — 🧭 emoji.\n\ncache entries expire after 24 hours"
+    },
+    {
+      "index": 5,
+      "kind": "compaction",
+      "time": "2026-09-06T18:20:00Z",
+      "text": "Earlier turns were compacted. This is a recorded summary, not the original wording."
+    },
+    {
+      "index": 6,
+      "kind": "branch",
+      "time": "2026-09-06T18:21:00Z",
+      "text": "Conversation branched here."
+    },
+    {
+      "index": 7,
+      "kind": "failure",
+      "role": "assistant",
+      "time": "2026-09-06T18:22:00Z",
+      "tool": "bash",
+      "input": {
+        "command": "psql -c 'VACUUM FULL cache'"
+      },
+      "text": "Tool call failed: permission denied."
+    },
+    {
+      "index": 8,
+      "kind": "message",
+      "role": "user",
+      "time": "2026-09-06T18:30:00Z",
+      "text": ""
+    },
+    {
+      "index": 9,
+      "kind": "message",
+      "role": "assistant",
+      "time": "2026-09-06T18:31:00Z",
+      "text": "Closing thought with an inline </script> string and a [link](https://example.com)."
+    }
+  ]
+}
