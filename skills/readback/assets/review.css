@@ -72,12 +72,10 @@ button.link{border:0;background:none;padding:2px 4px;font-weight:400;
 #nav a.h3{padding-left:32px;color:var(--muted)}
 #nav .who{color:var(--accent);font-weight:600}
 #nav .n{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:4px}
-/* This inset is intentional empty paper: the proofing notes live beside their passage,
-   not in a second application rail. */
-main{padding:20px 28px 120px 228px;min-width:0}
+main{padding:20px 28px 120px;min-width:0}
 /* nothing lands under the sticky header when scrolled to */
 .entry,.sec,.body h1,.body h2,.body h3,.body h4,.body h5,.body h6{scroll-margin-top:calc(var(--top) + 12px)}
-.doc{max-width:74ch;margin:0 auto}
+.doc{max-width:65ch;margin:0 auto}
 body.nav-off #nav{display:none}
 body.nav-off .cols{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1080px){
@@ -169,7 +167,7 @@ summary .caret{display:inline-block;transition:transform 120ms}
 /* ---- marginalia and read-back ---------------------------------------- */
 #marginalia{position:fixed;inset:0;z-index:10;pointer-events:none}
 #ann-list{list-style:none;margin:0;padding:0}
-#ann-list li{position:fixed;width:184px;pointer-events:auto;border:1px solid var(--line);
+#ann-list li{position:fixed;width:142px;pointer-events:auto;border:1px solid var(--line);
   border-radius:12px;padding:8px 10px;background:var(--card);font-size:.81rem;line-height:1.42}
 #ann-list li.on{border-color:var(--accent);background:var(--accent-soft)}
 #ann-list li.unresolved{border-left:1px solid var(--warn)}
@@ -198,7 +196,7 @@ textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:v
 #prompt-state,#send-state,#store-state{font-size:.8rem;margin:6px 0 0}
 #send-state.ok{color:var(--good);font-weight:600}
 #send-state.err{color:var(--bad)}
-@media (max-width:1080px){
+@media (max-width:1199px){
   #marginalia{position:static;pointer-events:auto;max-width:74ch;margin:0 auto;padding:0 18px}
   #ann-list{display:grid;gap:8px}
   #ann-list li{position:static;width:auto;box-shadow:none}
