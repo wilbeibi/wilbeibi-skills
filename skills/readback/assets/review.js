@@ -610,7 +610,6 @@ function hideMenu() {
   menu.hidden = true;
   menu.className = "";
   menu.textContent = "";   // the buttons go with it, so no stale handler survives
-  document.body.classList.remove("selection-editing");
   pendingSel = null;
 }
 /* Acting on a selection consumes it. Without this the mouseup that follows the
@@ -635,12 +634,19 @@ function placeMenu(menu, rect) {
   const w = menu.offsetWidth, h = menu.offsetHeight;
   const side = !narrowLayout() ? marginLeft(w) : null;
   let left = side;
+  let besideSelection = side != null;
+  if (left == null && menu.classList.contains("editor")) {
+    const right = rect.right + 12;
+    const before = rect.left - w - 12;
+    if (right + w <= window.innerWidth - 8) { left = right; besideSelection = true; }
+    else if (before >= 8) { left = before; besideSelection = true; }
+  }
   if (left == null) {
     left = rect.left + rect.width / 2 - w / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
   }
   const floor = headerInset() + 8;
-  const desiredTop = side == null ? rect.bottom + 8 : rect.top;
+  const desiredTop = besideSelection ? rect.top : rect.bottom + 8;
   const top = Math.max(floor, Math.min(desiredTop, window.innerHeight - h - 8));
   menu.style.left = left + "px";
   menu.style.top = top + "px";
@@ -648,7 +654,6 @@ function placeMenu(menu, rect) {
 function openSelectionEditor(sel, rect) {
   const menu = $("sel-menu");
   pendingSel = sel;
-  document.body.classList.add("selection-editing");
   menu.className = "editor";
   menu.textContent = "";
   menu.appendChild(el("div", "sel-kicker", "Comment on this passage"));
