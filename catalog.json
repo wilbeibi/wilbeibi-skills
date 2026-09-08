@@ -355,12 +355,12 @@
         },
         {
           "path": "scripts/route_skill.py",
-          "sha256": "28df1b96c51834ea963609b34d3e37aff9c82f2b26e394de56fd6d873e614b1e",
+          "sha256": "76074694f29932cf2b47c8459e560d6b5a5ec26f52173f7b007aca255ee0aabf",
           "executable": false
         },
         {
           "path": "scripts/test_route_skill.py",
-          "sha256": "b2105a1715cd4037db11a5363963fb0b9491692db080b75cded1131b1fe90b72",
+          "sha256": "5caea31a42725377b38c6ad82d37bced5f1ba47c33f977ff851de09ed45f9618",
           "executable": false
         }
       ]
