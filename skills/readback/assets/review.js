@@ -11,6 +11,25 @@ const KEY = "readback::v" + ANCHOR + "::" + DOC.fingerprint;
 const CONTEXT = 48;
 const SEARCH_LIMIT = 2000;
 
+/* ---- what a note is for ------------------------------------------------
+   A reader does three things with a passage: ask about it, ask for a change,
+   or just mark it. Without the distinction every note arrives as an order and
+   a page of questions gets answered by rewriting the document. Guessed from
+   what they wrote, then left alone the moment they set it by hand -- a control
+   that keeps moving while you type is worse than a guess you can correct. */
+const INTENTS = ["question", "change", "note"];
+const INTENT_TEXT = { question: "Question", change: "Change", note: "Note" };
+/* only openers that never start an imperative: "should be 12h" is a change */
+const ASKS = /^(why|what|how|where|when|who|which)\b/i;
+function inferIntent(text) {
+  const t = String(text || "").trim();
+  if (!t) return "note";
+  return t.endsWith("?") || ASKS.test(t) ? "question" : "change";
+}
+function intentOf(a) {
+  return INTENTS.indexOf(a.intent) < 0 ? inferIntent(a.comment) : a.intent;
+}
+
 const $ = function (id) { return document.getElementById(id); };
 const HL_OK = typeof window.Highlight === "function" && !!(window.CSS && CSS.highlights);
 
@@ -101,27 +120,32 @@ function foldCode(root) {
     d.appendChild(pre);
   }
 }
-/* Split rendered markdown into foldable sections at h1-h3 boundaries. */
+/* Split rendered markdown into foldable sections, nested by heading level.
+   Depth is relative, not absolute: a document written entirely in h4/h5 folds
+   exactly like one written in h1/h2. Absolute levels were the old rule, and any
+   document that started at #### got no folds and an empty outline rail. */
 function sectionize(rendered) {
   const out = document.createDocumentFragment();
-  let body = el("div", "body");
-  out.appendChild(body);
+  const root = { level: 0, body: el("div", "body") };
+  out.appendChild(root.body);
+  const stack = [root];
   while (rendered.firstChild) {
     const node = rendered.firstChild;
     const tag = node.nodeType === 1 ? node.tagName : "";
-    if (tag === "H1" || tag === "H2" || tag === "H3") {
-      const sec = el("details", "sec");
-      sec.open = true;
-      const sum = el("summary");
-      sum.appendChild(caret());
-      sum.appendChild(node);            // the heading itself, not a copy of its text
-      sec.appendChild(sum);
-      body = el("div", "body");
-      sec.appendChild(body);
-      out.appendChild(sec);
-      continue;
-    }
-    body.appendChild(node);
+    const level = /^H[1-6]$/.test(tag) ? Number(tag[1]) : 0;
+    if (!level) { stack[stack.length - 1].body.appendChild(node); continue; }
+    /* a heading closes every section at or below its own level */
+    while (stack.length > 1 && level <= stack[stack.length - 1].level) stack.pop();
+    const sec = el("details", "sec");
+    sec.open = true;
+    const sum = el("summary");
+    sum.appendChild(caret());
+    sum.appendChild(node);              // the heading itself, not a copy of its text
+    sec.appendChild(sum);
+    const body = el("div", "body");
+    sec.appendChild(body);
+    stack[stack.length - 1].body.appendChild(sec);
+    stack.push({ level: level, body: body });
   }
   return out;
 }
@@ -388,7 +412,7 @@ function save() {
   if (!storageOK) return;
   try {
     localStorage.setItem(KEY, JSON.stringify({
-      v: 2, anns: anns, sent: sent, submissionId: submissionId,
+      v: 3, anns: anns, sent: sent, submissionId: submissionId,
       savedAt: new Date().toISOString(),
     }));
     $("store-state").textContent = "Draft saved in this browser.";
@@ -411,6 +435,10 @@ function restore() {
   try { data = JSON.parse(raw); } catch (e) { return; }
   if (!data || !Array.isArray(data.anns)) return;
   anns = data.anns.filter(function (a) { return a && a.id && typeof a.comment === "string"; });
+  /* drafts saved before intents existed: guess, and keep guessing until touched */
+  anns.forEach(function (a) {
+    if (INTENTS.indexOf(a.intent) < 0) { a.intent = inferIntent(a.comment); a.intentAuto = true; }
+  });
   submissionId = data.submissionId || null;
   if (data.sent) markSent(null, true);
 }
@@ -419,6 +447,39 @@ function restore() {
 function excerpt(text, max) {
   const t = String(text).replace(/\s+/g, " ").trim();
   return t.length > max ? t.slice(0, max - 1) + "…" : t;
+}
+/* `holder` is the annotation, or a draft object while the passage editor is open */
+function intentPicker(holder, onPick) {
+  const pick = el("select", "a-intent");
+  pick.setAttribute("aria-label", "What this note is: a question, a change, or a note");
+  pick.title = "Question: answer it. Change: do it. Note: context only.";
+  INTENTS.forEach(function (key) {
+    const opt = el("option", null, INTENT_TEXT[key]);
+    opt.value = key;
+    pick.appendChild(opt);
+  });
+  pick.value = intentOf(holder);
+  pick.onchange = function () {
+    holder.intent = pick.value;
+    holder.intentAuto = false;
+    if (onPick) onPick();
+  };
+  return pick;
+}
+/* a comment you cannot read back is not a comment: the box follows the text,
+   up to the max-height the stylesheet caps it at, then scrolls. */
+function grow(ta) {
+  ta.style.height = "auto";
+  ta.style.height = Math.min(ta.scrollHeight, 220) + "px";
+  ta.style.overflowY = ta.scrollHeight > 220 ? "auto" : "hidden";
+}
+/* keep the guess in step with the typing, until the reader overrides it */
+function retrack(holder, pick) {
+  if (holder.intentAuto === false) return;
+  const guess = inferIntent(holder.comment);
+  if (guess === holder.intent) return;
+  holder.intent = guess;
+  pick.value = guess;
 }
 function renderAnnotations() {
   const list = $("ann-list");
@@ -439,10 +500,11 @@ function renderAnnotations() {
     if (a.id === activeId) li.classList.add("on");
     if (UNRESOLVED.has(a.id)) li.classList.add("unresolved");
     const head = el("div", "a-head");
-    const where = el("span", "a-where");
-    where.appendChild(el("span", "a-number", String(i + 1) + "."));
-    where.appendChild(document.createTextNode(a.scope === "document" ? "Whole document" : a.where));
-    head.appendChild(where);
+    /* the location never fit the card -- it rendered as pure ellipsis. It still
+       goes to the agent; here it is the ordinal's tooltip and nothing more. */
+    const num = el("span", "a-number", String(i + 1) + ".");
+    num.title = a.scope === "document" ? "Whole document" : a.where;
+    head.appendChild(num);
     const acts = el("div", "a-acts");
     if (a.scope !== "document") {
       const jump = el("button", "link", "jump");
@@ -460,6 +522,8 @@ function renderAnnotations() {
     head.appendChild(acts);
     li.appendChild(head);
     if (a.scope !== "document") li.appendChild(el("div", "a-quote", excerpt(a.quote, 220)));
+    const pick = intentPicker(a, function () { renderReadback(); saveSoon(); });
+    li.appendChild(pick);
     const input = el("textarea");
     input.rows = 3;
     input.placeholder = "Add a comment (optional)";
@@ -467,18 +531,22 @@ function renderAnnotations() {
     input.value = a.comment;
     input.oninput = function () {
       a.comment = input.value;
+      retrack(a, pick);
+      grow(input);
       renderReadback();
       saveSoon();
       requestAnimationFrame(layoutMarginalia);
     };
     li.appendChild(input);
+    requestAnimationFrame(function () { grow(input); });
     if (UNRESOLVED.has(a.id)) {
       li.appendChild(el("p", "a-flag",
         "Anchor unresolved — this passage was not found in the document as loaded. " +
         "The saved quote is still used in the prompt."));
     }
     li.onclick = function (ev) {
-      if (ev.target.closest("button,textarea")) return;
+      /* re-rendering under an open select would tear the control out mid-pick */
+      if (ev.target.closest("button,textarea,select")) return;
       activeId = a.id; paint(); renderAnnotations();
     };
     list.appendChild(li);
@@ -498,14 +566,14 @@ function addDocumentNote() {
     order: nextOrder(), fingerprint: DOC.fingerprint, anchorVersion: ANCHOR,
     scope: "document", entryId: null, where: "Whole document",
     start: 0, end: 0, quote: "", before: "", after: "",
-    comment: "", createdAt: new Date().toISOString(),
+    comment: "", intent: "note", intentAuto: true, createdAt: new Date().toISOString(),
   };
   anns.push(a);
   activeId = a.id;
   afterChange();
   focusComment(a.id);
 }
-function addFromSelection(sel, comment) {
+function addFromSelection(sel, comment, draft) {
   const idx = indexes.get(sel.entryId);
   const a = {
     id: "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -514,7 +582,10 @@ function addFromSelection(sel, comment) {
     start: sel.start, end: sel.end, quote: sel.quote,
     before: idx ? idx.text.slice(Math.max(0, sel.start - CONTEXT), sel.start) : "",
     after: idx ? idx.text.slice(sel.end, sel.end + CONTEXT) : "",
-    comment: comment || "", createdAt: new Date().toISOString(),
+    comment: comment || "",
+    intent: (draft && draft.intent) || inferIntent(comment),
+    intentAuto: !(draft && draft.intentAuto === false),
+    createdAt: new Date().toISOString(),
   };
   anns.push(a);
   anchor(a);
@@ -534,6 +605,7 @@ function afterChange() {
   paint();
   renderReadback();
   saveSoon();
+  requestAnimationFrame(buildMinimap);
 }
 function openAncestors(node) {
   let e = node && (node.nodeType === 1 ? node : node.parentElement);
@@ -560,11 +632,15 @@ function jumpTo(a) {
 }
 
 function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
+function mapWidth() {
+  const map = $("minimap");
+  return map && !map.hidden && getComputedStyle(map).display !== "none" ? map.offsetWidth : 0;
+}
 function marginLeft(width) {
   const doc = $("doc-body").getBoundingClientRect();
   const nav = $("nav").getBoundingClientRect();
   const right = doc.right + 12;
-  if (right + width <= window.innerWidth - 8) return right;
+  if (right + width <= window.innerWidth - 8 - mapWidth()) return right;
   const left = doc.left - width - 12;
   return left >= nav.right + 8 ? left : null;
 }
@@ -658,19 +734,23 @@ function openSelectionEditor(sel, rect) {
   menu.textContent = "";
   menu.appendChild(el("div", "sel-kicker", "Comment on this passage"));
   menu.appendChild(el("div", "sel-quote", "\u201c" + excerpt(sel.quote, 180) + "\u201d"));
+  const draft = { comment: "", intent: "note", intentAuto: true };
   const input = el("textarea");
   input.rows = 3;
-  input.placeholder = "What should change? (optional)";
+  input.placeholder = "Ask a question, or say what should change (optional)";
   input.setAttribute("aria-label", "Comment on selected passage");
   menu.appendChild(input);
   const actions = el("div", "sel-actions");
+  const pick = intentPicker(draft, null);
+  input.oninput = function () { draft.comment = input.value; retrack(draft, pick); };
+  actions.appendChild(pick);
   const cancel = el("button", null, "Cancel");
   cancel.type = "button";
   cancel.onclick = function () { consumeSelection(); hideMenu(); };
   const save = el("button", "primary", "Add comment");
   save.type = "button";
   save.onclick = function () {
-    addFromSelection(sel, input.value);
+    addFromSelection(sel, input.value, draft);
     consumeSelection(); hideMenu(); afterChange();
   };
   actions.appendChild(cancel);
@@ -773,15 +853,45 @@ function sourceLine() {
   bits.push("sha256 " + DOC.fingerprint);
   return bits.join(" · ");
 }
-function composePrompt() {
-  const items = ordered();
+function tally(items) {
+  const n = { question: 0, change: 0, note: 0 };
+  items.forEach(function (a) { n[intentOf(a)]++; });
+  return n;
+}
+function count(n, one, many) { return n + " " + (n === 1 ? one : many); }
+function mix(items, suffix) {
+  const n = tally(items), bits = [];
+  if (n.question) bits.push(count(n.question, "question", "questions") + (suffix ? " to answer" : ""));
+  if (n.change) bits.push(count(n.change, "change", "changes") + (suffix ? " to apply" : ""));
+  if (n.note) bits.push(count(n.note, "note", "notes"));
+  return bits.join(", ");
+}
+/* Nothing marked is the commonest way to finish reading a plan, and it used to
+   be the one outcome with no button. Cancelling says the opposite thing. */
+function approvalPrompt() {
   const out = [];
-  out.push('Task: Apply the feedback below to "' + DOC.title + '".');
+  out.push('Task: Record the outcome of a review of "' + DOC.title + '".');
   out.push("");
   out.push("Source: " + sourceLine());
   if (DOC.scope) out.push("Source scope: " + DOC.scope);
   out.push("");
-  out.push("Rules: Target is an exact location anchor, not replacement text. Apply Request only and preserve unrelated behavior. If Request is empty, inspect and report; do not invent a change.");
+  out.push("Outcome: Read in full. No changes requested and no questions raised.");
+  out.push("");
+  out.push("Rules: This is the reader's verdict on the document, not an instruction to act and "
+    + "not approval to implement anything. Do not edit the document in response to it. Carry on "
+    + "under the authority you already had.");
+  return out.join("\n") + "\n";
+}
+function composePrompt() {
+  const items = ordered();
+  if (!items.length) return approvalPrompt();
+  const out = [];
+  out.push('Task: Respond to a review of "' + DOC.title + '": ' + mix(items, true) + ".");
+  out.push("");
+  out.push("Source: " + sourceLine());
+  if (DOC.scope) out.push("Source scope: " + DOC.scope);
+  out.push("");
+  out.push("Rules: Target is an exact location anchor, not replacement text. Answer each Question in your reply rather than editing for it. Apply each Change and preserve unrelated behavior. Treat each Note as context, not an instruction. Where an item carries no text, inspect that passage and report whether action is needed.");
   out.push("");
   items.forEach(function (a, i) {
     out.push((i + 1) + ". Location: " + (a.scope === "document" ? "Whole document" : a.where));
@@ -792,14 +902,14 @@ function composePrompt() {
       out.push(a.quote);
       out.push(">>>");
     }
-    out.push("Request: " + (a.comment.trim()
+    out.push(INTENT_TEXT[intentOf(a)] + ": " + (a.comment.trim()
       ? a.comment.replace(/\s+$/, "")
-      : "None provided; inspect and report whether action is needed."));
+      : "None given; inspect this passage and report whether action is needed."));
     out.push("");
   });
   return out.join("\n").replace(/\n+$/, "\n");
 }
-function promptText() { return anns.length ? composePrompt() : ""; }
+function promptText() { return composePrompt(); }
 function renderReadback() {
   const state = $("prompt-state");
   const preview = $("prompt-preview");
@@ -807,10 +917,10 @@ function renderReadback() {
   state.className = "muted";
   if (sent) { state.textContent = "Sent. This prompt is final."; return; }
   if (cancelled) { state.textContent = "Review cancelled."; return; }
-  $("send").hidden = !LIVE || !anns.length;
+  $("send").hidden = !LIVE;
   state.textContent = anns.length
-    ? "A live read-back of " + anns.length + " annotation" + (anns.length === 1 ? "." : "s.")
-    : "Mark a passage or add a document note; the follow-up is composed here as you work.";
+    ? mix(ordered(), false) + " — exactly as the agent will receive them."
+    : "No notes. Sending now tells the agent you read the document and have nothing to change.";
 }
 
 /* ---- delivery --------------------------------------------------------- */
@@ -926,16 +1036,190 @@ async function copyText(text, box, label) {
 }
 
 /* ---- navigation ------------------------------------------------------- */
+function hideNav() {
+  $("nav").hidden = true;
+  $("toggle-nav").hidden = true;
+  document.body.classList.add("nav-off");
+}
+
+/* ---- minimap ----------------------------------------------------------
+   The outline says what the document contains; this says where you are in it
+   and where your own marks are. It is a pointer convenience over the same
+   destinations #nav already offers to the keyboard, so it stays out of the
+   accessibility tree rather than duplicating them as unlabelled hit targets. */
+function docHeight() { return Math.max(1, document.documentElement.scrollHeight); }
+/* The box that stands for a node on screen. Inside a closed fold that is the
+   summary: one engine drops the hidden box, another keeps its stale pre-fold
+   geometry, and neither answer is where the reader would look for it. */
+function shownBox(node) {
+  let e = node && (node.nodeType === 1 ? node : node.parentElement);
+  if (!e) return null;
+  const fold = e.closest("details:not([open])");
+  if (fold) e = fold.querySelector("summary") || fold;
+  while (e) {
+    const r = e.getBoundingClientRect();
+    if (r.height || r.width) return r;
+    e = e.parentElement;
+  }
+  return null;
+}
+/* Fraction down the document, in rendered pixels. */
+function frac(node) {
+  const r = shownBox(node);
+  return r ? (r.top + window.scrollY) / docHeight() : null;
+}
+function buildMinimap() {
+  const track = $("mm-track");
+  if (!track) return;
+  track.textContent = "";
+  const idx = indexes.get(ENTRIES[0] && ENTRIES[0].id);
+  const heads = (DOC.kind === "markdown" && idx) ? idx.headings : [];
+  heads.forEach(function (h) {
+    const at = frac(h.el);
+    if (at == null) return;
+    const tick = el("div", "mm-h lv" + Math.min(h.level, 6));
+    tick.style.top = (at * 100) + "%";
+    tick.dataset.label = h.text || "(untitled)";
+    tick.rbHead = h.el;                 /* the spy re-binds by element, not by index */
+    tick.onclick = function (ev) {
+      ev.stopPropagation();
+      openAncestors(h.el);
+      h.el.scrollIntoView({ block: "start" });
+    };
+    track.appendChild(tick);
+  });
+  ordered().forEach(function (a, i) {
+    const r = RANGES.get(a.id);
+    const at = a.scope === "document" ? 0 : frac(r && r.startContainer);
+    if (at == null) return;
+    const tick = el("div", "mm-a " + intentOf(a));
+    tick.style.top = (at * 100) + "%";
+    tick.dataset.label = (i + 1) + ". " + INTENT_TEXT[intentOf(a)]
+      + (a.comment.trim() ? " — " + excerpt(a.comment, 60) : "");
+    tick.onclick = function (ev) { ev.stopPropagation(); jumpTo(a); };
+    track.appendChild(tick);
+  });
+  linkSpyTicks();
+  paintMinimap();
+}
+/* Folded out of sight: inside a closed fold that is not this element's own summary. */
+function hidden(node) {
+  const e = node && (node.nodeType === 1 ? node : node.parentElement);
+  if (!e) return false;
+  const fold = e.closest("details:not([open])");
+  if (!fold) return false;
+  const sum = fold.querySelector(":scope > summary");
+  return !(sum && sum.contains(e));
+}
+/* Drop every mark. Clearing only the last index leaves a stale highlight behind
+   whenever the marks are re-bound (a fold, a rebuild) without a scroll. */
+function clearSpy() {
+  spy.forEach(function (s2) {
+    s2.link.classList.remove("here");
+    if (s2.tick) s2.tick.classList.remove("here");
+  });
+  spyAt = -1;
+}
+/* Which section the reader is actually in. The outline answers "what is in this
+   document"; without this it never answers "and where am I". The heading that
+   owns the top of the viewport wins -- the same one whose text you are reading. */
+let spy = [];                        // [{ link, el, tick }] in document order
+let spyAt = -1;
+function paintSpy() {
+  if (!spy.length) return;
+  const line = headerInset() + 24;
+  let at = -1;
+  for (let i = 0; i < spy.length; i++) {
+    /* a heading folded away is not the section you are in -- its collapsed parent
+       is, and marking the hidden child would point at text that is not on screen */
+    if (hidden(spy[i].el)) continue;
+    const box = shownBox(spy[i].el);
+    if (!box) continue;
+    if (box.top <= line) at = i; else break;
+  }
+  if (at < 0) at = 0;
+  if (at === spyAt) return;
+  clearSpy();
+  spyAt = at;
+  spy[at].link.classList.add("here");
+  if (spy[at].tick) spy[at].tick.classList.add("here");
+  /* a long outline scrolls too: keep the mark you are looking for on screen */
+  const rail = $("nav"), link = spy[at].link;
+  if (rail && rail.scrollHeight > rail.clientHeight) {
+    const r = link.getBoundingClientRect(), box = rail.getBoundingClientRect();
+    if (r.top < box.top + 8 || r.bottom > box.bottom - 8) {
+      rail.scrollTop += (r.top + r.height / 2) - (box.top + box.height / 2);
+    }
+  }
+}
+/* the ticks are rebuilt on every map build, so the spy's handles are re-bound */
+function linkSpyTicks() {
+  const by = new Map();
+  $("mm-track").querySelectorAll(".mm-h").forEach(function (t) {
+    if (t.rbHead) by.set(t.rbHead, t);
+  });
+  clearSpy();
+  spy.forEach(function (s2) { s2.tick = by.get(s2.el) || null; });
+  paintSpy();
+}
+function paintMinimap() {
+  const map = $("minimap");
+  if (!map || map.hidden) return;
+  const h = docHeight();
+  const view = $("mm-view");
+  view.style.top = (window.scrollY / h * 100) + "%";
+  view.style.height = Math.max(2, window.innerHeight / h * 100) + "%";
+}
+function scrubTo(clientY) {
+  const box = $("mm-track").getBoundingClientRect();
+  const at = Math.min(1, Math.max(0, (clientY - box.top) / Math.max(1, box.height)));
+  window.scrollTo({ top: at * docHeight() - window.innerHeight / 2, behavior: "auto" });
+}
+function wireMinimap() {
+  const map = $("minimap");
+  if (!map) return;
+  let scrubbing = false;
+  map.addEventListener("mousedown", function (ev) {
+    if (ev.target.dataset && ev.target.dataset.label) return;   // a tick handles its own click
+    scrubbing = true;
+    scrubTo(ev.clientY);
+    ev.preventDefault();
+  });
+  window.addEventListener("mousemove", function (ev) { if (scrubbing) scrubTo(ev.clientY); });
+  window.addEventListener("mouseup", function () { scrubbing = false; });
+  map.addEventListener("mouseover", function (ev) {
+    const label = ev.target.dataset && ev.target.dataset.label;
+    const tag = $("mm-label");
+    if (!label) { tag.hidden = true; return; }
+    tag.textContent = label;
+    tag.hidden = false;
+    tag.style.top = Math.min(window.innerHeight - 40, Math.max(headerInset() + 4, ev.clientY - 12)) + "px";
+  });
+  map.addEventListener("mouseleave", function () { $("mm-label").hidden = true; });
+}
+
 function buildNav() {
   const list = $("nav-list");
   list.textContent = "";
+  spy = [];
+  spyAt = -1;
   if (DOC.kind === "markdown") {
     const idx = indexes.get(ENTRIES[0] && ENTRIES[0].id);
-    if (!idx || !idx.headings.length) { $("nav").hidden = true; document.body.classList.add("nav-off"); return; }
-    idx.headings.forEach(function (h, i) {
-      if (h.level > 3) return;
+    /* indent by rank among the levels this document uses, not by the tag number:
+       an all-h4 document has a top tier, not a third-level one. */
+    const levels = [];
+    (idx ? idx.headings : []).forEach(function (h) {
+      if (levels.indexOf(h.level) < 0) levels.push(h.level);
+    });
+    levels.sort(function (a, b) { return a - b; });
+    const shown = levels.slice(0, 3);
+    const items = (idx ? idx.headings : []).filter(function (h) { return shown.indexOf(h.level) >= 0; });
+    /* one heading is not an outline. Reserving 250px for it is the reading
+       column's loss and the margin's -- give the space back. */
+    if (items.length < 2) { hideNav(); return; }
+    items.forEach(function (h) {
       const li = el("li");
-      const a = el("a", "h" + Math.min(h.level, 3), h.text || "(untitled)");
+      const a = el("a", "h" + (shown.indexOf(h.level) + 1), h.text || "(untitled)");
       a.href = "#";
       a.onclick = function (ev) {
         ev.preventDefault();
@@ -944,7 +1228,9 @@ function buildNav() {
       };
       li.appendChild(a);
       list.appendChild(li);
+      spy.push({ link: a, el: h.el, tick: null });
     });
+    paintSpy();
     return;
   }
   ENTRIES.forEach(function (entry, i) {
@@ -962,7 +1248,10 @@ function buildNav() {
     };
     li.appendChild(a);
     list.appendChild(li);
+    const box = entryEls.get(entry.id);
+    if (box) spy.push({ link: a, el: box, tick: null });
   });
+  paintSpy();
 }
 
 /* ---- boot ------------------------------------------------------------- */
@@ -1036,7 +1325,10 @@ function boot() {
     const t = ev.target;
     if (!(t instanceof Element) || !t.closest("#sel-menu")) hideMenu();
   });
-  document.addEventListener("scroll", function () { hideMenu(); requestAnimationFrame(layoutMarginalia); }, true);
+  document.addEventListener("scroll", function () {
+    hideMenu();
+    requestAnimationFrame(function () { layoutMarginalia(); paintMinimap(); paintSpy(); });
+  }, true);
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape") { hideMenu(); return; }
     const inField = /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || ev.target.isContentEditable;
@@ -1058,6 +1350,12 @@ function boot() {
   $("search-prev").onclick = function () { gotoMatch(matchAt - 1); };
   $("expand-all").onclick = function () { setFolds(true); };
   $("collapse-all").onclick = function () { setFolds(false); };
+  /* every fold shifts the content below it, so the tick positions are stale */
+  $("doc-body").addEventListener("toggle", function () {
+    requestAnimationFrame(function () { buildMinimap(); layoutMarginalia(); paintSpy(); });
+  }, true);
+  wireMinimap();
+  buildMinimap();
   $("toggle-nav").onclick = function () { toggleCol("nav-off", "toggle-nav"); };
   $("doc-note").onclick = addDocumentNote;
   $("go-followup").onclick = function () { $("followup").scrollIntoView({ block: "start", behavior: "smooth" }); };
@@ -1092,7 +1390,10 @@ function boot() {
     ev.returnValue = "";
   });
   measureTop();
-  window.addEventListener("resize", function () { measureTop(); requestAnimationFrame(layoutMarginalia); });
+  window.addEventListener("resize", function () {
+    measureTop();
+    requestAnimationFrame(function () { layoutMarginalia(); buildMinimap(); });
+  });
   if (window.ResizeObserver) new ResizeObserver(measureTop).observe(document.querySelector(".top"));
   document.body.classList.remove("loading");
 }
@@ -1105,7 +1406,7 @@ let closedForPrint = null;    // folds the reader had closed, restored after pri
 function setFolds(open, printing) {
   const all = $("doc-body").querySelectorAll("details");
   for (let i = 0; i < all.length; i++) all[i].open = open;
-  if (!printing) { closedForPrint = null; hideMenu(); }
+  if (!printing) { closedForPrint = null; hideMenu(); requestAnimationFrame(buildMinimap); }
 }
 function toggleCol(cls, btn) {
   const off = document.body.classList.toggle(cls);
