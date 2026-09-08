@@ -5,7 +5,7 @@ description: Explain an unfamiliar codebase through a repository briefing, dataf
 
 # grok-repo
 
-Read purpose, structure, mechanics, then history for the *why*; judge taste only after evidence.
+Read declared intent, structure, mechanics, then history for the *why*; judge taste only after evidence.
 Pick one mode by the question; every claim cites a file path or commit:
 
 - **Scoped question** ("how does X work?", "where does Y come from?") → a **dataflow trace**.
@@ -51,10 +51,11 @@ context, and history limits. Never turn commit order into causality or invent mo
 
 Work top-down. On large repos, sample representative components and say what you sampled.
 
-1. **Orient** — README, docs/, top-level layout, manifest (go.mod/package.json/Cargo.toml),
-   Makefile/CI config. Find the entry points (`main`, CLI commands, server bootstrap, exported API).
-   If it builds/tests cheaply, run it — a passing test suite and one real invocation anchor
-   everything that follows.
+1. **Orient** — read relevant first-party prose before code: README/docs and any architecture,
+   design-principle, ADR/RFC, or governance docs. Verify their goals, non-goals, invariants, and
+   rejected alternatives against code and history. A tracked `AGENTS.md` evidences workflow and
+   conventions within its scope, not automatically product intent. Then scan layout, manifests,
+   build/CI, and entry points; run it if cheap.
 2. **Trace one real flow** end-to-end (a request, a command, a build) before generalizing.
    Architecture claims made without a trace are usually wrong.
 3. **Map components and seams** — where modules meet: interfaces, wire protocols, DB schemas,
@@ -84,6 +85,10 @@ git log -S '<symbol>' --oneline           # when/why a concept appeared or died
 - Test a "team boundary" seam hypothesis with `git shortlog -sn -- <dir>` on each side:
   disjoint author sets support but do not establish it; the same names weaken the hypothesis.
 - `git blame` a surprising line before calling it a wart; it often has a fix-commit story.
+- For a public repo, if its history leaves consequential rationale unresolved, check project-specific
+  first-party posts by core maintainers—identified by governance/ownership and sustained contribution—
+  in blogs, talks, GitHub discussions, or X/Twitter. Cite author, date, and direct URL; treat individual
+  or retrospective statements as context unless repository evidence corroborates them.
 
 ## Briefing contract
 
@@ -114,7 +119,7 @@ in this order; cite `path:line` or short SHAs throughout.
 
 - Separate observation from inference: "X calls Y via Z" is read from code; "probably for
   testability" is a guess — label guesses.
-- If docs and code disagree, the code is the truth and the disagreement is itself a finding.
+- Docs evidence stated intent; code determines current behavior. If they disagree, report both.
 - Time-box: for repos over ~100k lines, deliver the briefing from entry points + one traced
   flow + history, and list which areas were not read.
 - Close full briefings with coverage: what was inspected, what was sampled or skipped, which
