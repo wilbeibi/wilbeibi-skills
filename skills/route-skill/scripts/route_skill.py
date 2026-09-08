@@ -222,7 +222,10 @@ def change_links(root, names, project, remove=False):
             print(f"removed {path}")
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.symlink_to(os.path.relpath(target, path.parent))
+            # Resolve the parent first: a link directory reached through a symlink
+            # (a canonical ~/.agents/skills pointing elsewhere) resolves relative
+            # targets against its physical path, not the path we walked to get here.
+            path.symlink_to(os.path.relpath(target, path.parent.resolve()))
             print(f"linked {path}")
     if not operations:
         print("no changes")

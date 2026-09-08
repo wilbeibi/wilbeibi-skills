@@ -195,6 +195,35 @@ class Scenarios(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown agents"):
             self.run_cli("link", "chart")
 
+    def test_links_work_when_canonical_dir_is_itself_a_symlink(self):
+        """Hosts that keep the skills root elsewhere symlink ~/.agents/skills to it.
+        Relative targets resolve against the physical dir, so the link must be
+        computed from there or every canonical link dangles."""
+        root = self.home / "checkout"
+        skill = root / "skills/chart"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_bytes(self.bodies["SKILL.md"])
+        self.checkout_mock.return_value = root
+
+        # Canonical root lives two levels deeper, reached through a symlink.
+        physical = self.home / "config/agents/skills"
+        physical.mkdir(parents=True)
+        (self.home / ".agents").mkdir()
+        (self.home / ".agents/skills").symlink_to(physical)
+        (self.home / ".claude/skills").mkdir(parents=True)
+
+        self.run_cli("link", "chart")
+
+        canonical = self.home / ".agents/skills/chart"
+        self.assertTrue(canonical.is_symlink())
+        self.assertTrue(canonical.exists(), "canonical link dangles through the symlinked root")
+        self.assertEqual(canonical.resolve(), skill.resolve())
+        # Reaching it by its physical path must work too.
+        self.assertTrue((physical / "chart").exists())
+        # sync recognises the link as checkout-owned rather than unmanaged.
+        self.run_cli("sync")
+        self.assertTrue(canonical.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
