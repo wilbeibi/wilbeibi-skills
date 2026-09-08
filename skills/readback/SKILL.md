@@ -33,13 +33,15 @@ Run `review` in the foreground and wait using whatever your harness supports. St
 
 | Exit | Meaning |
 |---|---|
-| 0 | Confirmed. stdout is the prompt verbatim, with no wrapper and no added trailing newline. |
+| 0 | Confirmed. stdout is the prompt verbatim, with no wrapper and no added trailing newline. A confirmed review with no annotations is a real outcome — the prompt says so, in an `Outcome:` line. |
 | 1 | Operational failure (port, unwritable directory). |
 | 2 | Invalid CLI or input (malformed transcript, empty document, `--out-dir` already holding a review). |
 | 3 | The user cancelled. No prompt, no feedback. |
 | 130 | Interrupted. |
 
-On exit 0, treat the quoted passages as references and the user's comments as the feedback to address, under the current conversation's mode and authority. **Confirm & send** delivers feedback; it is not approval of the document, permission to implement a plan, or authorization for restricted actions. No non-zero exit is a user response — never read cancellation or an interrupt as agreement.
+On exit 0, treat the quoted passages as references and the user's comments as the feedback to address, under the current conversation's mode and authority. Each item is labelled with what the reader wanted from it, and the labels are not interchangeable: answer a **Question** in your reply rather than editing for it, apply a **Change**, and treat a **Note** as context rather than an instruction. Reading a page of questions as a page of edit requests is the failure this labelling exists to prevent.
+
+**Confirm & send** delivers feedback; it is not approval of the document, permission to implement a plan, or authorization for restricted actions. That holds for the empty review too: `Outcome: Read in full` means the reader wanted nothing changed, not that they authorized anything. No non-zero exit is a user response — never read cancellation or an interrupt as agreement.
 
 ## When it fails
 
