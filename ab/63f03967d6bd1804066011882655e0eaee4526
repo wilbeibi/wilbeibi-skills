@@ -1,0 +1,19 @@
+catalog.json
+  s_41aaed7576b530::t_432e51c270d002 6,21-30,41-45,58,110,117,134,146,172,179,436-441,557-562
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ab63f03967d6bd1804066011882655e0eaee4526",
+  "prompts": {},
+  "sessions": {
+    "s_41aaed7576b530": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20b25534-7c29-4b52-9c8e-d31a686d6b0d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
