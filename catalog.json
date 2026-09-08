@@ -123,7 +123,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "c50933065e6dc800731d327fca64f467181a4cd9c9b6d630b7ef2994923dbd21",
+          "sha256": "4fa7f39b1439c6574f528a8dcf79bbff59f2ebb41f06a4bb6da5275c840382de",
           "executable": false
         },
         {
@@ -280,22 +280,22 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "e35d4633940b863820cd261b07fa038bee15c578ba1f16987426fe44f946755a",
+          "sha256": "ffe3c335c1966045b1b6ff889c0a32256dc6ae730c8782eaaf203a5dfa389b43",
           "executable": false
         },
         {
           "path": "assets/review.css",
-          "sha256": "53357af4c4894918385496ec0f972d796cfcb59cd86577403533bdd9975bbaac",
+          "sha256": "d52cda630129de03bfbdfc3fff8901eca9fd527254e8e656e29580cf59dd42ed",
           "executable": false
         },
         {
           "path": "assets/review.html",
-          "sha256": "11838d9d9a59a451036f478305d6b464612c64e583e68a98acd921c82ff82a9a",
+          "sha256": "8ef1de7cbd6d9ce421408742741a775e03bddff58c4b541bedc00bd04db59b40",
           "executable": false
         },
         {
           "path": "assets/review.js",
-          "sha256": "3a704aa78ecaa478a1d01816bc8b01801c0d577593702d53388bf5474d0d6799",
+          "sha256": "5157dcdb3155ea658506ce95707b4501a6bfccbf16d84c40fd1edc407998b640",
           "executable": false
         },
         {
