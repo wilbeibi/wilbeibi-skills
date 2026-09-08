@@ -3,7 +3,7 @@
   "skills": [
     {
       "name": "code-review",
-      "description": "Review a diff, package, or API through one of three lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), or product-versus-library fit (Mitsuhiko). Use when reviewing a change or dependency, auditing or polishing a package, or asking whether code is too complex, whether an API can panic or will age well, or whether a simpler version should ship. Do NOT use for gating complexity before you edit (use complexity-budget) or for onboarding-perspective review (use newcomer-lens-review).",
+      "description": "Review a diff, package, or API through one of five lenses (necessity and layering, honest invariants and costs, product-versus-library fit, a complexity gate before a design change, or newcomer clarity). Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.",
       "compatibility": "",
       "agents": [],
       "path": "skills/code-review",
@@ -19,6 +19,16 @@
           "executable": false
         },
         {
+          "path": "COMPLEXITY-REFERENCE.md",
+          "sha256": "e051320de9f12df283289868a0d7e08878e056298cdb2a530227f7d65b60c630",
+          "executable": false
+        },
+        {
+          "path": "COMPLEXITY.md",
+          "sha256": "77cff2e47ef34e9be51ad2f32a24095f59966a4298b41fb946c98cc803d71db7",
+          "executable": false
+        },
+        {
           "path": "MITSUHIKO-PRINCIPLES.md",
           "sha256": "874fcaac3b5b2875cc8f4196e6da50a8d321f394ad2bda6c6ad15ee65fcc4da2",
           "executable": false
@@ -26,6 +36,11 @@
         {
           "path": "MITSUHIKO.md",
           "sha256": "4bbaa8d17065045a050c1fa34e10712c0509a998745bcfd62ef98bb31205e33c",
+          "executable": false
+        },
+        {
+          "path": "NEWCOMER.md",
+          "sha256": "47a1f902514ea9e04dc2e2b73579f631bacb72196454b024c6169dc915bb736d",
           "executable": false
         },
         {
@@ -40,31 +55,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "1cdb935ec66c278b4caf2af325106a5eabe90505759b1781f56964d1444e2c85",
-          "executable": false
-        }
-      ]
-    },
-    {
-      "name": "complexity-budget",
-      "description": "Assess ownership, coupling, and value before a substantial design change when explicitly requested. Use code-review for completed changes.",
-      "compatibility": "",
-      "agents": [],
-      "path": "skills/complexity-budget",
-      "files": [
-        {
-          "path": "REFERENCE.md",
-          "sha256": "717ee811d8942e7c736f86920f467ff5edbbdbb4460a44173208327ea0b6ecf8",
-          "executable": false
-        },
-        {
-          "path": "SKILL.md",
-          "sha256": "f9431e5ef58344b5951220c106c61b23d957acd7373150ef1fe90eb7db85fbfe",
-          "executable": false
-        },
-        {
-          "path": "agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "sha256": "c150248651446d37a8a975c865694146f280c7cc96af5d0784f8a6d1610eeaaf",
           "executable": false
         }
       ]
@@ -116,14 +107,14 @@
     },
     {
       "name": "grok-repo",
-      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or change-history reconstruction. Use when asked for a repo tour, how something works, where a value comes from, or why and how a feature or change was introduced. Do NOT use for repository health (use repo-eval) or diff review.",
+      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).",
       "compatibility": "",
       "agents": [],
       "path": "skills/grok-repo",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "4fa7f39b1439c6574f528a8dcf79bbff59f2ebb41f06a4bb6da5275c840382de",
+          "sha256": "04c7da616ad8bf0eb81462a7c58fb0561a6db7914c928e4e9dfd1147d8e4bc7d",
           "executable": false
         },
         {
@@ -140,7 +131,7 @@
     },
     {
       "name": "hammerspoon",
-      "description": "Operate macOS via Hammerspoon — run one-off `hs -c` Lua from the shell (launch/quit/focus apps, open/close/focus browser tabs, volume/wifi/caffeinate toggles, on-screen alerts, clipboard) or author persistent automations (hotkeys, watchers, menubar) in ~/.hammerspoon. Use when asked to open/close/focus an app or tab, control Mac system state, \"keep my mac awake\", notify on screen, or write a Hammerspoon module/hotkey — macOS only. Do NOT use for interacting with web page content (use browser tools) or cross-platform scripting.",
+      "description": "Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. Use when asked to control an app, tab, or Mac system state, keep the Mac awake, or write a Hammerspoon module. Not for web page content.",
       "compatibility": "",
       "agents": [],
       "path": "skills/hammerspoon",
@@ -152,7 +143,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "7eb1b7adce7725a745d3dfa41a397924692ba39eb634aa56be2f1c94c11ce7bc",
+          "sha256": "0711275141d8bd865bbc3499f9cc5a166af206e1bd2cd0c1ffee206b907a866f",
           "executable": false
         }
       ]
@@ -177,29 +168,15 @@
       ]
     },
     {
-      "name": "newcomer-lens-review",
-      "description": "Review code for rationale, domain terms, constraints, and assumptions missing to a newcomer, and produce a documentation backlog. Use when asked for an onboarding review, what would confuse a new hire, what a handover is missing, or which parts of a codebase need documenting first. Do NOT use to find defects (use code-review) or to build your own understanding of unfamiliar code (use grok-repo).",
-      "compatibility": "",
-      "agents": [],
-      "path": "skills/newcomer-lens-review",
-      "files": [
-        {
-          "path": "SKILL.md",
-          "sha256": "71f6946ccd99b2eb55b42d380278c7afbb0751e9332e6b3ba16e0520720d6219",
-          "executable": false
-        }
-      ]
-    },
-    {
       "name": "obsidian-capture",
-      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes, and run the agent's own",
+      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent's",
       "compatibility": "",
       "agents": [],
       "path": "skills/obsidian-capture",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "3950011b6ded2e9c6e0f307257c63836ba946f8b639e1a3b36028e3c13386f7b",
+          "sha256": "0704898bdc076353b4fa1d5ad8553067dff5ce2474c593f2efa9368cb378331d",
           "executable": false
         },
         {
@@ -456,7 +433,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "270a129fedad4400674eb4c4986f74f5983737d532651761906b04d5e80fa5f1",
+          "sha256": "f7494745a1dad98482bd9541d1dc33dad03495dbcceb5b4462ea61b401bc1d71",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
           "executable": false
         }
       ]
@@ -572,7 +554,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "534fc2e26e86f331f9e5f2a2863375a20e4cf1915daa145f2d6647c004542548",
+          "sha256": "728bc513afd3f85cae9e28671ddb44447c646ecfdc23cedbfc10f06ce196b8ef",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
           "executable": false
         }
       ]
