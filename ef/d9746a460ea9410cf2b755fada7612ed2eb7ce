@@ -1,0 +1,23 @@
+skills/route-skill/scripts/route_skill.py
+  s_41aaed7576b530::t_b02677f4e0dd8d 225-228
+catalog.json
+  s_41aaed7576b530::t_083868fb96e020 358,363
+skills/route-skill/scripts/test_route_skill.py
+  s_41aaed7576b530::t_d80c359d8d1f95 198-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "efd9746a460ea9410cf2b755fada7612ed2eb7ce",
+  "prompts": {},
+  "sessions": {
+    "s_41aaed7576b530": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20b25534-7c29-4b52-9c8e-d31a686d6b0d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
