@@ -2,7 +2,7 @@
 
 > A trillion-parameter brain to wash my digital dishes.
 
-23 skills for Claude Code and Codex, covering code review, research, documentation, visualization, and personal automation.
+23 skills for Claude Code and Codex, covering code review, research, documentation, visualization, human-in-the-loop review, and personal automation.
 Keep the full collection here; choose what to use on each machine and in each project.
 The [route-skill](skills/route-skill/SKILL.md) entrypoint recommends skills and loads them after you explicitly select one.
 
@@ -34,7 +34,7 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [complexity-budget](skills/complexity-budget/SKILL.md) | Explicit-only review of ownership, coupling, and value before a substantial design change. |
 | [grill-me](skills/grill-me/SKILL.md) | Explicit-only design interview, one question at a time; capture durable terminology and decisions when useful. |
 | [questionnaire](skills/questionnaire/SKILL.md) | Batch a long discussion's open decisions into an offline HTML questionnaire (branching, autosaved drafts) whose answers come back as markdown keyed by stable question ids. |
-| [readback](skills/readback/SKILL.md) | Turn a plan or conversation transcript into an HTML review surface where the user highlights and comments, and return their notes as a follow-up prompt through a waiting local command. |
+| [readback](skills/readback/SKILL.md) | Turn a plan or conversation transcript into an HTML review surface where the user highlights passages and labels each note a question, a change, or an aside, and return them as a follow-up prompt through a waiting local command. |
 | [write-skill](skills/write-skill/SKILL.md) | Write compact shared skills for Codex, Claude Code, and Pi; isolate harness-specific behavior. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
 | [write-docs](skills/write-docs/SKILL.md) | Write or critique codebase prose — READMEs, developer guides and runbooks, CLI text, comments, agent guides, and commit/PR descriptions — with an advisory clarity checker. |
