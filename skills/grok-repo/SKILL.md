@@ -32,16 +32,29 @@ Reconstruct one feature or decision, not the repository's entire chronology:
    vocabulary. State what it does now before explaining how it arrived.
 2. **Find its introduction** — use `git log -S '<literal>'` for appearance/disappearance,
    `git log -G '<regex>'` for matching changed lines, and `--follow` for renamed files. Try old names.
+   Releases bound the search: `git tag --contains <sha>` names the first release carrying a commit,
+   and `git log <prev-tag>..<tag> -- <path>` narrows the range when the question is version-shaped
+   ("when did X change?", "why did upgrading break Y?").
 3. **Read commits, not just subjects** — `git show` the introduction and its parent. Bodies,
    tests, deleted code, and nearby fixes are evidence; diffs alone imply.
-4. **Pull the review thread** — the argument for a change usually outlives the commit message
+4. **Search the issue tracker** — the pressure for a change is usually filed before it is
+   committed, so search issues by the same literals used against `git log -S`, and read
+   closed ones: a rejected proposal explains a design as well as an accepted one.
+   ```bash
+   gh issue list --search '<term>' --state all --limit 30
+   gh issue view <n> --comments
+   ```
+   Weak git history (shallow, squashed, imported) shifts the rationale here — go to the
+   tracker first, not last. Skip if `gh auth status` fails or the remote is not GitHub, and
+   say so rather than presenting git-only evidence as the whole record.
+5. **Pull the review thread** — the argument for a change usually outlives the commit message
    in its PR. Recover the number from the merge that carried the commit, then read the
    discussion, not just the description:
    ```bash
    git log --merges --ancestry-path --oneline <sha>..HEAD | tail -1
-   gh pr view <n> --comments        # gh issue view <n> --comments for a linked issue
+   gh pr view <n> --comments        # follow "Fixes #n" links back to the issue
    ```
-5. **Trace the arc** — inspect follow-up fixes, refactors, reverts, and blame on surviving lines.
+6. **Trace the arc** — inspect follow-up fixes, refactors, reverts, and blame on surviving lines.
 
 Lead with **before → pressure/evidence → introduction → corrections/reversals → current form**.
 Cite SHA + path per stage; close with supported rationale, rejected alternatives, unresolved
@@ -62,7 +75,8 @@ Work top-down. On large repos, sample representative components and say what you
    queues, plugin points, process boundaries. For each seam ask *why here*: testability,
    swap-ability, deploy boundary, team boundary, or accident. Note which side owns the types.
 4. **Mine git history** for rationale (commands below). First check whether history is shallow,
-   squashed, imported, generated, or vendor-heavy; weak history produces clues, not rationale.
+   squashed, imported, generated, or vendor-heavy; weak history produces clues, not rationale,
+   and pushes the *why* into the issue tracker.
 5. **Judge taste and pick highlights** last, from the evidence already gathered.
 
 ## Git archaeology
@@ -97,7 +111,10 @@ reading it — every concept must point at the file that teaches it. Produce the
 in this order; cite `path:line` or short SHAs throughout.
 
 0. **Problem & users** — what pain it removes, for whom, and what the project deliberately
-   does *not* do (non-goals are often stated in README/docs or early commits).
+   does *not* do (non-goals are often stated in README/docs or early commits). Issues closed as
+   not-planned state non-goals more bluntly than docs do: `gh issue list --state closed --search
+   'reason:not-planned'`, plus the project's own refusal label if it has one (`--label wontfix`).
+   GitHub issue search has no `OR`, so run one qualifier at a time. Cite the issue number.
 1. **Architecture** — the 3-7 major components and the shape connecting them (pipeline,
    hub-and-spoke, layered, plugin host…). One paragraph plus a compact diagram or list.
 2. **Design taste** — the authors' consistent choices, each backed by two or more examples:
@@ -114,6 +131,10 @@ in this order; cite `path:line` or short SHAs throughout.
 6. **Hooks for curiosity** — the project's own vocabulary (5-10 jargon terms → the file
    that defines each), 2-3 flows that would make good dataflow traces, and open questions
    the analysis couldn't resolve — unexplained seams, suspicious code, undocumented decisions.
+   Check the open issues before writing this section: they say which of your questions the
+   maintainers already know about (link the issue) and which are genuinely unexamined, and
+   the oldest open ones often mark the design's real soft spots. Note if the tracker is
+   unused or disabled — that is itself a finding about how the project is maintained.
 
 ## Notes
 
