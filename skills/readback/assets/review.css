@@ -8,6 +8,8 @@
   --mark:#ffe6a8; --mark-active:#ffcf5c; --find:#bcdcff; --find-on:#6fb4ff;
   --on-find:#08243d;       /* text on --find-on */
   --top:64px;   /* replaced with the measured header height at runtime */
+  --measure:86ch;    /* prose measure: ~100 characters of this face, wide enough for a
+                        long identifier inline, short enough to track line to line */
   --margin-w:236px;  /* proofing margin: wide enough for a sentence, not a paragraph */
   --map-w:14px;      /* minimap rail, pinned to the right edge */
 }
@@ -67,9 +69,13 @@ button.link{border:0;background:none;padding:2px 4px;font-weight:400;
 #nav{position:sticky;top:var(--top);max-height:calc(100vh - var(--top));overflow:auto;
   border-right:1px solid var(--line-soft);padding:14px 10px 40px;font-size:.85rem}
 #nav ol{list-style:none;margin:0;padding:0}
-#nav a{display:block;color:var(--ink);text-decoration:none;border-radius:6px;padding:4px 8px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* two lines, not one: at this width a single clipped line turns "What Daytona
+   has (dayton…" into a row you cannot tell apart from its neighbours. */
+#nav a{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  color:var(--ink);text-decoration:none;border-radius:6px;padding:4px 8px;
+  overflow:hidden;overflow-wrap:break-word}
 #nav a:hover{background:var(--sunk)}
+#nav a.ask{font-weight:600}
 #nav a.h2{padding-left:20px}
 #nav a.h3{padding-left:32px;color:var(--muted)}
 /* where the reader is, not what they clicked: the outline marks the section that
@@ -82,16 +88,41 @@ main{padding:20px 28px 120px;min-width:0}
 /* nothing lands under the sticky header when scrolled to */
 .entry,.sec,.body h1,.body h2,.body h3,.body h4,.body h5,.body h6{scroll-margin-top:calc(var(--top) + 12px)}
 .doc{max-width:none;margin:0}
-body.has-annotations .doc{width:calc(100% - (var(--margin-w) + 14px));margin-left:0}
+/* Above this width the margin fits beside the column at no cost to the text, so
+   it is reserved from the start: the first annotation must not reflow the
+   paragraph the reader is looking at. Below it, the space has to be taken from
+   the column, and only once there is something to put there. */
+@media (min-width:1300px){ .doc{width:calc(100% - (var(--margin-w) + 14px))} }
+/* A proofing surface is read line by line, so prose is capped at a readable
+   measure rather than the width of the window. The cap is on the text, not on
+   the column: a table or a code block still gets the whole column, because a
+   clipped table column is unreadable and its scrollbar can be a screen below. */
+.body :is(p,ul,ol,dl,blockquote,h1,h2,h3,h4,h5,h6),.body .plain,
+.sec>summary,.entry>summary,.frontmatter{max-width:var(--measure)}
+@media (min-width:1081px) and (max-width:1299px){
+  body.has-annotations .doc{width:calc(100% - (var(--margin-w) + 14px));margin-left:0}
+}
 body.nav-off #nav{display:none}
 body.nav-off .cols{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1080px){
   .cols{grid-template-columns:minmax(0,1fr)}
   #nav{position:static;max-height:none;border:0;border-top:1px solid var(--line);
     padding:14px 18px 20px;max-width:900px;margin:0 auto;width:100%}
+  #nav a{-webkit-line-clamp:1}
   #nav{order:-1}
   main{padding:16px 18px 60px}
 }
+
+/* Tool steps: in the record, out of the way. A reader opens a session to react
+   to what was said, and a 4 KB JSON tool result is not something anyone marks
+   up and sends back. Hidden by default, one button away, counted in the notice
+   so nothing disappears quietly. */
+body.no-tools .entry.machinery{display:none}
+.toolrun{display:none}
+body.no-tools .toolrun{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:0 4px}
+.toolrun::before,.toolrun::after{content:"";flex:1;border-top:1px dashed var(--line-soft)}
+.toolrun button{flex:none;font-size:.76rem}
+#toggle-tools[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
 
 /* ---- document --------------------------------------------------------- */
 .entry{border-bottom:1px solid var(--line-soft);padding:2px 0 10px;margin:0 0 10px}
@@ -120,6 +151,10 @@ summary .caret{display:inline-block;transition:transform 120ms}
 .entry.k-failure>summary .who{color:var(--bad)}
 .kindtag{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);
   border-radius:99px;padding:0 7px;color:var(--muted);flex:none}
+/* an exporter's own marker, shown as it was written: upper-casing
+   "external_agent_tool_call: Bash" only makes it shout */
+.marktag{text-transform:none;letter-spacing:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  max-width:34ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toolline{font-size:.78rem;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   padding:0 4px 4px 22px;word-break:break-word}
 .sec{margin:0}
@@ -146,13 +181,38 @@ summary .caret{display:inline-block;transition:transform 120ms}
   padding:12px 14px;overflow-x:auto}
 .body pre code{background:none;padding:0;font-size:.84rem;line-height:1.5}
 .body table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
-.body th,.body td{border:1px solid var(--line);padding:5px 10px;text-align:left}
+/* A table wider than the column scrolls, but macOS keeps its overlay scrollbar
+   hidden until you touch it, so the clipped edge reads as a truncated table.
+   These two boxes are the ones that overflow, so they carry a visible rail. */
+.body table,.body pre{scrollbar-width:thin;scrollbar-color:var(--edge) var(--line-soft)}
+.body table::-webkit-scrollbar,.body pre::-webkit-scrollbar{height:9px}
+.body table::-webkit-scrollbar-track,.body pre::-webkit-scrollbar-track{
+  background:var(--line-soft);border-radius:99px}
+.body table::-webkit-scrollbar-thumb,.body pre::-webkit-scrollbar-thumb{
+  background:var(--edge);border-radius:99px}
+/* Words stay whole. Letting the browser break inside them lets it shrink a
+   column below its content -- a "D1" column one character wide, with the D
+   above the 1, and `update` set as "upd/ate". A table too wide for the column
+   scrolls instead, which is a worse table but not a mangled one. */
+.body th,.body td{border:1px solid var(--line);padding:5px 10px;text-align:left;
+  overflow-wrap:break-word}
 .body th{background:var(--sunk)}
 .body hr{border:0;border-top:1px solid var(--line)}
 .body img{display:none}
 .imgnote{color:var(--muted);font-size:.85rem;font-style:italic}
+/* A rendered diagram: full column width, never wider than it, and never
+   taller than a screenful without the reader asking. */
+.diagram{margin:.7em 0;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--edge) var(--line-soft)}
+.diagram::-webkit-scrollbar{height:9px}
+.diagram::-webkit-scrollbar-track{background:var(--line-soft);border-radius:99px}
+.diagram::-webkit-scrollbar-thumb{background:var(--edge);border-radius:99px}
+.diagram svg{max-width:100%;height:auto;display:block}
 .code{margin:.7em 0}
-.code>summary{cursor:pointer;font-size:.76rem;color:var(--muted);padding:2px 4px;list-style:none}
+.code>summary{cursor:pointer;font-size:.76rem;color:var(--muted);padding:2px 4px;list-style:none;
+  display:flex;gap:10px;align-items:baseline}
+.fold-copy{border:0;background:none;padding:0;min-height:0;font-size:.74rem;font-weight:400;
+  color:var(--muted);text-decoration:underline;flex:none}
+.fold-copy:hover{color:var(--accent)}
 .code>summary::-webkit-details-marker{display:none}
 .code>summary:hover{color:var(--accent)}
 .plain{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -206,18 +266,25 @@ textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:v
   padding:8px 10px;font-size:.88rem;resize:vertical}
 #ann-list textarea{min-height:60px;max-height:220px;margin-top:7px;line-height:1.42;font-size:.82rem;
   overflow:hidden;resize:none}
-.followup{max-width:74ch;margin:56px auto 0;padding-top:20px;border-top:1px solid var(--line)}
+/* left-aligned with the reading column, not centred in the window: centring it
+   under a capped column reads as a second, differently-indented document */
+.followup{max-width:min(74ch,100%);margin:56px 0 0;padding-top:20px;border-top:1px solid var(--line)}
 .followup h2{font-size:1.25rem;margin:0 0 4px}
-#prompt-preview{min-height:7em;max-height:34em;overflow:auto;margin:12px 0 4px;padding:14px;
-  border:1px solid var(--line);border-radius:12px;background:var(--sunk);white-space:pre-wrap;
-  overflow-wrap:anywhere;font:inherit;font-size:.88rem;line-height:1.55}
+/* The prompt is a draft of the reader's reply, so it is a field, not a
+   read-out: they can add the sentence the annotations do not carry. */
+#prompt-preview{display:block;width:100%;min-height:12em;max-height:34em;overflow:auto;
+  margin:12px 0 4px;padding:14px;border:1px solid var(--line);border-radius:12px;
+  background:var(--sunk);white-space:pre-wrap;overflow-wrap:anywhere;
+  font:inherit;font-size:.88rem;line-height:1.55;resize:vertical}
+#prompt-preview:read-only{opacity:.85}
+#prompt-state.edited{color:var(--warn);font-weight:600}
 .source-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:28px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .source-actions .muted{font-size:.8rem}
 #prompt-state,#send-state,#store-state{font-size:.8rem;margin:6px 0 0}
 #send-state.ok{color:var(--good);font-weight:600}
 #send-state.err{color:var(--bad)}
 @media (max-width:1080px){
-  #marginalia{position:static;pointer-events:auto;max-width:74ch;margin:0 auto;padding:0 18px}
+  #marginalia{position:static;pointer-events:auto;max-width:74ch;margin:0;padding:0 18px}
   #ann-list{display:grid;gap:8px}
   #ann-list li{position:static;width:auto;box-shadow:none}
   body.has-annotations .doc{width:auto}
@@ -227,6 +294,7 @@ textarea{width:100%;border:1px solid var(--edge);border-radius:10px;background:v
 /* ---- print ------------------------------------------------------------ */
 @media print{
   .top,#nav,#marginalia,#sel-menu,.notice,.skip{display:none!important}
+  .diagram{overflow:visible;page-break-inside:avoid}
   body{background:#fff;color:#000;font-size:11pt}
   .cols{display:block}
   main{padding:0}

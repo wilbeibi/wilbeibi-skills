@@ -21,10 +21,14 @@ const INTENTS = ["question", "change", "note"];
 const INTENT_TEXT = { question: "Question", change: "Change", note: "Note" };
 /* only openers that never start an imperative: "should be 12h" is a change */
 const ASKS = /^(why|what|how|where|when|who|which)\b/i;
+/* and the openers that announce context. Without these, "Note: this matches
+   what shipped in #330" comes back to the agent as a change to apply. */
+const TELLS = /^(note|notes|fyi|context|background|aside|observation|for (context|reference|the record)|heads[ -]?up|just (noting|flagging|recording))\b[:,]?/i;
 function inferIntent(text) {
   const t = String(text || "").trim();
   if (!t) return "note";
-  return t.endsWith("?") || ASKS.test(t) ? "question" : "change";
+  if (t.endsWith("?") || ASKS.test(t)) return "question";
+  return TELLS.test(t) ? "note" : "change";
 }
 function intentOf(a) {
   return INTENTS.indexOf(a.intent) < 0 ? inferIntent(a.comment) : a.intent;
@@ -47,6 +51,11 @@ let submissionId = null;
 let storageOK = true;
 let matches = [];
 let matchAt = -1;
+/* The reader's own edits to the prompt. Once they have touched it, the
+   annotations stop writing over their text: a field that rewrites itself under
+   the cursor is worse than no field. */
+let promptEdited = false;
+let promptDraft = "";
 
 /* ---- markdown --------------------------------------------------------- */
 function esc(s) {
@@ -91,13 +100,39 @@ function caret() {
   c.setAttribute("data-rb-ui", "");   // decoration: never part of quotable text
   return c;
 }
+/* Some exporters fold tool traffic into ordinary turns and mark it with a
+   bracketed line of its own — `[external_agent_tool_call: Bash]` from
+   `catchup --json` on a Codex session. The marker names the entry's kind, not
+   its content, so it belongs in the tag and never in the label: 200 outline
+   rows that all read "[external_agent_tool_call: Bash]" are 200 rows the
+   reader cannot tell apart. */
+const MARKER = /^\[[^\]\n]{1,120}\]$/;
+function markerOf(text) {
+  const first = String(text || "").split("\n", 1)[0].trim();
+  return MARKER.test(first) ? first.replace(/^\[|\]$/g, "") : "";
+}
+function clip(t) { return t.length > 100 ? t.slice(0, 99) + "…" : t; }
+/* Machinery: a tool call, its result, a failure -- whatever the exporter
+   recorded of how the work got done. It stays in the document, because that is
+   the record. It stays out of the outline and the minimap, because a reader
+   navigating a session is looking for what was asked and what came back, and
+   200 rows of Bash calls bury exactly that. */
+function isMachinery(entry) {
+  const role = entry.role || entry.kind || "";
+  return (entry.kind && entry.kind !== "message") || !!markerOf(entry.text) ||
+    (role !== "user" && role !== "assistant");
+}
 function firstLine(text) {
   const lines = String(text).split("\n");
+  let mark = "";
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim();
-    if (t) return t.length > 100 ? t.slice(0, 99) + "…" : t;
+    if (!t) continue;
+    /* a marker line, opening or closing, is machinery: keep looking for content */
+    if (MARKER.test(t)) { if (!mark) mark = t; continue; }
+    return clip(t);
   }
-  return "(empty)";
+  return mark ? clip(mark) : "(empty)";
 }
 function clockOf(iso) {
   if (!iso) return "";
@@ -105,21 +140,116 @@ function clockOf(iso) {
   if (isNaN(d.getTime())) return String(iso);
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
-function foldCode(root) {
+/* How long a block has to be before it is worth folding away unread. A plan's
+   SQL snippet stays open; the 90-line Mermaid source of a diagram this page
+   cannot draw does not get to push the prose off the screen. */
+const CODE_FOLD_LINES = 30;
+function langOf(pre) {
+  const code = pre.querySelector("code");
+  const m = code && /(?:^|\s)language-([\w+#.-]+)/.exec(code.className || "");
+  return m ? m[1] : "";
+}
+function foldCode(root, label) {
   const pres = root.querySelectorAll("pre");
   for (let i = 0; i < pres.length; i++) {
     const pre = pres[i];
     if (pre.parentElement && pre.parentElement.classList.contains("code")) continue;
     const n = (pre.textContent.match(/\n/g) || []).length + 1;
+    const lang = label || langOf(pre);
     const d = el("details", "code");
-    d.open = true;
-    const s = el("summary", null, "Code · " + n + (n === 1 ? " line" : " lines"));
+    if (lang) d.dataset.lang = lang;
+    /* closed is still quotable: search opens the fold it lands in, and the
+       summary says what and how much, so nothing is hidden silently. */
+    d.open = n <= CODE_FOLD_LINES;
+    const s = el("summary");
     s.setAttribute("data-rb-ui", "");
+    s.appendChild(el("span", "fold-label", (lang || "Code") + " · " + n +
+      (n === 1 ? " line" : " lines") + (d.open ? "" : " — click to open")));
+    /* This page cannot draw a diagram: mermaid is 300-odd ES modules and a
+       parser I will not put inside the page that holds the submit token. What
+       it can do is hand the source over in one click, for whatever the reader
+       already views diagrams in. */
+    const copy = el("button", "fold-copy", "Copy");
+    copy.type = "button";
+    copy.setAttribute("data-rb-ui", "");
+    copy.title = lang === "mermaid"
+      ? "Copy the diagram source — paste it into a Mermaid viewer to see it drawn"
+      : "Copy this block to the clipboard";
+    copy.onclick = function (ev) {
+      ev.preventDefault();          // a button inside a summary would toggle the fold
+      ev.stopPropagation();
+      const done = function (msg) {
+        copy.textContent = msg;
+        setTimeout(function () { copy.textContent = "Copy"; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pre.textContent).then(
+          function () { done("Copied"); }, function () { done("Blocked"); });
+      } else { done("Blocked"); }
+    };
+    s.appendChild(copy);
     pre.replaceWith(d);
     d.appendChild(s);
     d.appendChild(pre);
   }
 }
+/* ---- diagrams ----------------------------------------------------------
+   A Mermaid block is a picture written as text. The renderer is vendored and
+   only rides along when the source has one, so the page still opens offline
+   from a file:// URL with nothing to fetch. It runs after the text index is
+   built and its output is marked as chrome: the reader quotes the source,
+   never the drawing, so an annotation cannot anchor to a generated <text>
+   node that a different Mermaid version would lay out somewhere else. */
+const MERMAID = window.mermaid && typeof window.mermaid.render === "function"
+  ? window.mermaid : null;
+let mermaidReady = false;
+function darkNow() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+async function drawDiagrams() {
+  if (!MERMAID) return;
+  const folds = [].slice.call($("doc-body").querySelectorAll("details.code"));
+  const jobs = folds.filter(function (d) { return d.dataset.lang === "mermaid"; });
+  if (!jobs.length) return;
+  if (!mermaidReady) {
+    mermaidReady = true;
+    /* strict: labels are sanitised and no click/script directive in the source
+       can reach this page, which holds the token that submits the review. */
+    MERMAID.initialize({
+      startOnLoad: false, securityLevel: "strict", theme: darkNow() ? "dark" : "default",
+      flowchart: { htmlLabels: false }, fontFamily: "inherit",
+    });
+  }
+  for (let i = 0; i < jobs.length; i++) {
+    const fold = jobs[i];
+    const pre = fold.querySelector("pre");
+    if (!pre) continue;
+    const holder = el("div", "diagram");
+    holder.setAttribute("data-rb-ui", "");   // the drawing is chrome; the source is the text
+    try {
+      const out = await MERMAID.render("rb-d" + i, pre.textContent);
+      holder.innerHTML = out.svg;            // sanitised by mermaid at securityLevel strict
+      const svg = holder.querySelector("svg");
+      if (svg) {
+        svg.removeAttribute("width");
+        svg.setAttribute("role", "img");
+      }
+      fold.parentElement.insertBefore(holder, fold);
+      fold.open = false;                     // picture first, source one click away
+      const label = fold.querySelector(".fold-label");
+      if (label) label.textContent = label.textContent.replace(/ — click to open$/, "") + " — source";
+    } catch (e) {
+      /* a diagram this renderer cannot parse stays what it was: readable text */
+      const note = el("p", "imgnote", "This diagram did not render (" +
+        String((e && e.message) || e).split("\n")[0].slice(0, 120) + "). The source is below.");
+      note.setAttribute("data-rb-ui", "");
+      fold.parentElement.insertBefore(note, fold);
+      fold.open = true;
+    }
+  }
+  requestAnimationFrame(function () { buildMinimap(); layoutMarginalia(); paintSpy(); });
+}
+
 /* Split rendered markdown into foldable sections, nested by heading level.
    Depth is relative, not absolute: a document written entirely in h4/h5 folds
    exactly like one written in h1/h2. Absolute levels were the old rule, and any
@@ -151,6 +281,67 @@ function sectionize(rendered) {
 }
 /* YAML frontmatter is metadata, not prose: markdown-it would render the closing
    `---` as a setext h2 swallowing the whole block. Peel it off and show it as-is. */
+/* ---- inert HTML --------------------------------------------------------
+   Raw HTML stays inert here (markdown-it runs with html:false), which is the
+   right posture for a page holding the review's submit token and the wrong
+   reading experience: a GitHub draft's `<details><summary><b>Migration</b>
+   (expand)</summary>` arrived as exactly that text, mid-sentence. Those tags
+   carry nothing a reader needs, so they are unwrapped to their own words first.
+   A tag not on the list is left visible, because guessing at it is worse than
+   showing it, and the untouched original is always one Copy away. */
+const H_SUMMARY = /<summary\b[^>]*>([\s\S]*?)<\/summary>/gi;
+const H_BLOCK = /<\/?(?:details|p|div|section)\b[^>]*>/gi;
+const H_INLINE = /<\/?(?:b|strong|i|em|u|s|kbd|sub|sup|small|ins|del|span)\b[^>]*>/gi;
+const H_BR = /<br\s*\/?>/gi;
+function unwrapInert(prose) {
+  return prose
+    .replace(H_SUMMARY, function (_, inner) {
+      const text = inner.replace(H_INLINE, "").replace(H_BR, " ").trim();
+      return text ? "\n\n**" + text + "**\n" : "\n";
+    })
+    .replace(H_BR, "  \n")
+    .replace(H_BLOCK, "\n\n")
+    .replace(H_INLINE, "");
+}
+/* Code keeps its angle brackets: a Mermaid node label is
+   `NFS filer<br/>layer CAS`, and unwrapping that would break the diagram. */
+function outsideInlineCode(chunk, fn) {
+  return chunk.split(/(`+[^`]*`+)/).map(function (part, i) {
+    return i % 2 ? part : fn(part);
+  }).join("");
+}
+function stripInertHtml(text) {
+  const lines = String(text || "").split("\n");
+  const parts = [];
+  let cur = { code: false, lines: [] };
+  let fence = null;
+  lines.forEach(function (line) {
+    const m = /^[ \t]{0,3}(`{3,}|~{3,})/.exec(line);
+    if (fence === null) {
+      if (m) {
+        parts.push(cur);
+        cur = { code: true, lines: [line] };
+        fence = m[1];
+      } else {
+        cur.lines.push(line);
+      }
+      return;
+    }
+    cur.lines.push(line);
+    if (m && m[1][0] === fence[0] && m[1].length >= fence.length) {
+      parts.push(cur);
+      cur = { code: false, lines: [] };
+      fence = null;
+    }
+  });
+  parts.push(cur);
+  return parts.filter(function (p) { return p.lines.length; })
+    .map(function (p) {
+      const chunk = p.lines.join("\n");
+      return p.code ? chunk : outsideInlineCode(chunk, unwrapInert);
+    }).join("\n");
+}
+
 function splitFrontmatter(text) {
   const m = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(text || "");
   if (!m) return { meta: null, body: text || "" };
@@ -158,7 +349,7 @@ function splitFrontmatter(text) {
 }
 function renderMarkdownInto(host, text) {
   const holder = el("div");
-  holder.innerHTML = md.render(text || "");
+  holder.innerHTML = md.render(stripInertHtml(text));
   foldCode(holder);
   host.appendChild(sectionize(holder));
 }
@@ -175,12 +366,15 @@ function renderEntry(entry, ordinal) {
   const box = el("details", "entry k-" + kind.replace(/[^a-z0-9_-]/gi, ""));
   box.dataset.entry = entry.id;
   box.open = true;
+  if (isMachinery(entry)) box.classList.add("machinery");
+  const marker = markerOf(entry.text);
   const sum = el("summary");
   sum.setAttribute("data-rb-ui", "");   // header text is chrome, never quotable content
   sum.appendChild(caret());
   sum.appendChild(el("span", "n", "#" + (entry.sourceIndex != null ? entry.sourceIndex : ordinal)));
   sum.appendChild(el("span", "who", entry.role || kind));
   if (kind !== "message") sum.appendChild(el("span", "kindtag", kind));
+  if (marker) sum.appendChild(el("span", "kindtag marktag", marker));
   if (entry.time) {
     const w = el("span", "when", clockOf(entry.time));
     w.title = String(entry.time);
@@ -201,7 +395,15 @@ function renderEntry(entry, ordinal) {
     box.appendChild(d);
   }
   const body = el("div");
-  renderMarkdownInto(body, entry.text);
+  if (marker) {
+    /* a shell command and a JSON result are not prose: rendered as Markdown
+       their lines collapse into one running paragraph. Keep the machine text
+       as it was written, folded like any other long block. */
+    body.appendChild(el("pre", "plain", entry.text));
+    foldCode(body, marker);
+  } else {
+    renderMarkdownInto(body, entry.text);
+  }
   box.appendChild(body);
   return box;
 }
@@ -310,7 +512,7 @@ function readSelection() {
   const r = sel.getRangeAt(0);
   const a = entryOf(r.startContainer), b = entryOf(r.endContainer);
   if (!a && !b) return null;
-  if (!a || !b) return { error: "Select inside one message or section of the document." };
+  if (!a || !b) return { error: "Select inside a single message or section." };
   if (a !== b) return { error: "That selection spans more than one message. Annotate each message separately." };
   if (isUI(r.startContainer, a) || isUI(r.endContainer, a)) {
     return { error: "That is the message header, not its text. Select inside the message body." };
@@ -412,7 +614,8 @@ function save() {
   if (!storageOK) return;
   try {
     localStorage.setItem(KEY, JSON.stringify({
-      v: 3, anns: anns, sent: sent, submissionId: submissionId,
+      v: 4, anns: anns, sent: sent, submissionId: submissionId,
+      promptEdited: promptEdited, prompt: promptEdited ? promptDraft : null,
       savedAt: new Date().toISOString(),
     }));
     $("store-state").textContent = "Draft saved in this browser.";
@@ -440,6 +643,10 @@ function restore() {
     if (INTENTS.indexOf(a.intent) < 0) { a.intent = inferIntent(a.comment); a.intentAuto = true; }
   });
   submissionId = data.submissionId || null;
+  if (data.promptEdited && typeof data.prompt === "string") {
+    promptEdited = true;
+    promptDraft = data.prompt;
+  }
   if (data.sent) markSent(null, true);
 }
 
@@ -491,7 +698,7 @@ function renderAnnotations() {
   warn.hidden = lost === 0;
   if (lost) {
     warn.textContent = lost + (lost === 1 ? " annotation is" : " annotations are") +
-      " no longer anchored to a passage in this document — the document may have changed since the review was saved. " +
+      " no longer anchored to a passage in this text — the source may have changed since the review was saved. " +
       "The saved quotes are still included in the prompt.";
   }
   items.forEach(function (a, i) {
@@ -503,7 +710,7 @@ function renderAnnotations() {
     /* the location never fit the card -- it rendered as pure ellipsis. It still
        goes to the agent; here it is the ordinal's tooltip and nothing more. */
     const num = el("span", "a-number", String(i + 1) + ".");
-    num.title = a.scope === "document" ? "Whole document" : a.where;
+    num.title = a.scope === "document" ? "Overall" : a.where;
     head.appendChild(num);
     const acts = el("div", "a-acts");
     if (a.scope !== "document") {
@@ -541,7 +748,7 @@ function renderAnnotations() {
     requestAnimationFrame(function () { grow(input); });
     if (UNRESOLVED.has(a.id)) {
       li.appendChild(el("p", "a-flag",
-        "Anchor unresolved — this passage was not found in the document as loaded. " +
+        "Anchor unresolved — this passage was not found in the text as loaded. " +
         "The saved quote is still used in the prompt."));
     }
     li.onclick = function (ev) {
@@ -564,7 +771,7 @@ function addDocumentNote() {
   const a = {
     id: "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     order: nextOrder(), fingerprint: DOC.fingerprint, anchorVersion: ANCHOR,
-    scope: "document", entryId: null, where: "Whole document",
+    scope: "document", entryId: null, where: "Overall",
     start: 0, end: 0, quote: "", before: "", after: "",
     comment: "", intent: "note", intentAuto: true, createdAt: new Date().toISOString(),
   };
@@ -832,6 +1039,10 @@ function gotoMatch(i) {
   const m = matches[matchAt];
   const idx = indexes.get(m.entryId);
   const entry = entryEls.get(m.entryId);
+  /* a hit inside a hidden tool step reveals the tool steps, the same way it
+     opens a closed fold -- find must never point at something not on screen */
+  if (entry && entry.classList.contains("machinery") &&
+      document.body.classList.contains("no-tools")) showTools(true);
   if (entry) openAncestors(entry);
   const r = idx && rangeFor(idx, m.start, m.end);
   if (r) {
@@ -848,7 +1059,7 @@ function gotoMatch(i) {
 function sourceLine() {
   const s = DOC.source || {};
   const bits = [];
-  if (s.name) bits.push(s.name);
+  if (s.name && s.name !== "stdin") bits.push(s.name);
   if (s.agent) bits.push(s.agent + " session" + (s.sessionId ? " " + s.sessionId : ""));
   bits.push("sha256 " + DOC.fingerprint);
   return bits.join(" · ");
@@ -877,8 +1088,8 @@ function approvalPrompt() {
   out.push("");
   out.push("Outcome: Read in full. No changes requested and no questions raised.");
   out.push("");
-  out.push("Rules: This is the reader's verdict on the document, not an instruction to act and "
-    + "not approval to implement anything. Do not edit the document in response to it. Carry on "
+  out.push("Rules: This is the reader's verdict on what you sent, not an instruction to act and "
+    + "not approval to implement anything. Do not rewrite it in response to this. Carry on "
     + "under the authority you already had.");
   return out.join("\n") + "\n";
 }
@@ -894,7 +1105,7 @@ function composePrompt() {
   out.push("Rules: Target is an exact location anchor, not replacement text. Answer each Question in your reply rather than editing for it. Apply each Change and preserve unrelated behavior. Treat each Note as context, not an instruction. Where an item carries no text, inspect that passage and report whether action is needed.");
   out.push("");
   items.forEach(function (a, i) {
-    out.push((i + 1) + ". Location: " + (a.scope === "document" ? "Whole document" : a.where));
+    out.push((i + 1) + ". Location: " + (a.scope === "document" ? "Overall" : a.where));
     if (UNRESOLVED.has(a.id)) out.push("Status: anchor unresolved");
     if (a.scope !== "document") {
       out.push("Target (exact; locating only):");
@@ -909,18 +1120,27 @@ function composePrompt() {
   });
   return out.join("\n").replace(/\n+$/, "\n");
 }
-function promptText() { return composePrompt(); }
+function promptText() { return promptEdited ? promptDraft : composePrompt(); }
 function renderReadback() {
   const state = $("prompt-state");
-  const preview = $("prompt-preview");
-  preview.textContent = promptText();
+  const box = $("prompt-preview");
+  if (promptEdited) { if (box.value !== promptDraft) box.value = promptDraft; }
+  else box.value = composePrompt();
+  $("prompt-reset").hidden = !promptEdited || sent || cancelled;
+  box.readOnly = sent || cancelled;
   state.className = "muted";
   if (sent) { state.textContent = "Sent. This prompt is final."; return; }
   if (cancelled) { state.textContent = "Review cancelled."; return; }
   $("send").hidden = !LIVE;
+  if (promptEdited) {
+    state.className = "edited";
+    state.textContent = "Edited by hand — this exact text is what will be sent, and further " +
+      "notes will not rewrite it. Undo my edits puts the generated prompt back.";
+    return;
+  }
   state.textContent = anns.length
-    ? mix(ordered(), false) + " — exactly as the agent will receive them."
-    : "No notes. Sending now tells the agent you read the document and have nothing to change.";
+    ? mix(ordered(), false) + " — exactly as the agent will receive them. Editable."
+    : "No notes. Sending now tells the agent you read it all and have nothing to change.";
 }
 
 /* ---- delivery --------------------------------------------------------- */
@@ -963,6 +1183,7 @@ async function send() {
   try {
     const r = await postJSON("submit", {
       submission_id: submissionId, prompt: text, annotation_count: anns.length,
+      prompt_edited: promptEdited,
     });
     if (r.status === 200 && r.data && r.data.status === "accepted") { markSent(r.data); save(); return; }
     if (r.status === 409) {
@@ -1036,6 +1257,39 @@ async function copyText(text, box, label) {
 }
 
 /* ---- navigation ------------------------------------------------------- */
+/* A run of hidden tool steps still leaves a seam: one muted line saying how
+   many, so the jump from turn #2 to turn #31 is explained rather than
+   mysterious, and one click brings them back. */
+function markToolRuns(host) {
+  const kids = [].slice.call(host.children);
+  let i = 0;
+  while (i < kids.length) {
+    if (!kids[i].classList.contains("machinery")) { i++; continue; }
+    let j = i;
+    while (j < kids.length && kids[j].classList.contains("machinery")) j++;
+    const first = kids[i], n = j - i;
+    const strip = el("div", "toolrun");
+    strip.setAttribute("data-rb-ui", "");   // a seam, never quotable content
+    const btn = el("button", "link", n + (n === 1 ? " tool step" : " tool steps"));
+    btn.type = "button";
+    btn.title = "Show the tool calls and results recorded here";
+    btn.onclick = function () {
+      showTools(true);
+      requestAnimationFrame(function () { first.scrollIntoView({ block: "start" }); });
+    };
+    strip.appendChild(btn);
+    host.insertBefore(strip, first);
+    i = j;                                  // kids is a snapshot: inserting does not shift it
+  }
+}
+/* Show or hide the tool steps. The count stays in the button either way: the
+   reader has to be able to see that something is being held back. */
+function showTools(on) {
+  document.body.classList.toggle("no-tools", !on);
+  const btn = $("toggle-tools");
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+  requestAnimationFrame(function () { buildMinimap(); layoutMarginalia(); paintSpy(); });
+}
 function hideNav() {
   $("nav").hidden = true;
   $("toggle-nav").hidden = true;
@@ -1073,7 +1327,18 @@ function buildMinimap() {
   if (!track) return;
   track.textContent = "";
   const idx = indexes.get(ENTRIES[0] && ENTRIES[0].id);
-  const heads = (DOC.kind === "markdown" && idx) ? idx.headings : [];
+  /* A transcript has no headings, and an empty rail in a 69-turn session is the
+     one place the reader most needs the shape of what they are scrolling
+     through: one tick per turn of the conversation, the asks marked wider than
+     the answers. */
+  const heads = DOC.kind === "markdown" ? (idx ? idx.headings : [])
+    : ENTRIES.map(function (entry, i) {
+        const box = entryEls.get(entry.id);
+        if (!box || isMachinery(entry)) return null;
+        return { el: box, level: (entry.role === "user" ? 1 : 3),
+          text: "#" + (entry.sourceIndex != null ? entry.sourceIndex : i + 1) +
+            " " + (entry.role || "entry") + " — " + firstLine(entry.text) };
+      }).filter(Boolean);
   heads.forEach(function (h) {
     const at = frac(h.el);
     if (at == null) return;
@@ -1233,13 +1498,17 @@ function buildNav() {
     paintSpy();
     return;
   }
-  ENTRIES.forEach(function (entry, i) {
+  /* The conversation, not a roll call: each ask sits at the top level and the
+     answers nest under it, so indentation says who spoke instead of the word
+     "assistant" repeated down the rail. */
+  const turns = ENTRIES.filter(function (entry) { return !isMachinery(entry); });
+  if (turns.length < 2) { hideNav(); return; }
+  turns.forEach(function (entry) {
     const li = el("li");
-    const a = el("a");
+    const a = el("a", entry.role === "user" ? "ask" : "h2");
     a.href = "#";
-    a.appendChild(el("span", "n", "#" + (entry.sourceIndex != null ? entry.sourceIndex : i + 1)));
-    a.appendChild(el("span", "who", (entry.role || entry.kind || "entry") + " "));
-    a.appendChild(document.createTextNode(firstLine(entry.text)));
+    a.appendChild(el("span", "n", "#" + entry.sourceIndex));
+    a.appendChild(document.createTextNode(" " + firstLine(entry.text)));
     a.title = firstLine(entry.text);
     a.onclick = function (ev) {
       ev.preventDefault();
@@ -1260,9 +1529,14 @@ function boot() {
   $("doc-title").textContent = DOC.title;
   const s = DOC.source || {};
   const note = [];
-  if (s.name) note.push(s.name);
+  /* Where this text came from, when that tells the reader something. "stdin"
+     and "1 document" tell them nothing: the commonest input is one long reply
+     piped straight in, and its name is the title above. */
+  if (s.name && s.name !== "stdin") note.push(s.name);
   if (s.agent) note.push(s.agent + (s.sessionId ? " · " + s.sessionId : ""));
-  note.push(ENTRIES.length + (DOC.kind === "markdown" ? " document" : " entr" + (ENTRIES.length === 1 ? "y" : "ies")));
+  if (DOC.kind !== "markdown") {
+    note.push(ENTRIES.length + " entr" + (ENTRIES.length === 1 ? "y" : "ies"));
+  }
   if (s.updatedAt) note.push(s.updatedAt);
   $("source-note").textContent = note.join(" · ");
   $("scope-note").textContent = DOC.scope || "";
@@ -1284,7 +1558,7 @@ function boot() {
   const host = $("doc-body");
   if (!ENTRIES.length) {
     host.appendChild(el("p", "empty",
-      "This document is empty. You can still leave a note on the whole document."));
+      "There is nothing here to read. You can still leave an overall note."));
   }
   ENTRIES.forEach(function (entry, i) {
     const node = renderEntry(entry, i + 1);
@@ -1293,6 +1567,16 @@ function boot() {
     indexes.set(entry.id, buildIndex(node));
   });
 
+  const tools = ENTRIES.filter(function (e) { return DOC.kind !== "markdown" && isMachinery(e); }).length;
+  if (tools) {
+    const btn = $("toggle-tools");
+    btn.hidden = false;
+    btn.textContent = tools + (tools === 1 ? " tool step" : " tool steps");
+    btn.title = "Tool calls, results and failures from this session. Hidden by " +
+      "default: they are the record of how the work was done, not part of what was said.";
+    document.body.classList.add("no-tools");
+  }
+  if (tools) markToolRuns(host);
   buildNav();
   restore();
   anns.forEach(anchor);
@@ -1356,11 +1640,27 @@ function boot() {
   }, true);
   wireMinimap();
   buildMinimap();
+  $("toggle-tools").onclick = function () {
+    showTools(document.body.classList.contains("no-tools"));
+  };
   $("toggle-nav").onclick = function () { toggleCol("nav-off", "toggle-nav"); };
   $("doc-note").onclick = addDocumentNote;
   $("go-followup").onclick = function () { $("followup").scrollIntoView({ block: "start", behavior: "smooth" }); };
   $("send").onclick = send;
   $("cancel-review").onclick = cancelReview;
+  $("prompt-preview").addEventListener("input", function (ev) {
+    promptEdited = true;
+    promptDraft = ev.target.value;
+    saveSoon();
+    renderReadback();
+  });
+  $("prompt-reset").onclick = function () {
+    promptEdited = false;
+    promptDraft = "";
+    saveSoon();
+    renderReadback();
+    $("prompt-preview").focus();
+  };
   $("copy").onclick = function () { copyText(promptText(), null, "Prompt"); };
   $("download").onclick = function () {
     download("followup.md", promptText(), "text/markdown");
@@ -1385,11 +1685,12 @@ function boot() {
   window.addEventListener("beforeunload", function (ev) {
     /* offline is where losing the draft is unrecoverable, so it is guarded too */
     if (sent || cancelled) return;
-    if (!anns.length) return;
+    if (!anns.length && !promptEdited) return;
     ev.preventDefault();
     ev.returnValue = "";
   });
   measureTop();
+  drawDiagrams();
   window.addEventListener("resize", function () {
     measureTop();
     requestAnimationFrame(function () { layoutMarginalia(); buildMinimap(); });
