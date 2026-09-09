@@ -62,7 +62,27 @@ git log --no-merges --pretty='%h|%ad|%s' --date=short --shortstat \
       }' \
   | sort -rn | head -12 | cut -f2-
 
+section "ISSUE TRACKER (optional: needs gh, a GitHub remote, and auth)"
+# Every failure here is expected on a local, non-GitHub, or unauthenticated repo:
+# say why the section is empty rather than letting `set -e` kill the git digest.
+gh_issues() {
+  command -v gh >/dev/null 2>&1 || { echo "skipped: gh not installed"; return 0; }
+  git remote -v 2>/dev/null | grep -q 'github\.com' \
+    || { echo "skipped: no github.com remote — check this project's own tracker by hand"; return 0; }
+  gh auth status >/dev/null 2>&1 || { echo "skipped: gh not authenticated (gh auth login)"; return 0; }
+
+  printf -- '-- oldest open (long-lived soft spots) --\n'
+  gh issue list --state open --limit 10 --search 'sort:created-asc' 2>&1 | head -12
+  printf -- '\n-- most discussed, any state (contested decisions) --\n'
+  gh issue list --state all --limit 10 --search 'sort:comments-desc' 2>&1 | head -12
+  printf -- '\n-- closed as not-planned (stated non-goals) --\n'
+  gh issue list --state closed --limit 10 --search 'reason:not-planned sort:updated-desc' 2>&1 | head -12
+}
+gh_issues
+
 section "NEXT: read the big ones in full"
 echo "git show --stat <sha>        # commit messages often contain the design doc"
 echo "git log --follow --oneline -- <hot-file>"
 echo "git log -S '<symbol>' --oneline   # when a concept appeared or died"
+echo "gh issue list --search '<term>' --state all   # the pressure behind the commit"
+echo "gh issue view <n> --comments      # read closed ones too: rejections explain designs"
