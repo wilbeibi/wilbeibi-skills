@@ -1,0 +1,19 @@
+skills/readback/assets/review.js
+  s_62ae2bf0242ff1::t_1c3b1bf857c0aa 284-344,352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "77b274644a71f9e7fee1eed5b1da5d82bd9cfcfe",
+  "prompts": {},
+  "sessions": {
+    "s_62ae2bf0242ff1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "14e7534d-117c-4184-aa3f-cba780379522",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
