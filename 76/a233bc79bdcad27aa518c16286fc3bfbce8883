@@ -1,0 +1,27 @@
+skills/readback/SKILL.md
+  ai_agent 3,9-11,16-21,24,28,32-36,52-54,68-70
+skills/readback/assets/review.css
+  ai_agent 11-12,72-76,78,91-104,111,116-126,154-157,184-198,203-209,211-215,269-271,273-280,287,297
+skills/readback/assets/review.html
+  ai_agent 12,27,29,46-47,52,73
+skills/readback/assets/review.js
+  ai_agent 24-26,30-31,54-58,103-124,127,130-133,135,143-152,158,160-164,166-190,196-252,284-344,352,369-370,377,398-406,515,617-618,646-649,701,713,751,774,1042-1045,1062,1091-1092,1108,1123,1126-1130,1135-1140,1142-1143,1186,1260-1292,1330-1341,1501-1506,1508,1510-1511,1532-1535,1537-1539,1561,1570-1579,1643-1645,1651-1663,1688,1693
+skills/readback/assets/vendor/README.md
+  ai_agent 15-35
+catalog.json
+  ai_agent 253,260,265,270,275,280,293-302,305,310
+skills/readback/assets/vendor/mermaid.LICENSE
+  ai_agent 1-21
+skills/readback/assets/vendor/mermaid.min.js
+  ai_agent 1-3636
+skills/readback/scripts/readback.py
+  ai_agent 45-47,49-52,125,247-257,264-268,278,318,340-341,357-359,508-509,526,581-582,592-593,661-662
+skills/readback/scripts/test_readback.py
+  ai_agent 28,194-196,248-249,456-494
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "76a233bc79bdcad27aa518c16286fc3bfbce8883",
+  "prompts": {}
+}
