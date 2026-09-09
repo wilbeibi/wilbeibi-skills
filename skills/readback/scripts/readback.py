@@ -42,9 +42,14 @@ CSP_BASE = ("default-src blob:; base-uri 'none'; form-action 'none'; object-src 
 CSP_OFFLINE = CSP_BASE + "'none'"
 CSP_LIVE = CSP_BASE + "'self'"
 
-TRANSCRIPT_SCOPE = ("Transcript entries exactly as the export produced them. Anything the export "
-                    "leaves out - reasoning, tool calls, successful tool results - is absent here too.")
+TRANSCRIPT_SCOPE = ("Transcript entries exactly as the export produced them, and only those: "
+                    "whatever the export omits - reasoning, tool calls, successful tool results - "
+                    "is absent here too, and whatever it includes is here in full.")
 MARKDOWN_SCOPE = "Markdown document, rendered from the exact source stored with this review."
+# Piped in rather than read off disk: usually one long reply being handed back to its
+# own author, where calling it a "document" invites a rewrite of the wrong thing.
+PIPED_SCOPE = ("The text exactly as it was handed to this review, rendered as Markdown and "
+               "stored with it. Nothing here was re-rendered, summarised or rewritten.")
 
 
 class InputError(Exception):
@@ -117,7 +122,7 @@ def normalize_markdown(raw: str, name: str, title: str | None) -> dict:
         "kind": "markdown",
         "title": title or first_heading(raw) or name,
         "source": {"name": name, "format": "markdown"},
-        "scope": MARKDOWN_SCOPE,
+        "scope": PIPED_SCOPE if name == "stdin" else MARKDOWN_SCOPE,
         "warnings": [],
         "entries": [{"id": "e1", "kind": "document", "sourceIndex": 1, "text": raw}],
     }
@@ -239,13 +244,28 @@ def raw_name(document: dict) -> str:
     return name if name.lower().endswith(want) else f"source{want}"
 
 
-def render_page(document: dict, raw: str, live: dict | None = None) -> str:
+# A fenced Mermaid block, the only thing the 3.4 MB renderer is worth carrying for.
+MERMAID_FENCE = re.compile(r"^[ \t]{0,3}(?:`{3,}|~{3,})[ \t]*\{?\.?mermaid\b", re.MULTILINE)
+
+
+def wants_diagrams(document: dict) -> bool:
+    return any(MERMAID_FENCE.search(entry.get("text") or "")
+               for entry in document.get("entries") or [])
+
+
+def render_page(document: dict, raw: str, live: dict | None = None,
+                diagrams: bool = True) -> str:
     css = (ASSETS / "review.css").read_text(encoding="utf-8")
     script = (ASSETS / "review.js").read_text(encoding="utf-8")
     vendor = (ASSETS / "vendor" / "markdown-it.min.js").read_text(encoding="utf-8")
     template = (ASSETS / "review.html").read_text(encoding="utf-8")
     check_inline("review.js", script)
     check_inline("markdown-it.min.js", vendor)
+    # 3.4 MB rides along only when there is a diagram to draw with it.
+    mermaid = ""
+    if diagrams and wants_diagrams(document):
+        mermaid = (ASSETS / "vendor" / "mermaid.min.js").read_text(encoding="utf-8")
+        check_inline("mermaid.min.js", mermaid)
     if "</style" in css.lower():
         raise OperationalError("review.css cannot be inlined safely")
     payload = {"schema": SCHEMA, "anchorVersion": ANCHOR_VERSION, "document": document,
@@ -255,6 +275,7 @@ def render_page(document: dict, raw: str, live: dict | None = None) -> str:
         "CSP": CSP_LIVE if live else CSP_OFFLINE,
         "CSS": css,
         "VENDOR": vendor,
+        "MERMAID": mermaid,
         "JS": script,
         "PAYLOAD": embed_json(payload),
         "LIVE": embed_json(live),
@@ -294,7 +315,7 @@ def cmd_build(args: argparse.Namespace) -> int:
         raise InputError(f"{out} already exists; pass --force to overwrite it")
     if out.parent and not out.parent.exists():
         raise InputError(f"no such directory: {out.parent}")
-    out.write_text(render_page(document, raw), encoding="utf-8")
+    out.write_text(render_page(document, raw, diagrams=not args.no_diagrams), encoding="utf-8")
     count = len(document["entries"])
     unit = "entry" if count == 1 else "entries"
     print(f"{out} · {count} {unit} · sha256 {document['fingerprint'][:16]}")
@@ -316,7 +337,8 @@ class ReviewState:
         self.prompt: str | None = None
         self.ack: dict | None = None
 
-    def accept(self, submission_id: str, prompt: str, count: int | None) -> dict:
+    def accept(self, submission_id: str, prompt: str, count: int | None,
+               edited: bool | None = None) -> dict:
         """Save durably first; only a saved prompt is ever acknowledged."""
         encoded = prompt.encode("utf-8")
         write_atomic(self.dir / "followup.md", prompt)
@@ -332,6 +354,9 @@ class ReviewState:
             "promptBytes": len(encoded),
             "promptSha256": hashlib.sha256(encoded).hexdigest(),
             "annotationCount": count,
+            # The prompt may carry sentences that came from no annotation, so a
+            # count alone would misdescribe the file next to it.
+            "promptEdited": edited,
             "submittedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
         write_atomic(self.dir / "result.json", json.dumps(result, indent=2) + "\n")
@@ -480,6 +505,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return
         count = payload.get("annotation_count")
         count = count if isinstance(count, int) and not isinstance(count, bool) else None
+        edited = payload.get("prompt_edited")
+        edited = edited if isinstance(edited, bool) else None
 
         state = self.server.state
         with state.lock:
@@ -496,7 +523,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                                      "submissionId": state.ack["submissionId"]})
                 return
             try:
-                ack = state.accept(submission_id, prompt, count)
+                ack = state.accept(submission_id, prompt, count, edited)
             except OSError as exc:
                 self._json(500, {"error": f"could not save the prompt, nothing was sent: {exc}"})
                 return
@@ -551,7 +578,8 @@ def cmd_review(args: argparse.Namespace) -> int:
                      "inputPath": str(path.resolve()) if path else None,
                      "document": document, "raw": raw}
     try:
-        write_atomic(review_dir / "review.html", render_page(document, raw))
+        write_atomic(review_dir / "review.html",
+                     render_page(document, raw, diagrams=not args.no_diagrams))
         write_atomic(review_dir / "source.json",
                      json.dumps(source_record, ensure_ascii=False, indent=2) + "\n")
     except OSError as exc:
@@ -561,7 +589,8 @@ def cmd_review(args: argparse.Namespace) -> int:
     live = {"reviewId": review_id, "dir": str(review_dir),
             "promptFile": str(review_dir / "followup.md"),
             "resultFile": str(review_dir / "result.json")}
-    page = render_page(document, raw, live=live).encode("utf-8")
+    page = render_page(document, raw, live=live,
+                       diagrams=not args.no_diagrams).encode("utf-8")
     try:
         server = ReviewServer(("127.0.0.1", 0), Handler, state=state, token=token, page=page)
     except OSError as exc:
@@ -629,6 +658,8 @@ def parser() -> argparse.ArgumentParser:
     common.add_argument("--format", choices=("markdown", "transcript"),
                         help="override the format inferred from the file extension")
     common.add_argument("--title", help="override the title (does not change the fingerprint)")
+    common.add_argument("--no-diagrams", action="store_true",
+                        help="do not draw Mermaid blocks; keeps the page small (source only)")
 
     top = argparse.ArgumentParser(prog="readback.py", description=__doc__,
                                   formatter_class=argparse.RawDescriptionHelpFormatter)

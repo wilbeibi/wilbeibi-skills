@@ -250,34 +250,34 @@
     },
     {
       "name": "readback",
-      "description": "Turn a plan, Markdown document, or conversation transcript into an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when the user wants to mark up or annotate a document, react to a long session in the browser, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions (use questionnaire) or to interview the user one question at a time (use grill-me).",
+      "description": "Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when your answer is too long to review in a terminal, when the user wants to mark up or annotate a document, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions (use questionnaire) or to interview the user one question at a time (use grill-me).",
       "compatibility": "Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can hold a foreground command open.",
       "agents": [],
       "path": "skills/readback",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "ffe3c335c1966045b1b6ff889c0a32256dc6ae730c8782eaaf203a5dfa389b43",
+          "sha256": "f12339ec6529dbc02b41f1e973caf2015eac697a4be4d03624473b330173b6d3",
           "executable": false
         },
         {
           "path": "assets/review.css",
-          "sha256": "d52cda630129de03bfbdfc3fff8901eca9fd527254e8e656e29580cf59dd42ed",
+          "sha256": "0d2926e3f129210e07a0b4ecd41ebf5367325aaf1c2fec241a9897e054b521da",
           "executable": false
         },
         {
           "path": "assets/review.html",
-          "sha256": "8ef1de7cbd6d9ce421408742741a775e03bddff58c4b541bedc00bd04db59b40",
+          "sha256": "3d11f5a464c56e70b4e54d507710d326f51436447b0d356a017621f5c92e22b8",
           "executable": false
         },
         {
           "path": "assets/review.js",
-          "sha256": "5157dcdb3155ea658506ce95707b4501a6bfccbf16d84c40fd1edc407998b640",
+          "sha256": "36c71caa456ecda666d529dcc4b394c3f67b5b2268ff80153e353bd0b95d7bd0",
           "executable": false
         },
         {
           "path": "assets/vendor/README.md",
-          "sha256": "8a7026fd5c4009b3a0b9e0ae9342945145b40f2f9b346c052d191ffc5622d034",
+          "sha256": "10b9552d725dc877fb4d79d1e1bc055ead0614733c9ccd88b2c7d1d85ff23d6f",
           "executable": false
         },
         {
@@ -291,13 +291,23 @@
           "executable": false
         },
         {
+          "path": "assets/vendor/mermaid.LICENSE",
+          "sha256": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+          "executable": false
+        },
+        {
+          "path": "assets/vendor/mermaid.min.js",
+          "sha256": "581ed7d74bd9048d0e3a91363927d72ef22942d7722546b27f7cc29e35390eb8",
+          "executable": false
+        },
+        {
           "path": "scripts/readback.py",
-          "sha256": "e32e859556ca8993a79e1a59036073da249df59cb523fc11553af036c33afdc9",
+          "sha256": "b2fd2ea8fdc26102aa7280ba1892b63d813eb444378b228b1d1c97432e117c5a",
           "executable": false
         },
         {
           "path": "scripts/test_readback.py",
-          "sha256": "7148f0ce7519fea6efc7138b38b828522ee1cf1a04709e2f02dcd4993c575404",
+          "sha256": "71e7507bb82a63e96a8d22b9899dfb644b39797818b1a5bcb8ad1f8e21463de3",
           "executable": false
         },
         {

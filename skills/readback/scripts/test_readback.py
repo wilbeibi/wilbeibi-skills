@@ -25,6 +25,7 @@ FIXTURES = Path(__file__).resolve().parent.parent / "tests" / "fixtures"
 
 # Recorded when the file was vendored; see assets/vendor/README.md.
 MARKDOWN_IT_SHA256 = "38c70a1e7ca91ab40e2d9e6e60129851a717ed1c7d4acbbdd41bf9503791cf68"
+MERMAID_SHA256 = "581ed7d74bd9048d0e3a91363927d72ef22942d7722546b27f7cc29e35390eb8"
 
 
 def doc_from(text, name="plan.md", title=None):
@@ -190,6 +191,9 @@ class Embedding(unittest.TestCase):
         data = (ASSETS / "vendor" / "markdown-it.min.js").read_bytes()
         self.assertEqual(hashlib.sha256(data).hexdigest(), MARKDOWN_IT_SHA256)
         self.assertTrue((ASSETS / "vendor" / "markdown-it.LICENSE").is_file())
+        drawn = (ASSETS / "vendor" / "mermaid.min.js").read_bytes()
+        self.assertEqual(hashlib.sha256(drawn).hexdigest(), MERMAID_SHA256)
+        self.assertTrue((ASSETS / "vendor" / "mermaid.LICENSE").is_file())
         readme = (ASSETS / "vendor" / "README.md").read_text(encoding="utf-8")
         self.assertIn(MARKDOWN_IT_SHA256, readme)
 
@@ -241,6 +245,8 @@ class Pages(unittest.TestCase):
         rb.check_inline("review.js", (ASSETS / "review.js").read_text(encoding="utf-8"))
         rb.check_inline("markdown-it.min.js",
                         (ASSETS / "vendor" / "markdown-it.min.js").read_text(encoding="utf-8"))
+        rb.check_inline("mermaid.min.js",
+                        (ASSETS / "vendor" / "mermaid.min.js").read_text(encoding="utf-8"))
         self.assertNotIn("</style", (ASSETS / "review.css").read_text(encoding="utf-8").lower())
 
 
@@ -446,6 +452,46 @@ class Protocol(unittest.TestCase):
                          hashlib.sha256(b"do the thing").hexdigest())
         self.assertNotIn("do the thing", json.dumps(result))     # no second copy of the prompt
         self.assertTrue(self.state.done.is_set())
+
+    def test_the_diagram_renderer_rides_along_only_when_there_is_a_diagram(self):
+        """3.4 MB is worth carrying for a drawing, and not worth carrying otherwise."""
+        plain = rb.normalize_markdown("# Plan\n\nNo pictures here.\n", "p.md", None)
+        self.assertFalse(rb.wants_diagrams(plain))
+        page = rb.render_page(plain, "# Plan\n")
+        self.assertNotIn("__esbuild_esm_mermaid_nm", page)
+
+        raw = "# Plan\n\n```mermaid\nflowchart TD\n  A --> B\n```\n"
+        drawn = rb.normalize_markdown(raw, "p.md", None)
+        self.assertTrue(rb.wants_diagrams(drawn))
+        self.assertIn("__esbuild_esm_mermaid_nm", rb.render_page(drawn, raw))
+        # ...and not when the caller says no
+        self.assertNotIn("__esbuild_esm_mermaid_nm",
+                         rb.render_page(drawn, raw, diagrams=False))
+
+    def test_only_a_real_mermaid_fence_counts_as_a_diagram(self):
+        def has(text):
+            return rb.wants_diagrams(rb.normalize_markdown(text, "p.md", None))
+        self.assertTrue(has("```mermaid\nflowchart TD\n```\n"))
+        self.assertTrue(has("~~~mermaid\nflowchart TD\n~~~\n"))
+        self.assertTrue(has("   ```mermaid\nflowchart TD\n```\n"))
+        self.assertFalse(has("Ask me about mermaid diagrams sometime.\n"))
+        self.assertFalse(has("```mermaidish\nnot a diagram\n```\n"))
+        self.assertFalse(has("```python\nprint('mermaid')\n```\n"))
+
+    def test_the_result_records_whether_the_reader_edited_the_prompt(self):
+        """A hand-edited prompt carries sentences no annotation accounts for."""
+        status, _ = self.submit(submission_id="s1", prompt="mine, typed by hand",
+                                annotation_count=1, prompt_edited=True)
+        self.assertEqual(status, 200)
+        result = json.loads((self.dir / "result.json").read_text(encoding="utf-8"))
+        self.assertIs(result["promptEdited"], True)
+        self.assertEqual(result["annotationCount"], 1)
+
+    def test_an_unflagged_or_bogus_edited_flag_records_nothing(self):
+        self.assertEqual(self.submit(submission_id="s1", prompt="generated",
+                                     prompt_edited="yes please")[0], 200)
+        result = json.loads((self.dir / "result.json").read_text(encoding="utf-8"))
+        self.assertIsNone(result["promptEdited"])
 
     def test_a_retried_submission_is_idempotent_but_a_different_one_conflicts(self):
         self.submit(submission_id="s1", prompt="first")
