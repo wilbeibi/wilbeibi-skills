@@ -22,6 +22,9 @@ from datetime import date, datetime, timedelta
 
 OPENALEX = "https://api.openalex.org/works"
 AUTHORS = "https://api.openalex.org/authors"
+INSTITUTIONS = "https://api.openalex.org/institutions"
+SOURCES = "https://api.openalex.org/sources"
+TOPICS = "https://api.openalex.org/topics"
 ARXIV = "https://export.arxiv.org/api/query"
 MAILTO = os.environ.get("OPENALEX_MAILTO", "openalex@example.com")
 CS_FIELD = "primary_topic.field.id:fields/17"
@@ -29,8 +32,34 @@ CS_FIELD = "primary_topic.field.id:fields/17"
 WORK_FIELDS = (
     "id,ids,doi,title,display_name,publication_date,type,cited_by_count,fwci,"
     "citation_normalized_percentile,is_retracted,primary_location,locations,"
-    "best_oa_location,authorships,abstract_inverted_index"
+    "best_oa_location,authorships,abstract_inverted_index,primary_topic,topics,keywords"
 )
+
+VENUE_ALIASES = {
+    "fast": "File and Storage Technologies",
+    "osdi": "Operating Systems Design and Implementation",
+    "sosp": "Operating Systems Principles",
+    "nsdi": "Networked Systems Design and Implementation",
+    "eurosys": "European Conference on Computer Systems",
+    "atc": "USENIX Annual Technical Conference",
+    "asplos": "Architectural Support for Programming Languages and Operating Systems",
+    "socc": "Symposium on Cloud Computing",
+    "sigcomm": "Special Interest Group on Data Communication",
+    "mlsys": "Machine Learning and Systems",
+    "neurips": "Neural Information Processing Systems",
+    "icml": "International Conference on Machine Learning",
+    "iclr": "International Conference on Learning Representations",
+    "acl": "Association for Computational Linguistics",
+    "emnlp": "Empirical Methods in Natural Language Processing",
+    "naacl": "North American Chapter of the Association for Computational Linguistics",
+    "colm": "Conference on Language Modeling",
+    "aamas": "Autonomous Agents and Multiagent Systems",
+    "tmlr": "Transactions on Machine Learning Research",
+    "vldb": "Very Large Data Bases",
+    "sigmod": "Management of Data",
+    "cidr": "Conference on Innovative Data Systems Research",
+    "icde": "International Conference on Data Engineering",
+}
 
 # The venue name is the only tier signal OpenAlex gives, so keep this generous —
 # a miss here silently demotes a good paper to PEER.
@@ -51,6 +80,7 @@ TOP_NAME = re.compile(
     r"file and storage technologies|principles of distributed computing|"
     r"transactions on computer systems|innovative data systems research|"
     r"internet measurement conference|emerging networking experiments|"
+    r"machine learning and systems|"
     r"high performance computing, networking, storage|"
     r"principles and practice of parallel programming|"
     r"dependable systems and networks|"
@@ -157,11 +187,19 @@ def from_openalex(w):
         # For a paper too new to be cited, the lab is the most honest prior available.
         "affil": list(dict.fromkeys(
             i.get("display_name") for a in auth
-            for i in (a.get("institutions") or []) if i.get("display_name")))[:2],
+            for i in (a.get("institutions") or []) if i.get("display_name")))[:4],
         "h_max": 0,  # filled in by enrich_authors()
         "arxiv": arxiv,
         "doi": doi,
         "abstract": invert_abstract(w.get("abstract_inverted_index"))[:280],
+        "topic": ((w.get("primary_topic") or {}).get("display_name") or ""),
+        "topics": [t.get("display_name") for t in (w.get("topics") or [])
+                   if t.get("display_name")],
+        "keywords": [k.get("display_name") for k in (w.get("keywords") or [])
+                     if k.get("display_name") and (k.get("score") or 0) >= 0.5][:5],
+        "categories": [],
+        "query_hits": [],
+        "best_query_rank": 10**9,
         "pdf": (w.get("best_oa_location") or {}).get("pdf_url") or "",
         "fwci": w.get("fwci"),
         "pctile": (w.get("citation_normalized_percentile") or {}).get("value"),
@@ -193,6 +231,13 @@ def from_arxiv(entry, ns):
         "arxiv": re.sub(r"v\d+$", "", aid),
         "doi": None,
         "abstract": re.sub(r"\s+", " ", txt("summary"))[:280],
+        "topic": "",
+        "topics": [],
+        "keywords": [],
+        "categories": [c.get("term") for c in entry.findall("a:category", ns)
+                       if c.get("term")],
+        "query_hits": [],
+        "best_query_rank": 10**9,
         "pdf": f"https://arxiv.org/pdf/{aid}",
         "fwci": None,
         "pctile": None,
@@ -205,7 +250,7 @@ def from_arxiv(entry, ns):
 # --------------------------------------------------------------------------- #
 
 
-def search(query, since=None, min_cites=None, field="cs"):
+def search(query, since=None, min_cites=None, field="cs", scope_filters=None):
     # The `search` param, NOT `title_and_abstract.search` — the latter is a strict AND
     # match that drops the landmark paper on any query longer than a few words.
     filters = ["type:article|preprint"]
@@ -215,9 +260,56 @@ def search(query, since=None, min_cites=None, field="cs"):
         filters.append(f"from_publication_date:{since if len(since) > 4 else since + '-01-01'}")
     if min_cites:
         filters.append(f"cited_by_count:>{min_cites - 1}")
+    filters += scope_filters or []
     r = oa({"search": query, "filter": ",".join(filters),
             "per-page": 50, "select": WORK_FIELDS})
-    return [from_openalex(w) for w in r.get("results") or []]
+    out = [from_openalex(w) for w in r.get("results") or []]
+    for rank_no, paper in enumerate(out, 1):
+        paper["query_hits"] = [query]
+        paper["best_query_rank"] = rank_no
+    return out
+
+
+def resolve_entities(endpoint, values, prefix, aliases=None):
+    """Resolve user-facing names to stable OpenAlex IDs, preferring exact matches."""
+    resolved = []
+    aliases = aliases or {}
+    for value in values or []:
+        value = value.strip()
+        if re.fullmatch(fr"{prefix}\d+", value, re.I):
+            resolved.append((value.upper(), value))
+            continue
+        lookup = aliases.get(value.lower(), value)
+        r = get(f"{endpoint}?" + urllib.parse.urlencode({
+            "search": lookup, "per-page": 10, "select": "id,display_name", "mailto": MAILTO
+        }))
+        candidates = r.get("results") or []
+        if not candidates:
+            raise ValueError(f"no OpenAlex match for {value!r}")
+        exact = [x for x in candidates if norm_title(x.get("display_name")) == norm_title(lookup)]
+        match = (exact or candidates)[0]
+        resolved.append((match["id"].rsplit("/", 1)[-1], match.get("display_name") or value))
+    return resolved
+
+
+def scope_filters(institutions=None, institution_type=None, venues=None, topics=None):
+    filters = []
+    resolved = {"institutions": [], "institution_type": institution_type,
+                "venues": [], "topics": []}
+    if institutions:
+        resolved["institutions"] = resolve_entities(INSTITUTIONS, institutions, "I")
+        filters.append("authorships.institutions.lineage:" +
+                       "|".join(i for i, _ in resolved["institutions"]))
+    if institution_type:
+        filters.append(f"authorships.institutions.type:{institution_type}")
+    if venues:
+        resolved["venues"] = resolve_entities(SOURCES, venues, "S", VENUE_ALIASES)
+        filters.append("primary_location.source.id:" +
+                       "|".join(i for i, _ in resolved["venues"]))
+    if topics:
+        resolved["topics"] = resolve_entities(TOPICS, topics, "T")
+        filters.append("topics.id:" + "|".join(i for i, _ in resolved["topics"]))
+    return filters, resolved
 
 
 def resolve(seed):
@@ -257,7 +349,7 @@ def resolve(seed):
     return ids
 
 
-def citing(seed, since=None, field="cs"):
+def citing(seed, since=None, field="cs", scope_filters=None):
     """Top-cited papers that CITE the seed — the frontier that built on a landmark.
 
     Sorting server-side is the whole game: a landmark has thousands of citers and the
@@ -273,6 +365,7 @@ def citing(seed, since=None, field="cs"):
         if since:
             filters.append(
                 f"from_publication_date:{since if len(since) > 4 else since + '-01-01'}")
+        filters += scope_filters or []
         try:
             r = oa({"filter": ",".join(filters), "sort": "cited_by_count:desc",
                     "per-page": 50, "select": WORK_FIELDS})
@@ -282,17 +375,29 @@ def citing(seed, since=None, field="cs"):
     return out
 
 
-def search_arxiv(query, days):
+def arxiv_query(query, categories=None):
+    terms = [t for t in re.findall(r"[a-z0-9][a-z0-9+.-]*", query.lower())
+             if t not in STOP and len(t) > 2]
+    q = " AND ".join(f"all:{t}" for t in terms)
+    if categories:
+        cats = " OR ".join(f"cat:{c}" for c in categories)
+        q = f"({q}) AND ({cats})" if q else f"({cats})"
+    return q
+
+
+def search_arxiv(query, days, categories=None):
     """Last-N-days preprints. These are invisible to any citation-based ranking."""
-    q = " AND ".join(f"abs:{t}" for t in re.split(r"\s+", query.strip()) if t)
+    q = arxiv_query(query, categories)
     raw = get(f"{ARXIV}?" + urllib.parse.urlencode({
         "search_query": q, "sortBy": "submittedDate",
         "sortOrder": "descending", "max_results": 60}), raw=True)
     ns = {"a": "http://www.w3.org/2005/Atom"}
     cutoff = date.today() - timedelta(days=days)
     out = []
-    for e in ET.fromstring(raw).findall("a:entry", ns):
+    for rank_no, e in enumerate(ET.fromstring(raw).findall("a:entry", ns), 1):
         p = from_arxiv(e, ns)
+        p["query_hits"] = [query]
+        p["best_query_rank"] = rank_no
         d = parse_date(p["date"])
         if d and d >= cutoff:
             out.append(p)
@@ -377,10 +482,11 @@ NOTE = {
 
 STOP = {"the", "a", "an", "of", "in", "on", "for", "to", "and", "or", "with", "how",
         "what", "why", "is", "are", "be", "using", "via", "from", "at", "by", "that",
-        "this", "it", "as", "can", "do", "does", "paper", "papers", "study"}
+        "this", "it", "as", "can", "do", "does", "about", "find", "recent", "research",
+        "paper", "papers", "study", "studies", "work"}
 
 
-def relevance(papers, query, floor=0.4):
+def relevance(papers, query, floor=0.6):
     """OpenAlex ranks loosely and a famous paper is cited by every field. Require the
     result to actually contain the query's content words before scoring its quality."""
     terms = {w for w in re.findall(r"[a-z0-9]+", query.lower())
@@ -388,11 +494,16 @@ def relevance(papers, query, floor=0.4):
     if not terms:
         return papers
     phrase = query.lower().strip('"')
+    required = (len(terms) if len(terms) <= 2 else
+                max(2, int(len(terms) * floor + 0.999)))
     out = []
     for p in papers:
-        hay = f"{p['title']} {p['abstract']}".lower()
+        literal = f"{p['title']} {p['abstract']}".lower()
+        hay = f"{literal} {' '.join(p.get('topics', []))} " \
+              f"{' '.join(p.get('keywords', []))}".lower()
+        literal_hits = sum(1 for t in terms if t[:-1] in literal or t in literal)
         hits = sum(1 for t in terms if t[:-1] in hay or t in hay)
-        if phrase in hay or hits / len(terms) >= floor:
+        if phrase in literal or (literal_hits and hits >= required):
             out.append(p)
     return out
 
@@ -411,9 +522,13 @@ def dedupe(papers):
         keep, other = (cur, p) if (cur["cites"], cur["tier"] == "TOP") >= (
             p["cites"], p["tier"] == "TOP") else (p, cur)
         for f in ("fwci", "pctile", "abstract", "doi", "arxiv", "pdf", "author_ids",
-                  "affil"):
+                  "affil", "topic"):
             if not keep.get(f) and other.get(f):
                 keep[f] = other[f]
+        for f in ("topics", "keywords", "categories", "query_hits"):
+            keep[f] = list(dict.fromkeys((keep.get(f) or []) + (other.get(f) or [])))
+        keep["best_query_rank"] = min(keep.get("best_query_rank", 10**9),
+                                      other.get("best_query_rank", 10**9))
         keep["cites"] = max(keep["cites"], other["cites"])
         keep["h_max"] = max(keep["h_max"], other["h_max"])
         keep["retracted"] = keep["retracted"] or other["retracted"]
@@ -422,7 +537,7 @@ def dedupe(papers):
         for d in (keep["date"], other["date"]):
             if d and (not keep.get("first_posted") or d < keep["first_posted"]):
                 keep["first_posted"] = d
-        if keep["first_posted"] and keep["first_posted"] != keep["date"]:
+        if keep.get("first_posted") and keep["first_posted"] != keep["date"]:
             age = months_since(parse_date(keep["first_posted"]))
             keep["age_mo"] = round(age, 1) if age else keep["age_mo"]
             if keep["age_mo"]:
@@ -436,7 +551,8 @@ def rank(papers):
     median = vels[len(vels) // 2] if vels else 0.0
     for p in papers:
         p["verdict"] = verdict(p, median)
-    papers.sort(key=lambda p: (ORDER[p["verdict"]], -(p["fwci"] or 0),
+    papers.sort(key=lambda p: (ORDER[p["verdict"]], -len(p.get("query_hits") or []),
+                               p.get("best_query_rank", 10**9), -(p["fwci"] or 0),
                                -(p["velocity"] or 0), -p["cites"]))
     return papers, median
 
@@ -467,6 +583,12 @@ def render(papers, median, query):
         print(f"    {p['date']}  ({age})  {p['cites']} cites ({vel})  {fw}"
               f"  [{p['tier']}] {p['venue'][:34]}")
         print(f"    {who}")
+        labels = (([p["topic"]] if p.get("topic") else p.get("categories") or []) +
+                  (p.get("keywords") or [])[:3])
+        if labels:
+            print("    # " + " · ".join(dict.fromkeys(labels)))
+        if len(p.get("query_hits") or []) > 1:
+            print(f"    matched {len(p['query_hits'])} query variants")
         if p["abstract"]:
             print(f"    → {p['abstract'][:150]}")
         print(f"    {'https://arxiv.org/abs/' + p['arxiv'] if p['arxiv'] else p['pdf'] or ''}\n")
@@ -517,6 +639,24 @@ def selftest():
         fails += got != want
         if got != want:
             print(f"FAIL tier({venue!r}) want={want} got={got}")
+    p = from_openalex({"title": "Generic storage capacity survey"})
+    assert relevance([p], "computational storage") == []
+    p["topics"] = ["Computational Storage Systems"]
+    assert relevance([p], "computational storage") == [p]
+    assert arxiv_query("papers about agent runtime", ["cs.AI", "cs.OS"]) == (
+        "(all:agent AND all:runtime) AND (cat:cs.AI OR cat:cs.OS)")
+    p1 = from_openalex({"title": "One paper", "cited_by_count": 1})
+    p2 = from_openalex({"title": "One paper", "cited_by_count": 2})
+    p1["query_hits"], p1["best_query_rank"] = ["agent runtime"], 4
+    p2["query_hits"], p2["best_query_rank"] = ["AI agent systems"], 2
+    merged = dedupe([p1, p2])[0]
+    assert merged["query_hits"] == ["AI agent systems", "agent runtime"]
+    assert merged["best_query_rank"] == 2
+    assert VENUE_ALIASES["fast"] == "File and Storage Technologies"
+    filters, _ = scope_filters(["I1"], "company", ["S2"], ["T3"])
+    assert filters == ["authorships.institutions.lineage:I1",
+                       "authorships.institutions.type:company",
+                       "primary_location.source.id:S2", "topics.id:T3"]
     assert (months_since(date(2026, 1, 13), date(2026, 7, 13)) or 0) > 5.9
     print("FAILED" if fails else "all pass")
     return 1 if fails else 0
@@ -525,6 +665,8 @@ def selftest():
 def main():
     ap = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     ap.add_argument("query", nargs="?", help="topic, e.g. 'lost in the middle long context'")
+    ap.add_argument("-q", "--query", dest="query_variants", action="append", default=[],
+                    help="additional query variant; repeat to improve recall")
     ap.add_argument("--since", help="YYYY-MM-DD or YYYY — only papers after this")
     ap.add_argument("--fresh", type=int, metavar="DAYS",
                     help="also pull arXiv preprints from the last N days")
@@ -536,6 +678,16 @@ def main():
     ap.add_argument("--min-cites", type=int)
     ap.add_argument("--field", default="cs", choices=["cs", "any"],
                     help="restrict to Computer Science (default) or search all fields")
+    ap.add_argument("--institution", action="append", default=[], metavar="NAME_OR_ID",
+                    help="works affiliated with this institution or its descendants; repeatable")
+    ap.add_argument("--institution-type", metavar="TYPE",
+                    help="affiliated institution type, e.g. company or education")
+    ap.add_argument("--venue", action="append", default=[], metavar="NAME_OR_ID",
+                    help="publication venue; accepts aliases such as FAST, OSDI, and NeurIPS")
+    ap.add_argument("--topic", action="append", default=[], metavar="NAME_OR_ID",
+                    help="OpenAlex topic; use a displayed topic name or T-number")
+    ap.add_argument("--category", action="append", default=[], metavar="ARXIV_CATEGORY",
+                    help="arXiv category for --fresh, e.g. cs.OS or cs.AI; repeatable")
     ap.add_argument("--limit", type=int, default=15)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--selftest", action="store_true", help="offline; no network")
@@ -543,19 +695,29 @@ def main():
 
     if a.selftest:
         return selftest()
-    if not (a.query or a.after):
+    queries = ([a.query] if a.query else []) + a.query_variants
+    if not (queries or a.after):
         ap.error("need a query or --after")
 
+    filters, resolved = scope_filters(a.institution, a.institution_type, a.venue, a.topic)
+    for kind in ("institutions", "venues", "topics"):
+        entities = resolved[kind]
+        for entity_id, name in entities:
+            print(f"{kind[:-1]}: {name} ({entity_id})", file=sys.stderr)
+    if a.institution_type:
+        print(f"institution type: {a.institution_type}", file=sys.stderr)
+    if a.fresh and filters:
+        print("warning: skipping arXiv --fresh results because arXiv cannot enforce "
+              "the requested OpenAlex scope filters", file=sys.stderr)
     papers = []
     if a.after:
-        papers += citing(a.after, a.since, a.field)
-    if a.query:
-        papers += search(a.query, a.since, a.min_cites, a.field)
-        if a.fresh:
-            papers += search_arxiv(a.query, a.fresh)
+        papers += citing(a.after, a.since, a.field, filters)
+    for query in queries:
+        hits = search(query, a.since, a.min_cites, a.field, filters)
+        papers += relevance(hits, query)
+        if a.fresh and not filters:
+            papers += relevance(search_arxiv(query, a.fresh, a.category), query)
 
-    if a.query:
-        papers = relevance(papers, a.query)
     if a.about:
         papers = relevance(papers, a.about, floor=0.34)
     papers = dedupe(papers)
@@ -572,10 +734,11 @@ def main():
         papers = papers[: a.limit]
 
     if a.json:
-        print(json.dumps({"query": a.query or a.after, "median_velocity": median,
+        print(json.dumps({"query": queries or a.after, "scope": resolved,
+                          "median_velocity": median,
                           "papers": papers}, indent=2))
     else:
-        render(papers, median, a.query or a.after)
+        render(papers, median, " | ".join(queries) if queries else a.after)
     return 0
 
 
@@ -584,5 +747,7 @@ if __name__ == "__main__":
         sys.exit(main())
     except urllib.error.HTTPError as e:
         sys.exit(f"OpenAlex/arXiv HTTP {e.code}: {e.reason}")
+    except ValueError as e:
+        sys.exit(str(e))
     except KeyboardInterrupt:
         sys.exit(130)

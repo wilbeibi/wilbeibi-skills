@@ -114,12 +114,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "04c7da616ad8bf0eb81462a7c58fb0561a6db7914c928e4e9dfd1147d8e4bc7d",
+          "sha256": "0d82a23e85674898fee599ab967c8c2db699b3bef407ac50b30973a3902e1b68",
           "executable": false
         },
         {
           "path": "scripts/archaeology.sh",
-          "sha256": "89a2061e08f4a0da6dec67417a794b8d2722b7428ec5aff7576a0f8bef689a94",
+          "sha256": "33b1b2ceadbbe57bf168399b556b4e4cf97719facccd66a1b70b38d058a36cfc",
           "executable": true
         },
         {
@@ -212,20 +212,20 @@
     },
     {
       "name": "paper-search",
-      "description": "Find and rank research papers by recency and field-adjusted impact. Use when searching literature, recent or superseding work, or evidence for AI/ML/systems claims. Do NOT use for general web search or GitHub repository evaluation.",
+      "description": "Find and rank research papers by relevance, recency, field-adjusted impact, venue, and author affiliation. Use when searching AI, agents, runtimes, storage, databases, infrastructure, recent or superseding work, company or lab research, or evidence for technical claims. Do NOT use for general web search or GitHub repository evaluation.",
       "compatibility": "",
       "agents": [],
       "path": "skills/paper-search",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "15c5a84e28aeb70ae0544da688df8069fe352290ecdd98d49abcef38555b6d0a",
+          "sha256": "46901b384573665f3e07f470ae1b4d45d366055e1049e3d71bc05a747627f897",
           "executable": false
         },
         {
           "path": "scripts/paper_search.py",
-          "sha256": "cd0662640d5a7c525c815884065834129a6343c8aaf0ff3124226f7e8e0019fb",
-          "executable": false
+          "sha256": "963af9ac839dca9af1fc9ffc1223d6e8e60375686c9a5f8752797c9e81690179",
+          "executable": true
         }
       ]
     },
