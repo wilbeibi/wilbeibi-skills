@@ -224,6 +224,30 @@ class Scenarios(unittest.TestCase):
         self.run_cli("sync")
         self.assertTrue(canonical.exists())
 
+    def test_words_match_across_file_names_and_a_named_miss_refuses_substitution(self):
+        """The two ways routing used to go wrong: silent miss, and silent substitution.
+
+        A lens name lives in a file name, not the description, so a whole-query
+        substring match reported "no matching skill" for something present."""
+        self.catalog["skills"][1]["files"] = [
+            {"path": "RUSS-COX.md", "sha256": "0" * 64, "executable": False},
+        ]
+
+        output, _ = self.run_cli("list", "russ cox unrelated")
+        self.assertIn("other:", output)
+        self.assertNotIn("chart:", output)
+
+        # A hyphenated name is a claim that the skill exists; a neighbour is not it.
+        with self.assertRaises(ValueError) as caught:
+            self.run_cli("list", "chart-ingest")
+        self.assertIn("no skill named 'chart-ingest'", str(caught.exception))
+        self.assertIn("nearest by keyword: chart", str(caught.exception))
+        self.assertIn("do not load a neighbour", str(caught.exception))
+
+        # A bare word stays a topic search, neighbours and all.
+        output, _ = self.run_cli("list", "draw")
+        self.assertIn("chart:", output)
+
 
 if __name__ == "__main__":
     unittest.main()
