@@ -12,6 +12,9 @@ Recommend from the catalog; load a skill only after the user selects it.
 
 - "Use dataviz" or agreement to your specific recommendation authorizes fetching and using that skill. Do not ask again.
 - A mention, explanation request, or generic task is not selection. Read only the catalog and recommend when useful.
+- A name the catalog does not have is a miss, not a cue to load the nearest match: `list` fails and
+  names the keyword neighbours. Say the name was missing; do not load a neighbour, and do not hand-roll
+  what the named skill would have done — an unavailable skill authorizes nothing.
 - Consult the catalog once when no available skill clearly fits. Avoid repeated recommendations after refusal.
 - Announce the selected skill briefly. Prefer local files or cache; fetch only when absent or explicitly asked for the latest version.
 - Cached files do not authorize automatic use in a later task. Existing native skills retain their own invocation rules.
@@ -27,7 +30,8 @@ python3 scripts/route_skill.py get dataviz
 python3 scripts/route_skill.py get dataviz --refresh
 ```
 
-`list` reads metadata only; retry without a query if nothing matches. It reports local scope and compatibility.
+`list` ranks by how many query words a skill matches, its file names included, and reads metadata only;
+retry without a query if nothing matches. It reports local scope and compatibility.
 `get` prints the SKILL.md path on stdout, with source/version on stderr. Read that file completely before use.
 Supporting paths are relative to its directory. Check the skill's requirements before running its scripts.
 If requirements are missing, explain them; do not install dependencies or switch hosts without the required authorization.

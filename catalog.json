@@ -3,7 +3,7 @@
   "skills": [
     {
       "name": "code-review",
-      "description": "Review a diff, package, or API through one of five lenses (necessity and layering, honest invariants and costs, product-versus-library fit, a complexity gate before a design change, or newcomer clarity). Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.",
+      "description": "Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.",
       "compatibility": "",
       "agents": [],
       "path": "skills/code-review",
@@ -55,7 +55,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "c150248651446d37a8a975c865694146f280c7cc96af5d0784f8a6d1610eeaaf",
+          "sha256": "7d522a90dcdbf662486edda4994619143ed0d91d014c8d684aca9b66fd3c9ae1",
           "executable": false
         }
       ]
@@ -360,17 +360,17 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "92dd5507d776e072aa30de2ea0dbe5a4a041c75cb3628c8242e0531367ceb8be",
+          "sha256": "f03b8bd77dcf5d2304d74b5ab071b472cf4bff157b7692cf57bf404333bd2609",
           "executable": false
         },
         {
           "path": "scripts/route_skill.py",
-          "sha256": "76074694f29932cf2b47c8459e560d6b5a5ec26f52173f7b007aca255ee0aabf",
+          "sha256": "f79eafcdd66d475b2ab2b5a23d5aefd2a5a12a2065281592c233ab408128c693",
           "executable": false
         },
         {
           "path": "scripts/test_route_skill.py",
-          "sha256": "5caea31a42725377b38c6ad82d37bced5f1ba47c33f977ff851de09ed45f9618",
+          "sha256": "3effb4bbb75bb9b7fb1125cf1865507b01b8b3c7ec1c5260f0c8dc6451f0ceef",
           "executable": false
         }
       ]

@@ -30,6 +30,48 @@ def valid_name(name):
     return name
 
 
+def search(skills, query):
+    """Rank by how many query words a skill matches, keep only the best tier.
+
+    Whole-query substring matching missed every multi-word phrasing a human
+    actually types ("russ cox review"). File names are searched too: a lens or
+    subcommand name lives in RUSS-COX.md, never in the one-line description.
+    """
+    exact = [r for r in skills if r["name"] == query.strip()]
+    if exact:
+        return exact
+    words = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 1]
+    if not words:
+        return [r for r in skills if query.lower() in (r["name"] + " " + r["description"]).lower()]
+    scored = [(sum(bool(re.search(rf"\b{re.escape(w)}", haystack(r))) for w in words), r) for r in skills]
+    best = max((score for score, _ in scored), default=0)
+    return [r for score, r in scored if score and score == best]
+
+
+def haystack(row):
+    names = " ".join(PurePosixPath(f["path"]).stem for f in row.get("files", []))
+    return re.sub(r"[^a-z0-9]+", " ", f"{row['name']} {row['description']} {names}".lower())
+
+
+def name_shaped(query):
+    """A hyphenated token is someone naming a skill; a bare word is a topic search.
+
+    `list chart` has to stay a search. `list paper-ingest` is a claim that such a
+    skill exists, and when it does not the answer is a miss, not the nearest
+    keyword neighbour.
+    """
+    return bool(re.fullmatch(r"[a-z0-9]+(?:[-_][a-z0-9]+)+", query.strip()))
+
+
+def no_match(query, rows=()):
+    if not name_shaped(query):
+        return "no matching skill; run list without a query"
+    nearest = ", ".join(r["name"] for r in rows)
+    return (f"no skill named {query.strip()!r}"
+            + (f"; nearest by keyword: {nearest}" if nearest else "")
+            + ". Say so in your reply; do not load a neighbour or hand-roll what it would have done.")
+
+
 def checkout():
     for parent in Path(__file__).resolve().parents:
         if (parent / ".git").exists() and (parent / "skills").is_dir():
@@ -263,9 +305,11 @@ def main():
         print(f"route-skill: {source}", file=sys.stderr)
     elif args.command == "list":
         catalog, revision = store.catalog(args.refresh)
-        rows = [r for r in catalog["skills"] if args.query.lower() in (r["name"] + " " + r["description"]).lower()]
+        rows = search(catalog["skills"], args.query)
         if not rows:
-            raise ValueError("no matching skill; run list without a query")
+            raise ValueError(no_match(args.query))
+        if name_shaped(args.query) and not any(r["name"] == args.query.strip() for r in rows):
+            raise ValueError(no_match(args.query, rows))
         for row in rows:
             name = valid_name(row["name"])
             local = local_candidates(name)

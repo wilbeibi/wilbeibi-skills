@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review a diff, package, or API through one of five lenses (necessity and layering, honest invariants and costs, product-versus-library fit, a complexity gate before a design change, or newcomer clarity). Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.
+description: Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.
 ---
 
 # code-review
