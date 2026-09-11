@@ -1,0 +1,33 @@
+skills/route-skill/SKILL.md
+  s_f38cfe313956d4::t_c9595972f13b22 15,33-34
+  s_f38cfe313956d4::t_4a4d09936e0506 16-17
+skills/code-review/SKILL.md
+  s_f38cfe313956d4::t_445b525a4a5f07 3
+skills/route-skill/scripts/test_route_skill.py
+  s_f38cfe313956d4::t_061ac21c5e1f3e 227-244,246-250
+  s_f38cfe313956d4::t_4a4d09936e0506 245
+skills/route-skill/scripts/route_skill.py
+  s_f38cfe313956d4::t_874d9db1ed9b38 40-42
+  s_f38cfe313956d4::t_c536d53ad5456b 56,58,64
+  s_f38cfe313956d4::t_9046211788dc8f 57,59-63,66-71,74,311-312
+  s_f38cfe313956d4::t_7d41aa0ecf9ebf 33-39,43-55,65,73,308,310
+  s_f38cfe313956d4::t_4a4d09936e0506 72
+catalog.json
+  s_f38cfe313956d4::t_8a2b453dfbc331 6,58,363,368,373
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9fe810364ca535fca375e745a6609bb0a228f78e",
+  "prompts": {},
+  "sessions": {
+    "s_f38cfe313956d4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2515aba9-a3d6-4cc3-88c7-c9561e2e371c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
