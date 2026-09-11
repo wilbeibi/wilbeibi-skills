@@ -42,7 +42,7 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [grok-repo](skills/grok-repo/SKILL.md) | Understand an unfamiliar codebase through a full briefing, scoped dataflow trace, or reconstruction of why and how a feature changed. |
 | [sherlock](skills/sherlock/SKILL.md) | Work an open question like a case: log graded clues, run competing theories through a consistency matrix, kill by evidence, backtrack, converge — for puzzling bugs, reverse-engineering a product from public signals, or "what happened here". |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |
-| [paper-search](skills/paper-search/SKILL.md) | Find papers across Semantic Scholar, OpenAlex, and arXiv, ranked by impact relative to field and age — so recent work and credible work are told apart from noise. |
+| [paper-search](skills/paper-search/SKILL.md) | Find OpenAlex and arXiv papers with fused query variants, topic/keyword hints, institution and venue filters, and field- and age-adjusted impact ranking. |
 | [web-recap](skills/web-recap/SKILL.md) | Extract browser history (Chrome, Firefox, Safari, Edge, Brave) to find URLs by topic or get visit stats. Adapted from [robzolkos/web-recap](https://github.com/robzolkos/web-recap). |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Explicit-only implementation planning: scope, material assumptions, and verifiable completion. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon: one-off `hs -c` Lua for apps, browser tabs, and system toggles, plus authoring persistent automations in ~/.hammerspoon. |
