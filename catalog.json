@@ -20,12 +20,12 @@
         },
         {
           "path": "COMPLEXITY-REFERENCE.md",
-          "sha256": "e051320de9f12df283289868a0d7e08878e056298cdb2a530227f7d65b60c630",
+          "sha256": "91fc3562d5d726a98ed7e12466afb7fac8956b73b53c38582e5a36713705563c",
           "executable": false
         },
         {
           "path": "COMPLEXITY.md",
-          "sha256": "77cff2e47ef34e9be51ad2f32a24095f59966a4298b41fb946c98cc803d71db7",
+          "sha256": "2ce37ad0fbcb2ed33ac7ec4609d4187cccfcaeeb4b069631c650af63b887ac70",
           "executable": false
         },
         {
@@ -50,12 +50,17 @@
         },
         {
           "path": "RUSS-COX.md",
-          "sha256": "0fb6484be62f8c990dfc6d81d70a068da3ef7bf0ebd76b1e1854bd0da400d4d6",
+          "sha256": "dd5d36aff9dadd3bec0034e41286c1dfc138eba6ad8047580c35792ae7f03921",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "7d522a90dcdbf662486edda4994619143ed0d91d014c8d684aca9b66fd3c9ae1",
+          "sha256": "193d07fe3b6eaca8813222049684a9b1454c7340cd0297393542204efface6da",
+          "executable": false
+        },
+        {
+          "path": "scripts/slop.py",
+          "sha256": "cb6e31af3b4bd945318c45c0aa530684522b47704c8b930d00a01735348c10ab",
           "executable": false
         }
       ]

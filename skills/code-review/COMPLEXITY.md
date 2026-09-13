@@ -13,6 +13,7 @@ Use this lens for contested design choices; it is not a ceremony before routine 
   but coupling across ownership or trust boundaries may cost more than a small copy.
 - Judge coupling and admitted invalid states, not line count. A larger change at the correct layer can be simpler.
 - Use the project's idioms. Prefer types or constructors that prevent invalid states where practical.
+- Measure the landing zone before pricing the change: `uvx scb-check check <package>` (or `scripts/slop.py` on a prior range; see SKILL.md). Complexity is a property of (change, layer), and the layer's current state is part of that. Adding a branch to a function already over the complexity threshold, or a near-copy to a package whose clone count is climbing, costs more than the same change into clean code, and the proposal has to carry either the fold-in cost or an explicit acceptance of the drift. Do not turn the threshold into a budget: a change that keeps every function under 10 by splitting one knot into four fragments has hidden the cost, not paid it.
 
 ## Review the proposed change
 
