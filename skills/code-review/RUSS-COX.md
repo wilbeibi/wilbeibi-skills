@@ -12,6 +12,11 @@ Judge code by long-term maintenance cost: whether it should exist, whether it si
 3. **Dependency explosion** — What does the dependency actually do, what transitive cost arrives with it, and could 20-50 lines replace it? Heuristic: import what is hard, own what is core, copy what is small.
 4. **Quality debt** — Will a new maintainer understand it in six months, and is any debt paired with a concrete paydown trigger?
 
+For an agent-written diff, ask two more before pass 1, with `scripts/slop.py` output beside the diff (see SKILL.md "Measure before judging"):
+
+- **What did it delete?** An agent on defaults only adds; a diff that removes nothing while extending existing behavior has almost certainly duplicated something. Check the clone hits and the base-to-head counts.
+- **Folded in or bolted on?** New logic that lives beside the abstraction it extends, rather than inside it, is the additive edit; it is easy and still complex. Name the function it should have gone into.
+
 ## Package audit — six dimensions
 
 These are principles, not a compliance checklist: translate each into the codebase's own language, ecosystem, and scale, and silently skip any dimension that doesn't apply (a CLI script has no seams to audit; a stateless lib has no long-running loops). Never write a finding that demands another project's idiom — name the principle and its local translation.

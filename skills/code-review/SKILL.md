@@ -21,6 +21,23 @@ Default to **Russ Cox** for an unqualified "review this diff." Reach for the oth
 
 In an established codebase, search for existing primitives before judging anything new — under any lens, the most common real finding is that a helper, interface, or package already does this.
 
+## Measure before judging
+
+A model's opinion of how verbose or tangled code is is close to noise (the same judge flips on renamed inputs), so do not form one. Measure instead, then spend judgment only where the measurement points. Run this when the diff was written by an agent, exceeds ~100 lines, or you are in audit mode:
+
+```
+python3 scripts/slop.py [BASE] [--scope DIR] [--all]   # working tree vs BASE: HEAD for uncommitted work, main for a branch
+```
+
+It wraps [scb-check](https://github.com/gabeorlanski/scb-check) (SlopCodeBench's tool; Python, Rust, JS, TS, Zig, Haskell, C++) and prints: line delta; base-to-head counts for the changed files (functions over cyclomatic complexity 10, clone lines, flagged lines, erosion and verbosity ratios); and every clone, complexity, or slop-rule hit that lands on a touched line, as `file:line`. Cross-repo clones need the full scan; if scb-check aborts on a file it cannot parse, the script says so and falls back to the changed files. For Go, Java, C#, Swift, Kotlin, Ruby, PHP and C it uses [lizard](https://github.com/terryyin/lizard) instead: same complexity metric, a weaker token-level clone detector, no slop rules. Lizard's ratios are comparable to the same repo's history, not to scb-check's reference points below.
+
+Reading the output:
+
+- Every line is a lead, not a finding. Open the code. A 10-line function with complexity 15 is dense, not sloppy; a 40-line one with three branches that each re-derive the same state is the finding, and the number is only its evidence.
+- Ratios are meaningful for a package, not a diff. On a small diff report the counts and locations; in audit mode use the package ratios as the refactor plan's baseline. SlopCodeBench's reference points: established repos average verbosity 0.15 and erosion 0.31, agent output roughly double both.
+- Clone hits are the mechanical form of the "existing primitive" search above. The finding is the pair that will diverge, named on both sides.
+- Slop accumulates across sessions because each agent run, reviewer included, starts without memory of the last. The base-to-head counts are the only view of that drift you get; when a package's numbers only ever rise, say so in the summary even if no single hit is a finding.
+
 Not this skill: writing the commit or PR message (use `write-docs`) or building your own understanding of an unfamiliar codebase (use `grok-repo`).
 
 ## Output contract — all lenses
@@ -43,6 +60,9 @@ Each finding is one block, most-consequential first:
 - Close with one line naming what you checked and found sound — coverage, not praise, so the reader knows what the silence covers — then a brief `Summary`.
 - Do not nitpick style, naming, or formatting unless it obscures correctness or cost.
 - Report only what you found. Never pad toward a count, per axis, per dimension, or per section — a short review of a clean change is the correct output.
+- Never emit a numeric quality score or grade, under any lens. Scores are where a model judge is least reliable, and once fed back to the author they become the target.
+- A finding must survive renaming every identifier in the diff. If it would vanish, it was about vocabulary, not structure — drop it. (Newcomer is the exception; its subject is names and context.)
+- A measurement (complexity, clone size, line count) may appear only in the `Failure` line as evidence. The claim names the tangle or divergence the number points at. "Complexity 18" is not a finding; "three branches each re-derive `refresh`, so changing one silently leaves two behind" is. This is what keeps a threshold from being gamed by splitting a function into fragments that share the same knot.
 
 ## Accepting a compromise — all lenses
 
