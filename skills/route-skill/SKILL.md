@@ -1,6 +1,6 @@
 ---
 name: route-skill
-description: Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. Use when asked to use an unavailable skill by name, find a suitable skill, or when no available skill clearly fits a substantive task. Do NOT treat a question about a skill as permission to use it.
+description: Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. Use when asked to use an unavailable skill by name, find a suitable skill, or when available capabilities are insufficient and a catalog skill could fill the specific gap. Do NOT treat a question about a skill as permission to use it.
 compatibility: Python 3.10+; network access only for uncached catalog entries or skills and explicit refreshes.
 ---
 
@@ -15,7 +15,7 @@ Recommend from the catalog; load a skill only after the user selects it.
 - A name the catalog does not have is a miss, not a cue to load the nearest match: `list` fails and
   names the keyword neighbours. Say the name was missing; do not load a neighbour, and do not hand-roll
   what the named skill would have done — an unavailable skill authorizes nothing.
-- Consult the catalog once when no available skill clearly fits. Avoid repeated recommendations after refusal.
+- Consult the catalog for explicit discovery or a concrete capability gap. A task without a matching skill does not itself require discovery; proceed directly when available capabilities suffice. Avoid repeated recommendations after refusal.
 - Announce the selected skill briefly. Prefer local files or cache; fetch only when absent or explicitly asked for the latest version.
 - Cached files do not authorize automatic use in a later task. Existing native skills retain their own invocation rules.
 - If several sources match, show their paths and ask which one. Never silently replace a selected source.
