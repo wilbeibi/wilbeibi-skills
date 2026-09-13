@@ -211,6 +211,20 @@
       ]
     },
     {
+      "name": "paper-ingest",
+      "description": "Ingest research papers into source-preserving Obsidian notes with engineering learning guides. Use when asked to ingest a paper or PDF, or refresh a paper's generated guide. Do NOT use for literature search or whole books.",
+      "compatibility": "An Obsidian vault with scripts/paper-ingest, uv, and the script's configured model credentials.",
+      "agents": [],
+      "path": "skills/paper-ingest",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "075228193a373827813c3aea05ea0342d51082511606c48f2c77606bf424fc87",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "paper-search",
       "description": "Find and rank research papers by relevance, recency, field-adjusted impact, venue, and author affiliation. Use when searching AI, agents, runtimes, storage, databases, infrastructure, recent or superseding work, company or lab research, or evidence for technical claims. Do NOT use for general web search or GitHub repository evaluation.",
       "compatibility": "",
