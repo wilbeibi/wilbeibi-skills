@@ -43,7 +43,6 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [sherlock](skills/sherlock/SKILL.md) | Work an open question like a case: log graded clues, run competing theories through a consistency matrix, kill by evidence, backtrack, converge — for puzzling bugs, reverse-engineering a product from public signals, or "what happened here". |
 | [repo-eval](skills/repo-eval/SKILL.md) | Score a public GitHub repo on momentum (popularity trajectory) and maintenance (how well it is run) via the OSS Insight API and `gh`. |
 | [paper-search](skills/paper-search/SKILL.md) | Find OpenAlex and arXiv papers with fused query variants, topic/keyword hints, institution and venue filters, and field- and age-adjusted impact ranking. |
-| [paper-ingest](skills/paper-ingest/SKILL.md) | Ingest papers into source-preserving Obsidian notes with mechanisms, assumptions, evidence, and engineering learning guides. |
 | [web-recap](skills/web-recap/SKILL.md) | Extract browser history (Chrome, Firefox, Safari, Edge, Brave) to find URLs by topic or get visit stats. Adapted from [robzolkos/web-recap](https://github.com/robzolkos/web-recap). |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Explicit-only implementation planning: scope, material assumptions, and verifiable completion. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon: one-off `hs -c` Lua for apps, browser tabs, and system toggles, plus authoring persistent automations in ~/.hammerspoon. |
