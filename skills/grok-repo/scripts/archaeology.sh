@@ -52,14 +52,18 @@ git log --no-merges --format='%h%x09%s' \
       }' \
   | head -10
 
-section "BIGGEST COMMITS (by lines touched — likely rewrites/redesigns)"
-git log --no-merges --pretty='%h|%ad|%s' --date=short --shortstat \
-  | awk -F'|' '
-      NF==3 { h=$1; d=$2; s=$3; next }
-      /files? changed/ {
-        n=0; for(i=1;i<=NF;i++) if ($i ~ /insertion|deletion/) { split($i,a," "); n+=a[1] }
-        printf "%08d\t%s %s %s\n", n, h, d, s
-      }' \
+section "BIGGEST COMMITS (text lines added + deleted; binaries excluded — reading candidates)"
+git log --no-merges --pretty='@@COMMIT@@%h %ad %s' --date=short --numstat \
+  | awk -F '\t' '
+      function emit() { if (n > 0) printf "%012d\t%s\n", n, header }
+      /^@@COMMIT@@/ {
+        emit()
+        sub(/^@@COMMIT@@/, "")
+        header=$0; n=0
+        next
+      }
+      $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { n += $1 + $2 }
+      END { emit() }' \
   | sort -rn | head -12 | cut -f2-
 
 section "ISSUE TRACKER (optional: needs gh, a GitHub remote, and auth)"

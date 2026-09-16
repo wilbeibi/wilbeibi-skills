@@ -119,17 +119,17 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "0d82a23e85674898fee599ab967c8c2db699b3bef407ac50b30973a3902e1b68",
+          "sha256": "c56904c778cc2d4b68248e5e97afb7580a1056ebf4470ee34768b0306a731dfc",
           "executable": false
         },
         {
           "path": "scripts/archaeology.sh",
-          "sha256": "33b1b2ceadbbe57bf168399b556b4e4cf97719facccd66a1b70b38d058a36cfc",
+          "sha256": "bc0d66b1d68daf14bdaeca2a93e00af35d778da0074268b283b4b6a6040d4287",
           "executable": true
         },
         {
           "path": "scripts/test_archaeology.sh",
-          "sha256": "d57bce99f7e835aba3bba8859f87b04738c4bde5af7b786d1580fcfc674f035c",
+          "sha256": "07d0eef6be455393b8aef1f65dfe05fe0717af709c1eaa3717a6342f42b5235e",
           "executable": true
         }
       ]
