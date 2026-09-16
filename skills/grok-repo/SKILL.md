@@ -45,8 +45,10 @@ Reconstruct one feature or decision, not the repository's entire chronology:
    gh issue view <n> --comments
    ```
    Weak git history (shallow, squashed, imported) shifts the rationale here — go to the
-   tracker first, not last. Skip if `gh auth status` fails or the remote is not GitHub, and
-   say so rather than presenting git-only evidence as the whole record.
+   tracker first, not last. Use an available GitHub connector/API if `gh` is unavailable;
+   if the tracker cannot be accessed, say so rather than presenting git-only evidence as
+   the whole record. An open issue is a historical claim: check whether current code and
+   tests still exhibit it before treating it as an unresolved defect.
 5. **Pull the review thread** — the argument for a change usually outlives the commit message
    in its PR. Recover the number from the merge that carried the commit, then read the
    discussion, not just the description:
@@ -62,7 +64,8 @@ context, and history limits. Never turn commit order into causality or invent mo
 
 ## Reading order (full briefing)
 
-Work top-down. On large repos, sample representative components and say what you sampled.
+Work top-down. Pin the repository revision and sample representative components on large
+repos; say what you sampled.
 
 1. **Orient** — read relevant first-party prose before code: README/docs and any architecture,
    design-principle, ADR/RFC, or governance docs. Verify their goals, non-goals, invariants, and
@@ -71,13 +74,28 @@ Work top-down. On large repos, sample representative components and say what you
    build/CI, and entry points; run it if cheap.
 2. **Trace one real flow** end-to-end (a request, a command, a build) before generalizing.
    Architecture claims made without a trace are usually wrong.
+   Then choose one important promise and trace a failure or boundary case that could break
+   it: partial failure, cancellation, lost response after commit, or competing ownership.
+   Identify the authoritative state and the invariant at the boundary; distinguish the
+   guarantee implemented in code from the cases tested and any production evidence.
 3. **Map components and seams** — where modules meet: interfaces, wire protocols, DB schemas,
    queues, plugin points, process boundaries. For each seam ask *why here*: testability,
    swap-ability, deploy boundary, team boundary, or accident. Note which side owns the types.
 4. **Mine git history** for rationale (commands below). First check whether history is shallow,
    squashed, imported, generated, or vendor-heavy; weak history produces clues, not rationale,
    and pushes the *why* into the issue tracker.
-5. **Judge taste and pick highlights** last, from the evidence already gathered.
+5. **Explain decisions and pick highlights** last. For consequential findings, connect
+   constraint → mechanism → code/history evidence → benefit → cost or failure condition →
+   reusable lesson. Look for a counterexample or reversal that could change the judgment;
+   no need to print these fields mechanically for every finding.
+
+When a key mechanism crosses a dependency boundary, follow the pinned implementation or
+fork and inspect its actual delta; stop at the verified contract if source is unavailable.
+For a consequential comparison or novelty claim, check the same mechanism in a small
+number of relevant alternatives. Distinguish a new algorithm from reuse, a new combination,
+or adaptation to a workload; label unverified comparisons. Compare guarantees and constraints,
+not just features. Add this evidence where it explains a decision, rather than a separate
+mandatory competitor survey.
 
 ## Git archaeology
 
@@ -88,9 +106,9 @@ git log --follow --oneline -- <hot-file>  # evolution of a load-bearing file
 git log -S '<symbol>' --oneline           # when/why a concept appeared or died
 ```
 
-- Find "key changes" by size and message, not recency: rewrites, "refactor", "redesign",
-  version-bump commits, and any commit whose message explains a tradeoff. Good projects
-  hide design docs in commit messages — quote them.
+- Find "key changes" by their effect on behavior, invariants, or constraints. Size, recency,
+  and words like "refactor" or "redesign" are leads; a small durability fix may matter more
+  than a large rewrite. Commit messages can explain tradeoffs — read them with the diff.
 - Cross-reference **frequently touched × fix-touched** to choose files for closer reading.
   This is a lead, not proof of fragility: formatting, generated code, and long-lived files
   can dominate counts.
@@ -120,6 +138,8 @@ in this order; cite `path:line` or short SHAs throughout.
 2. **Design taste** — the authors' consistent choices, each backed by two or more examples:
    dependency policy, error-handling style, abstraction depth, naming, testing philosophy,
    concurrency model. Taste is what repeats; one instance is noise.
+   Explain which states or special cases a choice removes, and where complexity moves;
+   fewer lines or dependencies alone do not establish simplicity.
 3. **Components & seams** — per component: responsibility, its inbound/outbound seams, and
    why the boundary sits there. Flag seams that leak (imports crossing the "wrong" way).
 4. **History & rationale** — 3-6 pivotal commits/eras and what each reveals about why the
@@ -127,6 +147,8 @@ in this order; cite `path:line` or short SHAs throughout.
 5. **Beautiful code** — if evidence warrants it, show 1-3 pieces that are novel,
    dense-but-clear, or do a lot with a little. Quote a short excerpt and say precisely what
    makes it good: the invariant it protects, the cases it collapses, or the API it keeps honest.
+   Include small utilities and test harnesses when useful, not just core algorithms. State
+   the assumptions and costs that determine where a technique can be reused.
    If none stands out in the sampled code, say so instead of manufacturing praise.
 6. **Hooks for curiosity** — the project's own vocabulary (5-10 jargon terms → the file
    that defines each), 2-3 flows that would make good dataflow traces, and open questions
@@ -141,7 +163,10 @@ in this order; cite `path:line` or short SHAs throughout.
 - Separate observation from inference: "X calls Y via Z" is read from code; "probably for
   testability" is a guess — label guesses.
 - Docs evidence stated intent; code determines current behavior. If they disagree, report both.
-- Time-box: for repos over ~100k lines, deliver the briefing from entry points + one traced
-  flow + history, and list which areas were not read.
-- Close full briefings with coverage: what was inspected, what was sampled or skipped, which
-  claims depend on inference, and whether tests or a real invocation were run.
+- Time-box large repos around entry points, one normal and one failure/boundary trace, and
+  history. Stop when the model explains those paths and important judgments have evidence;
+  list unresolved questions and unread areas rather than filling every section with guesses.
+- Close full briefings with the revision and coverage: what was inspected, what was sampled
+  or skipped, which claims depend on inference, and whether tests or a real invocation were
+  run. Keep "worth learning from" separate from "ready to adopt"; defer full health scoring
+  to repo-eval.

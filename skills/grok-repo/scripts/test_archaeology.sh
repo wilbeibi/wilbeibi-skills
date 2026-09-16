@@ -41,11 +41,39 @@ git -C "$fixture_dir" rm -q deleted.txt
 git -C "$fixture_dir" commit -qm 'Remove temporary file'
 git -C "$fixture_dir" commit --allow-empty -qm 'Revert broken direction'
 
+# Rank churn, not file count; include insertion-only, deletion-only, mixed,
+# binary-only, and a subject containing the old parser's delimiter.
+for i in {1..8}; do
+  printf 'small\n' >"$fixture_dir/small-$i.txt"
+done
+git -C "$fixture_dir" add .
+git -C "$fixture_dir" commit -qm 'Touch many files'
+many_files_sha=$(git -C "$fixture_dir" rev-parse --short HEAD)
+
+for i in {1..100}; do printf 'line %s\n' "$i"; done >"$fixture_dir/large.txt"
+git -C "$fixture_dir" add large.txt
+git -C "$fixture_dir" commit -qm 'Add many lines | preserve subject'
+large_sha=$(git -C "$fixture_dir" rev-parse --short HEAD)
+
+head -30 "$fixture_dir/large.txt" >"$fixture_dir/remaining.txt"
+mv "$fixture_dir/remaining.txt" "$fixture_dir/large.txt"
+git -C "$fixture_dir" commit -qam 'Delete seventy lines'
+delete_sha=$(git -C "$fixture_dir" rev-parse --short HEAD)
+
+for i in {1..30}; do printf 'replacement %s\n' "$i"; done >"$fixture_dir/large.txt"
+git -C "$fixture_dir" commit -qam 'Replace thirty lines'
+mixed_sha=$(git -C "$fixture_dir" rev-parse --short HEAD)
+
+printf '\0binary\0payload\n' >"$fixture_dir/blob.bin"
+git -C "$fixture_dir" add blob.bin
+git -C "$fixture_dir" commit -qm 'Add binary payload'
+
 report=$(bash "$script_dir/archaeology.sh" "$fixture_dir")
 authors=$(awk '/^== COMMIT AUTHORS/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 hot=$(awk '/^== MOST-TOUCHED/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 fixes=$(awk '/^== CURRENT FILES TOUCHED BY FIX/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 reverts=$(awk '/^== REVERT\/ROLLBACK/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
+biggest=$(awk '/^== BIGGEST COMMITS/{keep=1; next} /^==/{keep=0} keep && NF' <<<"$report")
 
 assert_contains() {
   local haystack=$1 needle=$2
@@ -73,5 +101,15 @@ assert_omits "$fixes" 'not-a-fix.txt'
 assert_omits "$fixes" 'bug-tracker.txt'
 assert_contains "$reverts" 'Revert broken direction'
 assert_omits "$reverts" 'Discuss fix-prone files and reverts'
+ranked_shas=$(awk 'NR <= 4 {print $1}' <<<"$biggest")
+expected_shas=$(printf '%s\n' "$large_sha" "$delete_sha" "$mixed_sha" "$many_files_sha")
+if [[ "$ranked_shas" != "$expected_shas" ]]; then
+  printf 'expected churn order (100, 70, 60, 8 lines):\n%s\nactual:\n%s\n' \
+    "$expected_shas" "$biggest" >&2
+  exit 1
+fi
+assert_contains "$biggest" 'Add many lines | preserve subject'
+assert_omits "$biggest" 'Add binary payload'
+assert_omits "$biggest" 'Revert broken direction'
 
 printf 'archaeology behavior: ok\n'
