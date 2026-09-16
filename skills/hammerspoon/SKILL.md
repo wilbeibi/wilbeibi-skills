@@ -5,6 +5,8 @@ description: Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, 
 
 # hammerspoon
 
+Host scope: mini/macOS. Keep this skill disabled on joi/Linux; shared source may remain in the repository. Do not sync activation links between hosts or switch to SSH merely because the local host lacks Hammerspoon. Remote actions follow the session's host-authorization policy.
+
 One-off action = one `hs -q -c '<lua>'` call. Lasting behavior (hotkeys, watchers, menubar) = a module in `~/.hammerspoon/`. Recipes: [REFERENCE.md](REFERENCE.md).
 
 ## Readiness

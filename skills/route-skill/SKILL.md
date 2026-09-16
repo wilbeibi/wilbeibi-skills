@@ -54,4 +54,5 @@ A skill may restrict itself with `agents:` frontmatter (`agents: [codex]`; known
 
 Links require a local checkout. Keep machine-specific project links out of commits.
 `sync` repairs only links owned by this checkout; it does not install new skills or edit other managers' lockfiles.
+Selection stays per-host: do not copy activation links or lists between joi (Arch) and mini (macOS). Keep Hammerspoon enabled only on mini/macOS and the joi housekeeping workflow only on joi. Cross-platform source can be shared without enabling every skill.
 Run `python3 scripts/route_skill.py --help` for source selection and other options.

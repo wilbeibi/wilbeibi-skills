@@ -100,7 +100,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "055e1eb9b9ec4448a95f103d15e9ee983be457c7ccaf764e29993553b1fe0474",
+          "sha256": "327bacda23ade4f49f57ae7e3d714705d9ed616884d306c01e93e6fed0db0701",
           "executable": false
         },
         {
@@ -148,7 +148,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "0711275141d8bd865bbc3499f9cc5a166af206e1bd2cd0c1ffee206b907a866f",
+          "sha256": "a8f5b6f7be7bd6fd3576ca5edd77919f577032d16f8b40955bdab7bf14800ed0",
           "executable": false
         }
       ]
@@ -235,34 +235,15 @@
       ]
     },
     {
-      "name": "questionnaire",
-      "description": "Turn the open decisions from a long discussion into a self-contained offline HTML questionnaire the user fills at their own pace, whose answers come back as markdown keyed by stable question ids. Use when the user wants to finalize or confirm a design, align on accumulated decisions, review assumptions from notes/memory, or asks for a survey or questionnaire. Do NOT use for live one-question-at-a-time interviews (use grill-me).",
-      "compatibility": "",
-      "agents": [],
-      "path": "skills/questionnaire",
-      "files": [
-        {
-          "path": "SKILL.md",
-          "sha256": "0677ee7844b07838032eb593ae4083486cda565adb8f0ea489d4275746247970",
-          "executable": false
-        },
-        {
-          "path": "scripts/build.py",
-          "sha256": "38aaccd68f023fba4cf5e5bba7dc1760d1b560e567825b9f121273aea1b2062e",
-          "executable": true
-        }
-      ]
-    },
-    {
       "name": "readback",
-      "description": "Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when your answer is too long to review in a terminal, when the user wants to mark up or annotate a document, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions (use questionnaire) or to interview the user one question at a time (use grill-me).",
+      "description": "Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when your answer is too long to review in a terminal, when the user wants to mark up or annotate a document, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions or to interview the user one question at a time (use grill-me).",
       "compatibility": "Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can hold a foreground command open.",
       "agents": [],
       "path": "skills/readback",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "f12339ec6529dbc02b41f1e973caf2015eac697a4be4d03624473b330173b6d3",
+          "sha256": "c35c9b8f5d4032cfdde2de0ceab882292deaa0cd1351400b89966ccc221dab68",
           "executable": false
         },
         {
@@ -365,7 +346,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "1f8938efaccf22d96d30419844bdadbb97430cb5d72355a21322dd92ae9f4db7",
+          "sha256": "fb84c335a2af6fb66667229181837947bda2acb7d580667d9e1399abaa3e08aa",
           "executable": false
         },
         {

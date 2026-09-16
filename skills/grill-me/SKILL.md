@@ -6,17 +6,17 @@ description: Interview the user one question at a time until a plan is resolved,
 
 # grill-me
 
-Relentlessly interview the user about a plan or design until you both reach shared understanding and every open decision is resolved.
+Interview the user about a plan or design until the key decisions needed to implement the current scope are resolved.
 
 ## How to run it
 
 - Read the plan, linked docs, code, or local files needed to understand the topic first.
 - Ask **one** question at a time. Wait for the answer before the next question.
 - For each question, state **your recommended answer** and a one-line why.
-- Walk **each branch** of the decision tree. When an answer opens new questions, follow them; resolve dependencies between decisions in order rather than jumping around.
+- Follow branches that affect implementation of the current scope; record optional or out-of-scope branches for later. Resolve dependencies between key decisions in order.
 - If a question can be answered by **exploring the codebase**, explore instead of asking.
 - Push on fuzzy words, hidden assumptions, edge cases, dependencies between decisions, and reversibility.
-- Keep going until no unresolved branch remains. Then summarize the agreed plan.
+- Stop when the key implementation decisions are resolved. Summarize the agreed plan and record remaining non-blocking questions as follow-ups.
 
 ## Question patterns
 
@@ -40,6 +40,6 @@ For glossary format, read [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md). For ADR format
 
 ## Notes
 
-- Do not soften or batch questions to "be efficient" — the value is the relentlessness. One question, one recommendation, repeat.
-- Stop early only if the user explicitly says to stop or accepts all remaining recommendations at once.
+- Preserve the requested one-question-at-a-time format while the interview is needed.
+- Stop earlier if the user asks to stop or accepts the remaining recommendations.
 - Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), adapted to this repo's conventions and voice.

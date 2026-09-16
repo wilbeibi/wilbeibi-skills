@@ -31,7 +31,6 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [test-writing](skills/test-writing/SKILL.md) | Guide effective, maintainable test writing. |
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), product-versus-library fit (Mitsuhiko), a pre-change complexity gate, or newcomer clarity. |
 | [grill-me](skills/grill-me/SKILL.md) | Explicit-only design interview, one question at a time; capture durable terminology and decisions when useful. |
-| [questionnaire](skills/questionnaire/SKILL.md) | Batch a long discussion's open decisions into an offline HTML questionnaire (branching, autosaved drafts) whose answers come back as markdown keyed by stable question ids. |
 | [readback](skills/readback/SKILL.md) | Turn a plan or conversation transcript into an HTML review surface where the user highlights passages and labels each note a question, a change, or an aside, and return them as a follow-up prompt through a waiting local command. |
 | [write-skill](skills/write-skill/SKILL.md) | Write compact shared skills for Codex, Claude Code, and Pi; isolate harness-specific behavior. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
