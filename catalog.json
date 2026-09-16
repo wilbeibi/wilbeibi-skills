@@ -550,12 +550,17 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "728bc513afd3f85cae9e28671ddb44447c646ecfdc23cedbfc10f06ce196b8ef",
+          "sha256": "4a767cf37ea059ff9ee2e7ea4b50d96cd3a99a9a6dbb22b4cd11a0e5aaca111a",
           "executable": false
         },
         {
           "path": "agents/openai.yaml",
           "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        },
+        {
+          "path": "references/heavyweight-workflow-patterns.md",
+          "sha256": "25eee4b22aadc586bc4155e89d863d6287fccff81f0f7619e2b3e0243a4a81d7",
           "executable": false
         }
       ]

@@ -80,6 +80,9 @@ Delete:
 - Findings should lead for review skills; summaries and praise are optional.
 - Split philosophy, examples, and source notes into `references/REFERENCE.md`. Keep examples
   inline when the example *is* the instruction, as in an output-shape skill.
+- For a skill that orchestrates subagents, claims coverage, or emits a report artifact, read
+  [references/heavyweight-workflow-patterns.md](references/heavyweight-workflow-patterns.md)
+  for mode gating, verdict tiers, coverage ledgers, and fail-loud terminal states. Not needed otherwise.
 
 ## Targeting
 
