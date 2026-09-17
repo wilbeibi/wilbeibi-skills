@@ -50,12 +50,12 @@
         },
         {
           "path": "RUSS-COX.md",
-          "sha256": "dd5d36aff9dadd3bec0034e41286c1dfc138eba6ad8047580c35792ae7f03921",
+          "sha256": "4484ea8eeadae51f54f61b6ca5ae42ef1675105613c759ab9e4d917277d0e145",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "193d07fe3b6eaca8813222049684a9b1454c7340cd0297393542204efface6da",
+          "sha256": "8d12d104d9ec4101e9c7c2afb7e01a8e4807a7da27bf97595dee55ee77c68c04",
           "executable": false
         },
         {
@@ -479,14 +479,14 @@
     },
     {
       "name": "web-recap",
-      "description": "Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity.",
+      "description": "Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity. Do NOT use for project/git recaps or agent-session history.",
       "compatibility": "",
       "agents": [],
       "path": "skills/web-recap",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "2dc9961fcf90398df810abd5f876c502fbbc186c0b5216b8820e362383ee7f8b",
+          "sha256": "fde0968825bd06df399b0d4c8be4115da099804e265bfb530d597faddeb4d79b",
           "executable": false
         }
       ]

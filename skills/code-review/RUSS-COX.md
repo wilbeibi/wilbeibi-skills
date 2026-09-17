@@ -14,8 +14,8 @@ Judge code by long-term maintenance cost: whether it should exist, whether it si
 
 For an agent-written diff, ask two more before pass 1, with `scripts/slop.py` output beside the diff (see SKILL.md "Measure before judging"):
 
-- **What did it delete?** An agent on defaults only adds; a diff that removes nothing while extending existing behavior has almost certainly duplicated something. Check the clone hits and the base-to-head counts.
-- **Folded in or bolted on?** New logic that lives beside the abstraction it extends, rather than inside it, is the additive edit; it is easy and still complex. Name the function it should have gone into.
+- **Does it duplicate existing behavior?** Check callers, clone hits, and base-to-head counts for competing owners of the same behavior. An additive diff alone is not evidence of duplication.
+- **Folded in or separate?** Compare extending the existing owner with a separate component. Prefer folding in when it removes duplicated policy; preserve separation when it protects an ownership or trust boundary.
 
 ## Package audit — six dimensions
 

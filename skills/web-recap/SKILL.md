@@ -1,11 +1,13 @@
 ---
 name: web-recap
-description: Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity.
+description: Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity. Do NOT use for project/git recaps or agent-session history.
 ---
 
 # web-recap
 
 Extracts browser history from Chrome, Chromium, Brave, Firefox, Safari, Edge. Run `web-recap --help` for all flags.
+
+The word "recap" alone is not a browser-history request. Resolve the subject from context before invoking the CLI.
 
 ## Prerequisite
 

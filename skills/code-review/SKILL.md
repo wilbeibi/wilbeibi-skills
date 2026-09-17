@@ -21,6 +21,10 @@ Default to **Russ Cox** for an unqualified "review this diff." Reach for the oth
 
 In an established codebase, search for existing primitives before judging anything new — under any lens, the most common real finding is that a helper, interface, or package already does this.
 
+For contested designs, reconstruct the author's strongest rationale from the design docs, issues, and review discussion before drafting objections.
+Test the user's preferred alternative against the same constraints, including costs it reintroduces.
+Report objections that survive this comparison; state what evidence would reverse an unresolved judgment.
+
 ## Measure before judging
 
 A model's opinion of how verbose or tangled code is is close to noise (the same judge flips on renamed inputs), so do not form one. Measure instead, then spend judgment only where the measurement points. Run this when the diff was written by an agent, exceeds ~100 lines, or you are in audit mode:
@@ -57,7 +61,7 @@ Each finding is one block, most-consequential first:
 - **The failure line is the filter.** A finding that cannot name concrete inputs producing concrete wrong behavior is not a finding — drop it rather than softening it into a suggestion.
 - Say `traced` when you followed the path, `inferred` when you reasoned from shape. Never blur the two.
 - Sketch the alternative; do not merely point at the problem.
-- Close with one line naming what you checked and found sound — coverage, not praise, so the reader knows what the silence covers — then a brief `Summary`.
+- Close with one line naming coverage and verification limits. Do not repeat the findings in a separate summary.
 - Do not nitpick style, naming, or formatting unless it obscures correctness or cost.
 - Report only what you found. Never pad toward a count, per axis, per dimension, or per section — a short review of a clean change is the correct output.
 - Never emit a numeric quality score or grade, under any lens. Scores are where a model judge is least reliable, and once fed back to the author they become the target.
@@ -77,6 +81,6 @@ When the author answers a finding with "I know, but we ship Friday," the reviewe
 Findings land when they carry the analysis, not the verdict. Applies under every lens.
 
 - Instead of "This is too complex": "This has N layers of indirection. Could we solve directly: [sketch]. Benefits: [list]. Tradeoffs: [list]."
-- Instead of "Don't add this dependency": "This adds N transitive deps. Alternative: [stdlib / 20 lines]. The simpler approach wins here because [reason]."
-- Instead of "This abstraction is wrong": "We have 1 use case; suggest solving directly now and abstracting when the pattern emerges (3+ uses)."
+- Instead of "Don't add this dependency": "This adds [concrete cost]. Alternative: [sketch]. It preserves [required guarantees] but trades away [capability or maintenance benefit]."
+- Instead of "This abstraction is wrong": "For this use case, [direct design] removes [specific coupling]. The tradeoff is [cost or lost guarantee]."
 - Instead of "Rewrite this": "Current approach: [analysis]. Maintenance implications: [list]. Alternative: [sketch]. Which fits our long-term goals?"
