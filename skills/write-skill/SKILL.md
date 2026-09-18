@@ -12,7 +12,7 @@ Create compact skills under `skills/<name>/` that load only the behavior needed 
 
 1. Clarify only missing essentials: capability, triggers, non-triggers, tool/script needs, and portability.
 2. Pick a unique kebab-case name.
-3. Draft `SKILL.md` as an operator card: what to run, when to run it, what output means, what traps matter.
+3. Draft `SKILL.md` as an operator card: what to run, when to run it, what output means, what traps matter. End each step with a checkable completion criterion.
 4. Add helper files only when they remove repeated deterministic work.
 5. Compress once; add one README row; do not commit unless asked.
 
@@ -49,6 +49,8 @@ The description is the routing surface; optimize it first.
 - Sentence 2 starts with `Use when ...` and lists actual trigger phrases, file types, tools, or contexts.
 - Add `Do NOT use ...` for broad domains such as review, search, docs, macOS, git, or browser work.
 - Avoid marketing words, time-sensitive claims, and duplicate "this skill should be used when" phrasing.
+- State triggers, never a workflow summary: agents follow a summarized flow in the description and skip the body.
+- Keep the trigger nouns users actually say (product, tool, action, object); cut the rest. Codex gives the whole skill list 2% of the context window and truncates every description equally when it overflows.
 
 ## Body
 
@@ -57,7 +59,15 @@ Keep:
 - setup checks that commonly block first use;
 - compact output contracts;
 - routing boundaries and safety pitfalls;
-- one strong example per command or concept.
+- one strong example per command or concept (several invite pattern-matching instead of understanding).
+
+Match the form to the failure the skill fixes:
+
+| Observed failure | Write |
+|---|---|
+| Output has the wrong shape | A positive recipe or template; prohibitions backfire here |
+| One element gets omitted | A structural slot marked REQUIRED |
+| Behavior should depend on context | A predicate-keyed branch, not "usually X, except when Y" (agents treat the exemption as always true) |
 
 Delete:
 - overview prose that restates the description;
