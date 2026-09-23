@@ -459,6 +459,60 @@
       ]
     },
     {
+      "name": "tla-model",
+      "description": "Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. Use when asked to write, review, or debug a TLA+ spec, .tla/.cfg files, or TLC output, or to model-check or formally verify a protocol, lock, lease, consensus, replication, WAL, retry, or race condition. Do NOT use for unit or property-based tests (use test-writing) or for Lean, Coq, Dafny, or Verus proofs.",
+      "compatibility": "uv (scripts/tlc.py runs as a uv script, Python 3.10+, no dependencies); Java 11+ and tla2tools.jar (scripts/tlc.py fetch downloads it).",
+      "agents": [],
+      "path": "skills/tla-model",
+      "files": [
+        {
+          "path": "BRIEF-TEMPLATE.md",
+          "sha256": "38142bae40095df751d040f5d35ee58041261e0b9e0f395495282f14e5f1a596",
+          "executable": false
+        },
+        {
+          "path": "CEX-TEMPLATE.md",
+          "sha256": "83798c7f377a39c3ce5375dc9c47a3f2593670f1b0ca477078499f78fcbff525",
+          "executable": false
+        },
+        {
+          "path": "REFERENCE.md",
+          "sha256": "1c8e81e9583157cb1ca9eec2f0a619ac2836406e9fad1238f6a972dad5d51be3",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "ff710f76a2f3940dea3b731cdf3ef0c39e055dba5fa9792873af50e31fe20d19",
+          "executable": false
+        },
+        {
+          "path": "examples/MiniLock.cfg",
+          "sha256": "d07082db4ae2faba6fb921d685e3f106e57fc71b9cdd02c03af71a318fbd0a66",
+          "executable": false
+        },
+        {
+          "path": "examples/MiniLock.tla",
+          "sha256": "2126b359b0e2bfd18ebc92ddbd9d04674f0259223be3b31e512e69d332cad2a9",
+          "executable": false
+        },
+        {
+          "path": "examples/MiniLockLive.cfg",
+          "sha256": "1b2f82dae0994e0135ed7754b888f13c5dd742f57b9b90ec79e3148d33a41df7",
+          "executable": false
+        },
+        {
+          "path": "scripts/test_tlc.sh",
+          "sha256": "53b05d358a1fb30f9863e4282d407360a2d1f5c9344766cb89e67335df501e5a",
+          "executable": true
+        },
+        {
+          "path": "scripts/tlc.py",
+          "sha256": "0e00becba66ddf90e8175c87d4aa8c18bbe8099b8d9915b8d586773e71623bc1",
+          "executable": true
+        }
+      ]
+    },
+    {
       "name": "web-recap",
       "description": "Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity. Do NOT use for project/git recaps or agent-session history.",
       "compatibility": "",
