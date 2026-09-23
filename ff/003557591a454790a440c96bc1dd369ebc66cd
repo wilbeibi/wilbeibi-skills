@@ -1,0 +1,42 @@
+README.md
+  s_552bc987a3f06b::t_c746243cde74ae 32
+skills/tla-model/examples/MiniLock.tla
+  s_552bc987a3f06b::t_42176730d8b3af 1-48
+skills/tla-model/scripts/test_tlc.sh
+  s_552bc987a3f06b::t_74a687b563924d 1-11,62-63
+  s_552bc987a3f06b::t_632825906a6c9b 12-61
+skills/tla-model/examples/MiniLockLive.cfg
+  s_552bc987a3f06b::t_2e825c33f64f48 1-6
+skills/tla-model/CEX-TEMPLATE.md
+  s_552bc987a3f06b::t_e766636c58ed70 1-30
+skills/tla-model/scripts/tlc.py
+  s_552bc987a3f06b::t_89fa6b918d54ee 53-270
+  s_552bc987a3f06b::t_2be8d06476dc44 1-52
+catalog.json
+  s_552bc987a3f06b::t_e10552ddb361bc 461-514
+skills/tla-model/REFERENCE.md
+  s_552bc987a3f06b::t_d9138e6a160bab 1-118
+skills/tla-model/BRIEF-TEMPLATE.md
+  s_552bc987a3f06b::t_3f02442071fc48 1-59
+skills/tla-model/examples/MiniLock.cfg
+  s_552bc987a3f06b::t_664dd422d941d2 1-7
+skills/tla-model/SKILL.md
+  s_552bc987a3f06b::t_3b1feb8041938a 1-3,5-52
+  s_552bc987a3f06b::t_c42beca9444a5e 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ff003557591a454790a440c96bc1dd369ebc66cd",
+  "prompts": {},
+  "sessions": {
+    "s_552bc987a3f06b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a90866f0-00be-42be-8a06-439f6163e0b5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
