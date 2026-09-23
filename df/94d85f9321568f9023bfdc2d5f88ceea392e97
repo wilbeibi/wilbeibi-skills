@@ -1,0 +1,23 @@
+skills/tla-model/SKILL.md
+  s_552bc987a3f06b::t_c42beca9444a5e 4
+skills/tla-model/scripts/test_tlc.sh
+  s_552bc987a3f06b::t_632825906a6c9b 12,29-31,33,35,37,39,44,56,59-61
+skills/tla-model/scripts/tlc.py
+  s_552bc987a3f06b::t_2be8d06476dc44 1-5,17,43,45,49,51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "df94d85f9321568f9023bfdc2d5f88ceea392e97",
+  "prompts": {},
+  "sessions": {
+    "s_552bc987a3f06b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a90866f0-00be-42be-8a06-439f6163e0b5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
