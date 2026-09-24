@@ -441,19 +441,19 @@
     },
     {
       "name": "test-writing",
-      "description": "Write and repair tests that verify observable behavior, not implementation. Use when writing or reviewing tests, choosing test scope or mocks, fixing brittle tests, or deciding whether a failing test means the code is wrong or the test is.",
+      "description": "Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. Use when writing or reviewing tests, choosing a test seam, scope, or mocks, adding property, fuzz, or regression tests, fixing brittle tests, auditing a bloated suite, or deciding whether a failing test means the code or the test is wrong. Do NOT use for TLA+ model checking (use tla-model).",
       "compatibility": "",
       "agents": [],
       "path": "skills/test-writing",
       "files": [
         {
           "path": "REFERENCE.md",
-          "sha256": "cc0fd06c510c2f7203d2591ffcf8d206237d27638b963fb4519662a45d7db434",
+          "sha256": "24df043af621b6043137e0a4a156d53e8dca2a55aa921eaf32934f62640d0795",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "e2c730349771cb1bf8c344f048aba9f0122d3cc4b09623b94dc9fde0b8f98847",
+          "sha256": "370b9666299c2b6d854e2e2fb413c4fd0d54dbc6e6541fba5b84f9669b82429a",
           "executable": false
         }
       ]

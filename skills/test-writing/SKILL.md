@@ -1,72 +1,59 @@
 ---
 name: test-writing
-description: Write and repair tests that verify observable behavior, not implementation. Use when writing or reviewing tests, choosing test scope or mocks, fixing brittle tests, or deciding whether a failing test means the code is wrong or the test is.
+description: Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. Use when writing or reviewing tests, choosing a test seam, scope, or mocks, adding property, fuzz, or regression tests, fixing brittle tests, auditing a bloated suite, or deciding whether a failing test means the code or the test is wrong. Do NOT use for TLA+ model checking (use tla-model).
 ---
 
 # test-writing
 
-Test behavior through the widest boundary that stays hermetic and cheap to set up.
+Verify aggressively; commit sparingly. A generated test costs nothing to write and still costs every future refactor and reader. The committed suite holds contracts, invariants, failure and recovery semantics, compatibility, and real regressions — a generated test is not a repo test.
 
-Choose verification proportional to the change and complete the project's required checks.
-Do not expand production scope merely to follow a preferred testing style.
+## Workflow
 
-## Habits to correct
+1. **Find the seam.** Name the interface that survives a full internal rewrite: for a store, `Open/Read/Write/Save/Restore`, not the fetcher, cache, retryer, or chunk layout beneath it. Done when you can say what a rewrite behind it is free to change.
+2. **State the oracle first.** For each expected value, name its source: requirement, design doc, API contract, reference implementation, or hand computation. Done when no expected value comes from running the code under test.
+3. **Explore ephemerally.** Properties, fuzzing, differential runs, fault injection, random operation sequences against a simple model — run them in the loop, in test files you will delete before the report. Done when every exploration file is either admitted by step 4 or gone.
+4. **Admit or discard.** A test enters the repo only if every answer is yes:
+   - It protects a contract, invariant, failure/recovery semantic, compatibility promise, or a bug that happened.
+   - Its oracle is independent of the implementation.
+   - It survives an internal rewrite behind the seam.
+   - No existing test already says it.
 
-- **Writing the test from the code you just wrote.** Reading the implementation and asserting what it does bakes in its bugs. Derive expected values from the requirement and compute them by hand. If you cannot state the expected answer without running the code, you do not understand the behavior well enough to test it yet.
-- **Copying actual output into expected.** Running the test, seeing it fail, and pasting the actual value produces a recording, not a test. Same for widening a tolerance until it passes.
-- **Mirroring code structure.** One test file per source file and one test per public method is a unit-of-*code* suite. Test units of *behavior*; how many classes implement one is irrelevant.
-- **Mocking by default.** Prefer real local dependencies when cheap and deterministic. Use a fake or mock at external boundaries when it gives a reliable signal; its presence alone does not justify a redesign.
-- **Repairing the test instead of the code.** A failing test is a hypothesis about the code until proven otherwise. Never weaken an assertion, add a mock, or skip a test to reach green. Changing a test and the code it covers in one commit needs a stated reason why both were wrong.
-- **Mutating the environment to get green.** Seeding a row by hand, flipping a flag, restarting a service, or draining a queue is the deployment-tier version of weakening an assertion — it passes, nothing is fixed, and the shared state has drifted for everyone else.
-- **Debugging against a shared environment by trial and error.** A red run there is ambiguous by construction: your change, someone else's, stale data, or a broken env. Reproduce it locally in a hermetic test first; if you cannot, say so rather than guessing.
-- **Blind-accepting snapshots.** Running the update mode without reading the diff turns the expect-test loop into an auto-approval loop. Treat an unreviewed snapshot update as an untested change.
-- **Generating volume.** Cheap tests become near-duplicates that break together and bury the one real failure. Coverage percentage and test count are not goals.
-- **Hiding failures.** Avoid retries or exception handling that turn a broken behavior green. Bounded waits and timeouts are appropriate for asynchronous behavior when failures remain clear.
-- **Testing the framework.** Asserting that the ORM saves or the stdlib sorts tests someone else's code.
+   Exploration found a bug → shrink it to the smallest stable case and admit only that. Found nothing → delete it.
+5. **Write it in long-lasting form.** Test logic once; cases as data — table rows, `testdata` files, txtar archives, scripts. Failures print input, got, and want. Golden files regenerate through an update flag, and every regenerated diff is read. Done when the next regression is a one-line or one-file addition.
 
-In an agentic loop the suite is not a safety net — it is the acceptance criteria being optimized against. A tautological suite does not merely miss bugs, it steers the work wrong.
+## Existing suites
+
+New tests beside existing ones follow the workflow. Changing, merging, or deleting existing tests — including ones that pin internals — requires the user's confirmation: propose each change with its reason, then apply only what they approve. Never propose deleting a regression test whose bug you cannot identify.
 
 ## Routing
 
-First ask where the complexity actually lives, because it sets the shape of the whole suite:
+Place the suite where the complexity lives:
 
-- **Inside the process** — algorithms, domain rules, parsers. Test deeply at the domain layer; boundary tests only prove wiring.
-- **At the boundaries** — services, glue, orchestration. The contract is the product, so test from the edges with realistic fixtures and keep implementation-detail tests to the few genuinely complex isolated pieces.
+- **Inside the process** — algorithms, parsers, domain rules. Test deeply through the public API; prefer properties or exhaustive small inputs over hand-picked examples.
+- **At the boundaries** — services, glue, orchestration. The service is the unit; test from its edges with realistic fixtures.
+- **In the state space** — storage, replication, recovery, concurrency. Random operation sequences against a sequential model, with crash, restart, and injected faults as operations. For the design itself, use `tla-model`.
 
-Then:
+Widen the boundary until setup gets expensive or the test stops being hermetic, then stop. IO is not the criterion: loopback HTTP, in-process SQLite, and a temp dir are cheap; a shared or remote target is not. A deployed environment earns only wiring and real third-party behavior. Trivial glue gets no test.
 
-1. Trivial glue/getters? Skip — a test that cannot fail is noise in the failure signal.
-2. Pure logic, few dependencies? Test through the public API. Prefer property or exhaustive tests over hand-picked examples.
-3. Orchestration, real I/O, controller/database/filesystem behavior? Integration test — the module or service in isolation, its own dependencies real, its collaborators faked at the edge.
-4. Complex *and* dependency-heavy? Extract the domain logic and test that; leave a thin orchestrator for integration tests.
-5. Deployment, wiring, real third-party behavior, or infrastructure under load? Only that needs a deployed environment. Prefer ephemeral (per-PR stack, compose file) over shared staging.
+## Traps
 
-Widen the boundary until setup gets expensive or the test stops being hermetic, then stop. IO is not the criterion — loopback HTTP and an in-process SQLite are cheap, while a shared remote database is not. What costs you is setup time, resource footprint, and anything you do not control.
+- **Repairing the test instead of the code.** Never weaken an assertion, add a mock, or skip to reach green. Changing a test and its code in one commit needs a stated reason both were wrong.
+- **Trusting your own oracle.** A failing property is a hypothesis: the code, the property, or the generator is wrong. Recheck the property against the spec before calling it a bug.
+- **Mutating the environment to get green.** Seeding rows, flipping flags, restarting services, or draining queues passes nothing that matters. Reproduce a shared-environment failure hermetically, or say you could not.
+- **Blind-accepting snapshots.** Running update mode without reading the diff is an untested change.
+- **Hiding failures.** No retries or exception handling that turn broken behavior green; bounded waits on a public completion signal are fine. Inject the clock.
+- **Mocking by default.** Real local dependencies when cheap and deterministic; fakes at unmanaged boundaries; communication mocks only for outbound calls you cannot observe otherwise.
 
-## Rules
+## Report (REQUIRED)
 
-- Keep routine tests independent of shared external services. Use explicitly scoped integration or end-to-end checks when verifying a real external contract is the task; report environment failures separately.
-- A failure must localize the defect. A red result that only says "something in the system is wrong" is nearly worthless in a loop, because the next step is a guess.
-- One test = one scenario a domain expert would recognize. Name it for the behavior, not the method.
-- Prefer output-based tests, then state-based; use communication mocks only for compatibility-sensitive external calls.
-- Prefer fakes for unmanaged dependencies and real local databases/filesystems where practical. Match the boundary to the behavior under test.
-- Prefer an injected clock or the project's established fake-timer mechanism for time-dependent behavior. Await asynchronous work or observe its completion through a bounded public signal.
-- Arrange, Act, Assert. Keep Act to one operation. Assert narrowly, so a failure names one cause.
-- Keep setup scoped to the test that needs it. Shared class-level fixtures tax every individual test run, which is how you debug.
-- Prefer existing public observability for behavior such as cache hits or fallback use. Add instrumentation only when the requested contract needs it, not merely to assert an implementation branch.
+End every test-writing task with:
 
-## Red Flags
+- **Kept:** each committed test — the behavior it protects and its oracle source.
+- **Explored:** what ran and was discarded, and what it found.
+- **Proposed:** changes to existing tests awaiting confirmation.
 
-- Expected value traceable to actual output rather than to a requirement.
-- Test duplicates production logic instead of hardcoding the answer.
-- Test breaks on refactor because it checks internals, private methods, call order, or class layout.
-- Passing requires several services running, or a shared environment to be healthy.
-- Database/filesystem behavior mocked away.
-- Unbounded sleeps/retries or conditionals that suppress failures.
-- A test changed in the same commit as the code it covers, with no explanation.
+## Quality bar
 
-## Quality Bar
+A test earns its place when it fails when behavior breaks, stays green through refactors, and names one cause when it fails. A test that locks in the wrong shape is worse than none, because it will be believed; in an agentic loop the suite is the acceptance criteria being optimized against.
 
-Judge a test by whether it is a trustworthy verification signal: it fails when behavior breaks, stays green through refactors, and names one obvious cause when it fails. Resistance to refactoring matters most — it is what makes a green suite mean anything. A test that locks in the wrong shape is worse than no test, because it will be believed.
-
-See [REFERENCE.md](REFERENCE.md) for test sizing, the pyramid/honeycomb choice, the check() seam, observability points, expect tests, property and fuzz testing, humble-object refactors, and database patterns.
+See [REFERENCE.md](REFERENCE.md) for the long-lasting form, exploration and what to keep from it, state-machine and compatibility tests, pruning, test sizing, and deployed environments.
