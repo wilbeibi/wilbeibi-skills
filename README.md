@@ -2,7 +2,7 @@
 
 > A trillion-parameter brain to wash my digital dishes.
 
-21 skills for Claude Code and Codex, covering code review, research, documentation, visualization, human-in-the-loop review, and personal automation.
+21 skills for Claude Code and Codex, covering code review, testing and TLA+ modeling, research, documentation, visualization, human-in-the-loop review, and personal automation.
 Keep the full collection here; choose what to use on each machine and in each project.
 The [route-skill](skills/route-skill/SKILL.md) entrypoint recommends skills and loads them after you explicitly select one.
 
@@ -32,7 +32,7 @@ Already installed this repo with `npx skills add … --all` or `load-skill`? See
 | [tla-model](skills/tla-model/SKILL.md) | Model concurrent and distributed designs in TLA+/PlusCal and check them with TLC as a closed loop: modeling brief, incremental spec, mutation-tested properties, classified counterexamples, and a link back to code. |
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), invariant and cost honesty (BurntSushi), product-versus-library fit (Mitsuhiko), a pre-change complexity gate, or newcomer clarity. |
 | [grill-me](skills/grill-me/SKILL.md) | Explicit-only design interview, one question at a time; capture durable terminology and decisions when useful. |
-| [readback](skills/readback/SKILL.md) | Turn a plan or conversation transcript into an HTML review surface where the user highlights passages and labels each note a question, a change, or an aside, and return them as a follow-up prompt through a waiting local command. |
+| [readback](skills/readback/SKILL.md) | Put a long reply, plan, document, or session transcript on an HTML page where the user highlights passages and labels each note a question, a change, or a note, and return them as a follow-up prompt through a waiting local command. |
 | [write-skill](skills/write-skill/SKILL.md) | Write compact shared skills for Codex, Claude Code, and Pi; isolate harness-specific behavior. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit and de-duplicate an existing skill library — forked scripts, contradictory instructions, bloat, internal defects. |
 | [write-docs](skills/write-docs/SKILL.md) | Write or critique codebase prose — READMEs, developer guides and runbooks, CLI text, comments, agent guides, and commit/PR descriptions — with an advisory clarity checker. |
