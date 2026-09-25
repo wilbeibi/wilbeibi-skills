@@ -76,18 +76,28 @@ On-disk formats, wire protocols, snapshot layouts: keep bytes written by old ver
 
 ## Observability points
 
-When the fact you need is not in the output — a cache was hit, a fallback did *not* fire — make it output rather than reaching into internals. Cargo's cache tests enable verbose logging and assert on the emitted cache-hit lines. For negative assertions, emit a mark naming the reason and assert on the mark; "it didn't happen" often holds for the wrong reason. Add such a point only when the contract needs it.
+When the fact you need is not in the output — a cache was hit, a fallback did *not* fire — make it output rather than reaching into internals. Cargo's cache tests enable verbose logging and assert on the emitted cache-hit lines. For negative assertions, emit a mark naming the reason and assert on the mark; "it didn't happen" often holds for the wrong reason. Add such a point only when the contract needs it, and only as output an operator would also read — a log line, metric, or status field. An export, flag, or hook that only a test consumes is a test-only seam.
 
 ## Pruning an existing suite
 
-Only on request, and only as a proposal the user approves. Candidates:
+Only on request, and only as a proposal the user approves. Candidates are tests that fail the admission gate:
 
-- Tests that pin internals: private methods, call order, mocks of your own collaborators, one file per source file.
-- Near-duplicate examples — collapse into rows of one table rather than deleting coverage.
-- Tests of the framework (the ORM saves, the stdlib sorts) and tests that cannot fail.
+- Pinned internals: private methods, mocks of your own collaborators, one file per source file.
+- Near-duplicates, including one scenario replayed at every layer — collapse into rows of one table at the owner.
+- Tests of the framework (the ORM saves, the stdlib sorts), tests that cannot fail, and expected values produced by the code under test.
 - Snapshot tests nobody reads.
+- Test-only seams, and production code whose only callers are tests: deleting the tests unlocks deleting the code.
 
-Before proposing a deletion, break the behavior the test claims to protect and check that another test fails. If none does, the test stays or gets rewritten at the seam. Coverage finds untested code; it does not decide what to keep.
+Not candidates on their own: a test red on unchanged code (a bug report — reproduce it and repair the code); call order that is observable (flush before ack); a source or byte check that pins a user-facing key, path, or wire byte and survives identifier renames; slow or static tests.
+
+Each proposal carries:
+
+- the failure the test can detect;
+- the test that still catches it — break the behavior and watch that test fail; if none does, rewrite at the seam instead of deleting;
+- why it exists (`git log -S`, blame) — a regression whose bug you cannot identify stays;
+- the production code the deletion frees, if any.
+
+Prefer a few proven candidates to a long speculative list; optimize for confidence, not deletion count. Coverage finds untested code; it does not decide what to keep.
 
 ## Humble object
 
