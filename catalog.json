@@ -174,14 +174,14 @@
     },
     {
       "name": "obsidian-capture",
-      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent's",
+      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent's #agent-todo queue via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, record a weekly reflection, or list or close the agent's tasks (\"看你的 todo\", \"干活\"). Not for searching notes (use obsidian-search) or standalone long-form notes.",
       "compatibility": "",
       "agents": [],
       "path": "skills/obsidian-capture",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "0704898bdc076353b4fa1d5ad8553067dff5ce2474c593f2efa9368cb378331d",
+          "sha256": "85c0fa37a6546e5c9da130a88fbb431229e749f602a3de1ccb7671d3e8e58187",
           "executable": false
         },
         {
@@ -448,12 +448,12 @@
       "files": [
         {
           "path": "REFERENCE.md",
-          "sha256": "24df043af621b6043137e0a4a156d53e8dca2a55aa921eaf32934f62640d0795",
+          "sha256": "66c3df743556a204b762757cb160dc63a55f87a45017825a51ababd81522f0af",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "370b9666299c2b6d854e2e2fb413c4fd0d54dbc6e6541fba5b84f9669b82429a",
+          "sha256": "8d099731b64439c4718a4474e74ab2857d08b20bca501e1f20d055547c7ccbd1",
           "executable": false
         }
       ]
