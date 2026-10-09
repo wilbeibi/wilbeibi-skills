@@ -13,6 +13,7 @@ Write READMEs for readers with short attention: what is it, when do I use it, ho
 7. Use **strict** mode for install and quickstart steps; use **natural** mode for motivation and explanation.
 8. Use [READMES-REFERENCE.md](READMES-REFERENCE.md) only for section choices, not as a required template.
 9. Final pass: every line must answer a likely reader question or change their next action.
+10. Check that every relative link and asset path resolves.
 
 ## Opening Rules
 
@@ -34,6 +35,12 @@ Delete or compress:
 - Separate "What it does", "Features", and "Why" sections that restate the same sentence.
 - Long caveats. Keep boundaries, but write them as short operational facts.
 
+## Rewriting an Existing README
+
+- Move maintainer content (release runbooks, CI secret tables, repo trees, debug guides) to `CONTRIBUTING.md` or `docs/` and leave a link. Do not delete it.
+- Ask before removing decoration the author chose (badges, star charts, wordmarks), even when the cut pass says to delete it.
+- Report the rewrite as decisions: what moved where, what you cut and why, which test assertions changed.
+
 ## Agent Tools
 
 For CLIs meant to be invoked by coding agents:
@@ -47,6 +54,8 @@ For CLIs meant to be invoked by coding agents:
 
 - Install/quickstart before architecture.
 - Limitations get their own heading, not a buried caveat.
+- Name a non-permissive license (AGPL, SSPL) at the top, not only in the License section.
+- Images that carry required information live in the repo, not on an external host.
 - Broad support claims must name platforms, formats, languages, or integrations.
 - Troubleshooting belongs in the README only when the failure is common and actionable.
 - Use `<details>` only for advanced config, raw data, methodology, or alternative setup.
