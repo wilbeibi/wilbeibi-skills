@@ -555,7 +555,7 @@
         },
         {
           "path": "COMMENTS.md",
-          "sha256": "493b8a2a948970dd54e685f667a6be4b68956a939a3b4b95dae3c2e5cecb86f2",
+          "sha256": "b4342a495c12eed84b0e18efdeb0a07c33704cf013309c16479b072ddbbebaad",
           "executable": false
         },
         {
@@ -575,12 +575,12 @@
         },
         {
           "path": "READMES.md",
-          "sha256": "5d0eee7fb633deb0588d08f189e1dcd606682a972bfa08465cbc0b29474f7da9",
+          "sha256": "d7a5890e4aa383bf5f68236b7892b2bc44ac16c1f60e15ef9937dbed246de8c4",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "f428e2edd8591198b29ee628bdad56f0d7e13a48553921aff1f2f5c2e6443a1c",
+          "sha256": "729bd237595836871c91f5d4099169dc0a1f1b6c07ec11824626aadffffa98a0",
           "executable": false
         },
         {

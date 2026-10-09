@@ -54,6 +54,11 @@ python3 scripts/prose_lint.py --mode natural <path>
 
 Use `-` for stdin and `--json` for structured findings. Exit 1 means strict errors; review-only findings return 0. Add `<!-- prose-lint-ignore -->` to ignore one line. The checker cannot detect synonym rotation without project context, so check terminology manually. This is not an STE certification or a substitute for factual review. See [CLARITY-REFERENCE.md](CLARITY-REFERENCE.md) for rationale and sources.
 
+## Rewriting an existing document
+
+- Grep tests and CI for strings pinned from the document before you restructure it. If a test pins wording, make it assert the requirement (order, a link's presence) instead of the exact text. Name the changed assertion in the PR.
+- Find copies derived from it: package README, docs site, translations. Update them or state that they are out of scope.
+
 ## Reviewing rather than writing
 
 Same lens, inverted: verify the artifact against its source, then report what the target reader cannot do, cannot trust, or must read twice. Lead with the defect and its location, not with praise.
