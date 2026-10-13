@@ -26,9 +26,10 @@ A lesson is one line of thought, not the source's sections in order. Design it f
 already hold, what they are wondering at this moment, and what would answer it. Before any beat is written,
 `outline.md` gives every scene the question the viewer arrives with and the earlier scene that raised it. A scene
 opens from that question, never from a term, a model's name or a figure, and says what it is for before its details.
-What the viewer already holds is recalled in a clause, not taught again. A title or a chapter list establishes none
-of this. The rules and the failures behind them are in `references/authoring.md`. Whether the thread holds is judged
-by a reader who has not seen the source (`references/cold-read.md`), not by the author.
+Recall established knowledge in a clause; a term appearing earlier does not establish understanding. Each transition
+comes from an unresolved question, not a question appended to justify the next topic. Use source examples where they
+help; an abstract source does not require an invented case. The rules are in `references/authoring.md`.
+Whether the thread holds is judged by a reader who has not seen the source (`references/cold-read.md`), not by the author.
 
 ## Order of work
 
