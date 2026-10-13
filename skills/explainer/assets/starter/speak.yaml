@@ -1,7 +1,7 @@
-# The spoken layer. script.js stays the only place the words live; this file says how they are pronounced.
-model: minimax/speech-2.8-turbo
-voice: "English_expressive_narrator"     # zh: "Chinese (Mandarin)_Radio_Host"
-speed_default: 1.0
+# The spoken layer: who reads the lesson and how its words are pronounced. script.js stays the only place the words
+# live, and how each beat is delivered (tone, pace, where it turns) is written beside it there: D('direction', beat).
+model: google/gemini-3.8-flash-tts
+voice: "Charon"     # one voice per lesson, picked for its subject: Charon, Sulafat or Sadaltager (references/authoring.md)
 
 # Request labels and where the key comes from. The key is read from the environment and never printed.
 headers:
@@ -9,24 +9,22 @@ headers:
 key_env: OPENROUTER_API_KEY
 # base_url: defaults to $OPENROUTER_BASE_URL, then https://openrouter.ai/api/v1
 
-# Slower or faster for single beats, keyed by the beat number the player shows (1-based). Slow down formula beats.
-speed: {}
-#  12: 0.95
-
-# Ordered replacements applied to the spoken text only. Put longer strings first.
+# Ordered replacements applied to the spoken text only. Put longer strings first. Write one after hearing a
+# misreading, not before: see "Probe before writing pairs" in references/authoring.md.
 say: []
 #  - ["EBITA", "E-bit-ah"]
-#  - ["÷", " divided by "]
 
-# Built-in rewrites of what the Mandarin voice misreads: "$32.5 billion", "2020 年", a − before a figure, "1.5x".
-# `zh` turns them on (`init --lang zh` does), `none` leaves the text alone. `say` pairs run first and win.
+# Built-in rewrites for a Chinese lesson: "$32.5 billion" is spoken 三百二十五亿美元, "$653" 653美元, "1.5x" 一点五倍, and
+# "2020 年" and a − before a figure are made unambiguous. `none` leaves the text alone; `zh` turns them on, and
+# `init --lang zh` sets it. `say` pairs run first and win.
 rules: none
 
-# USD per million billed characters, for the estimate `say` and `synth` print. 60 is minimax/speech-2.8-turbo on
-# OpenRouter, measured 2026-10-12; it bills a non-ASCII character as two. Remove the key to print characters only.
-price: 60
+# USD per million audio output tokens, for the estimate `say` and `synth` print; the voice bills 25 tokens per second
+# of sound. 9 is gemini-3.8-flash-tts until 2026-12-31 and Google lists 18 from 2027-01-01. Remove the key to print
+# minutes only.
+price_audio: 9
 
-# A short breath after set-up phrases. `pause` is whatever pause markup the voice model accepts.
-pause: "<#0.18#>"
+# A pause after set-up phrases. A tag changes the rhythm of the whole beat, not one gap: use it sparingly.
+pause: " <short pause> "
 pause_after: []
 #  - "In other words,"

@@ -185,6 +185,7 @@ const UI = ({
 if (!UI) throw new Error('lesson.json lang must be "zh" or "en"');
 const $ = id => document.getElementById(id);
 const W = t => ({t, wait: true});   // a beat that pauses when it ends, for "stop and predict" / "you compute it"
+const D = (d, b) => ({...(typeof b === 'string' ? {t: b} : b), d});   // a beat with a delivery direction for the voice; the page does not use it
 
 // ---------- lesson data (data.js): plain values and pure functions, no DOM ----------
 /*__DATA__*/

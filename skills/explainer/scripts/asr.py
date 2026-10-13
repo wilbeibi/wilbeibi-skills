@@ -95,8 +95,11 @@ def digits(text: str) -> str:
     return re.sub(r"[负付富]\s*(?=\d)", "-", text.replace("−", "-"))            # 付 and 富 are how Whisper writes a spoken 负
 
 
+MARKUP = r"<#[\d.]+#>|<[a-z][a-z ]*>"   # pause and vocal tags in the spoken text: MiniMax <#0.18#>, Gemini <short pause>
+
+
 def norm(text: str) -> str:
-    text = re.sub(r"<#[\d.]+#>", "", text)                        # pause markup
+    text = re.sub(MARKUP, "", text)
     return re.sub(r"[^\w%.\-]|_", "", digits(text).lower())
 
 
@@ -105,7 +108,7 @@ def unheard(said: str, heard: str) -> list[str]:
     those as homophones (4 -> 丝, 0 -> 灵) too often for the list to be worth reading. A minus sign that was said must
     be heard, as 负 or as 减; a minus that was only heard is the word 减."""
     def numbers(text):
-        return Counter(re.findall(rf"(?:(?<![\d%])-)?{ARABIC}%?", digits(re.sub(r"<#[\d.]+#>", "", text))))
+        return Counter(re.findall(rf"(?:(?<![\d%])-)?{ARABIC}%?", digits(re.sub(MARKUP, "", text))))
     heard = re.sub(r"减\s*(?=[\d零一二两三四五六七八九十])", "-", heard)
     regrouped = re.sub(r"(?<=\d),(?=\d)", "", heard)   # 894,813 heard as 89,4813
     got = numbers(heard) + numbers(regrouped)
@@ -165,7 +168,7 @@ def transcriber(model: str, lang: str, spelled: bool = False):
 
 
 def said_text(wav: Path) -> str:
-    return wav.with_suffix(".txt").read_text(encoding="utf-8").split("\n", 1)[1]   # line 1 is model|voice|speed
+    return wav.with_suffix(".txt").read_text(encoding="utf-8").split("\n", 1)[1]   # line 1 is model|voice|speed, or model|voice|direction
 
 
 def years(clips: list[Path], model: str, lang: str) -> int:

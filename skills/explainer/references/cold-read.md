@@ -12,6 +12,10 @@ You are the viewer described in your prompt. `00.txt` is the lesson's first scre
 its on-screen heading and its subtitles, in order. You have nothing but these pages. Open them one at a time, in order,
 one page per step.
 
+`00.txt` also lists the chapter names, which stay on screen as the lesson's jump buttons. Before page 01, write:
+
+- **chain**: in one line, what those names say the lesson will argue; `topics` if they read as a list of subjects.
+
 Before you open a page, write in your own words:
 
 - **want**: the question you now want answered (`none` if nothing is open).
@@ -24,15 +28,18 @@ After you read it:
 - **known**: anything explained at length that you already knew.
 
 Do not be generous. A page that is clear in itself still fails `met` when nothing before it made you want it.
-Judge the order and the bridges, not the facts: you cannot check those.
+Judge the order and the bridges, not the facts: you cannot check those. A second reader with the source does
+(`source-read.md`).
 
-Report one row per page (`page | first words | want | met | lost | known`), then the five seams that lost you most,
-and whether the end answered the question the opening raised.
+Report your `chain` line, one row per page (`page | first words | want | met | lost | known`), then the five seams
+that lost you most, and whether the end answered the question the opening raised.
 
 ## For the author
 
 Read the report as measurements, not as a reviewer to argue with.
 
+- **`topics`** for `chain` means the chapters are a contents list. Name each by the question it answers, in the order
+  a viewer would ask them.
 - **`no`** is a scene nothing asked for. Add the beat that raises its question to the scene before, move it, or cut it.
 - **The five seams** and **whatever the end left unanswered** are fixed before anything is drawn or voiced.
 - **`lost`** is triaged, not counted. A reader quotes something on almost every page, in a sound lesson too; most are
@@ -40,8 +47,9 @@ Read the report as measurements, not as a reviewer to argue with.
 - **`known`** marks re-teaching: shrink it to a clause.
 
 Then rerun `thread` and give the pages to a new reader; one who has seen the lesson is no longer cold. Stop when a
-reader reports no `no` and says the end answered the opening. After two rounds, name what remains in the handover.
+reader reads the chapter names as an argument, reports no `no` and says the end answered the opening. After two rounds, name what remains in the handover.
 
 What to expect (2026-10-12, one reader per lesson): a 15-scene lesson whose scene map came first drew 7 `yes`, 7
 `partly`, 1 `no`; two lessons that followed their paper's section order drew 6/14/6 of 26 and 2/18/9 of 29. A read
-took about ten minutes and 90k tokens.
+took about ten minutes and 90k tokens. On the first screen alone, four readers wrote `topics` for two lessons whose
+chapters were section nouns ("取舍 does not say between what") and an argument for two sets of question names.

@@ -109,7 +109,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "9006f2569425eef07782f8d598fa4104c8f5c06192a7688b0bf4aaef23718e8f",
+          "sha256": "69c25b5aa5d0c437a67cdd820c6fea70d96dd0814ee6188905400f946a538f2b",
           "executable": false
         },
         {
@@ -139,7 +139,12 @@
         },
         {
           "path": "assets/player.html",
-          "sha256": "905cc1ec80bb5fe310aa31a82669a1d0b895b1dd7ecb925d37fe6cf704e8445a",
+          "sha256": "18df7110786a2622ca11abb966285015ea6cd4f7390757117919daa250b2013c",
+          "executable": false
+        },
+        {
+          "path": "assets/speak-minimax.yaml",
+          "sha256": "34a775fbb3aae71172f6627b3721db509210687d61f7e30ae0de0c7a3ac6e304",
           "executable": false
         },
         {
@@ -154,12 +159,12 @@
         },
         {
           "path": "assets/starter/lesson.json",
-          "sha256": "ca01b7d0a7b9de8688df7b911236e7c42b51754346549dafad9c03f44f0805c7",
+          "sha256": "7e773c625948c9216fee2013db164d3696f309813222a25f33828d311ff2e8ef",
           "executable": false
         },
         {
           "path": "assets/starter/outline.md",
-          "sha256": "44d3cef6f237acffec364c10527fbad509dde595680fe739bb105348984bab1f",
+          "sha256": "25b8dd6d2f8861e6cf475265f0f71d2eb849d13f7489712d7dcf4de4a260811b",
           "executable": false
         },
         {
@@ -169,22 +174,22 @@
         },
         {
           "path": "assets/starter/script.js",
-          "sha256": "3a902efb686ce873ae06e161e9653d63a80bf03a28873cffb685df33abbfb3e2",
+          "sha256": "90c1e93e7aca0095cd42c9ab10f435558d74c640f2b72ffbee1dd90a740c39a7",
           "executable": false
         },
         {
           "path": "assets/starter/speak.yaml",
-          "sha256": "64f42f84a1f5a210a03866d921328316cde1ac9790c6ef63d071a54ab76d55e0",
+          "sha256": "b2dc05717bad472023c0da477fc3d28a16ea000c5b0c37522cfa48659e8e8586",
           "executable": false
         },
         {
           "path": "references/authoring.md",
-          "sha256": "d833b8c47ab8f34d6c9a4f24273245af419a8002f280edb2db4f54cc071e9d0c",
+          "sha256": "283700094607cf08eb178bc07f2493522d9475c4d8fdf2d3af761b24e992fdfe",
           "executable": false
         },
         {
           "path": "references/cold-read.md",
-          "sha256": "24c862fe4ad1482e36ed3259286c2d4241407723cf030b0e63ac4d5845138149",
+          "sha256": "5c408c275d64392dfeb3ab2e7d97bbb11ec70159c765a17c1222accb20e9529b",
           "executable": false
         },
         {
@@ -193,8 +198,13 @@
           "executable": false
         },
         {
+          "path": "references/source-read.md",
+          "sha256": "045e8c9f61ec9b70b67ac9dcc0feb5a9b0b8007ff97a4dee005649ef6bc66a6c",
+          "executable": false
+        },
+        {
           "path": "scripts/asr.py",
-          "sha256": "8ab8531de2337f1057a3fa8ff882b755b4d6a6998e942de78700a9768990439f",
+          "sha256": "53184a3d30e8fae7d9edd533ad0a8454f6e963405933cb386c55d5304cef490b",
           "executable": false
         },
         {
@@ -204,12 +214,12 @@
         },
         {
           "path": "scripts/lesson.py",
-          "sha256": "37f25a1ad3fe07fb38f51752d9c7275bad91227571539bb3cfb409af04d7909f",
+          "sha256": "06b1546d509e9a246cf678ec8b2999d2455632c7b16492e4af49eccf6217a9a6",
           "executable": true
         },
         {
           "path": "scripts/test_lesson.py",
-          "sha256": "457caea0353ed360a9531cfb93d32a1d02f54bfcdd9a040b1942b8a249ffe307",
+          "sha256": "5712513a71ce719263f0b2287947bdf5ed945b8bc4c2bba1585d850ad8b2a68b",
           "executable": false
         }
       ]

@@ -11,14 +11,14 @@
     lesson.py thread DIR                          how each scene opens against what came before + DIR/thread/ pages for a cold read
     lesson.py shots DIR [BEATS|waits]             screenshots (default: last beat of every scene) + contact sheets
     lesson.py numbers DIR                         every numeral shown must be in source.txt or numbers.allow
-    lesson.py say DIR [WHICH]                     print what the voice will say, and what it will cost; no API call
+    lesson.py say DIR [WHICH]                     print what the voice will say and how, and what it will cost; no API call
     lesson.py synth DIR all|changed|1,5,9         per-beat TTS clips into DIR/clips (beat numbers as the player shows them)
     lesson.py mix DIR                             clips -> out/<slug>-narration.mp3, measured timings, rebuild
     lesson.py video DIR [BEATS]                   film the lesson into one out/<slug>.mp4 (pauses become short holds)
 
-A lesson directory holds lesson.json, outline.md (brief + scene map), scenes.html, script.js, data.js, hooks.js,
+A lesson directory holds lesson.json, outline.md (brief with the chapter chain + scene map), scenes.html, script.js, data.js, hooks.js,
 optional style.css, speak.yaml (spoken layer), optional source.txt and numbers.allow. script.js is the only place
-subtitle text lives.
+subtitle text lives; a beat's delivery direction for the voice is written beside it there, D('direction', beat).
 Exit 0 clean, 1 a check failed or a tool is missing, 2 usage or malformed lesson.
 """
 
@@ -46,6 +46,10 @@ TEMPLATE = SKILL / "assets" / "player.html"
 PARTS = ("scenes.html", "script.js", "data.js", "hooks.js")
 MAX_UNITS = 92  # two subtitle lines: CJK/fullwidth = 1, ASCII = 0.5
 RATE = 32000
+MARKUP = r"<#[\d.]+#>|<[a-z][a-z ]*>"   # pause and vocal tags inside the spoken text: MiniMax <#0.18#>, Gemini <short pause>
+AUDIO_TOKENS = 25         # Gemini TTS bills its output at this many audio tokens per second of sound
+GEMINI_UNITS = 4.6        # subtitle units read per second, for the estimate: a 109-beat Chinese lesson ran 5.2 on an
+                          # undirected voice (2026-10-13) and directed sample beats 10-25% longer. English runs faster.
 BROWSERS = (
     "chromium", "chromium-browser", "google-chrome", "google-chrome-stable",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -54,10 +58,18 @@ BROWSERS = (
 BEATS_JS = """
 const fs = require('fs');
 const W = t => ({t, wait: true});
+const D = (d, b) => ({...(typeof b === 'string' ? {t: b} : b), d});
 // data.js is pure (no DOM), so beats may interpolate its values: `ROIC is ${V.roic}`
-const SCRIPT = new Function('W', fs.readFileSync(process.argv[1], 'utf8') + '\\n' + fs.readFileSync(process.argv[2], 'utf8') + '\\nreturn SCRIPT;')(W);
-process.stdout.write(JSON.stringify(SCRIPT.map(c => ({ch: c.ch, scenes: c.scenes.map(([id, lines]) =>
-  [id, lines.map(l => typeof l === 'string' ? {t: l, wait: false} : {t: l.t, wait: !!l.wait})])}))));
+const SCRIPT = new Function('W', 'D', fs.readFileSync(process.argv[1], 'utf8') + '\\n' + fs.readFileSync(process.argv[2], 'utf8') + '\\nreturn SCRIPT;')(W, D);
+const beat = l => {
+  const o = typeof l === 'string' ? {t: l} : l;
+  if (!o || typeof o.t !== 'string' || typeof (o.d ?? '') !== 'string') {
+    console.error('a beat is a string, W(string) or D(direction, beat), and D goes outside W: ' + JSON.stringify(l));
+    process.exit(1);
+  }
+  return {t: o.t, wait: !!o.wait, d: (o.d ?? '').trim()};
+};
+process.stdout.write(JSON.stringify(SCRIPT.map(c => ({ch: c.ch, scenes: c.scenes.map(([id, lines]) => [id, lines.map(beat)])}))));
 """
 VALUES_JS = """
 const V = new Function(require('fs').readFileSync(process.argv[1], 'utf8') + '\\nreturn typeof V === "undefined" ? {} : V;')();
@@ -115,8 +127,9 @@ def zh_number(n: int) -> str:
     return re.sub("^一十", "十", out) or "零"
 
 
-def read_zh(text: str) -> str:
-    """speak.yaml `rules: zh`: rewrite the four classes the voice misreads into words it reads correctly."""   # each class was heard misread; see authoring.md
+def read_zh(text: str, dollars: bool = False) -> str:
+    """speak.yaml `rules: zh`: rewrite the four classes the voice misreads into words it reads correctly, and with `dollars`
+    a fifth that only a Gemini voice was heard to misread."""   # each class was heard misread; see authoring.md
     def amount(m):   # $32.5 billion -> 三百二十五亿美元, 180 million -> 一亿八千万
         value = Decimal(m.group(2).replace(",", "")) * 10 ** MAGNITUDE[m.group(3).lower()]
         if value != value.to_integral_value():
@@ -131,18 +144,23 @@ def read_zh(text: str) -> str:
     text = re.sub(rf"([{LATIN}%)])\s*−\s*(?=\$?\d)", r"\1减", text)                # − (U+2212) is not read at all: 900 − 247
     text = re.sub(r"−(?=\s*\$?\d)", "负", text)                                   # and −5%
     text = re.sub(rf"(?<![{LATIN}.])(\$?)(\d[\d,]*(?:\.\d+)?)\s*(million|billion|trillion)(?![A-Za-z])", amount, text, flags=re.I)
-    return re.sub(rf"(?<![{LATIN}.])(\d+(?:\.\d+)?)x(?![{LATIN}])", times, text)
+    text = re.sub(rf"(?<![{LATIN}.])(\d+(?:\.\d+)?)x(?![{LATIN}])", times, text)
+    if dollars:   # $653 came out 653 元, 653 块, 653 刀 and a bare 653 within one lesson: 653美元. $5K and $3 万 stay as written
+        text = re.sub(rf"(?<![{LATIN}])\$(\d+(?:,\d{{3}})*(?:\.\d+)?)(?![{LATIN}]|[.,]\d|\s*(?:million|billion|trillion|[万亿]|美元))",
+                      r"\1美元", text, flags=re.I)
+    return text
 
 
-SPEECH = (   # (pattern over the spoken text, what the voice does with it and what to write instead)
+SPEECH = (   # (pattern over the spoken text, what the voice does with it and what to write instead, heard on the Gemini voice too)
     (r"\d[\d.,]*\s*(?:million|billion|trillion)(?![A-Za-z])",
-     "the English magnitude word is read as English (\"265 美元 billion\"): set `rules: zh`, or write the Chinese amount in a `say` pair"),
-    (r"\d{4}\s+年", "a space before 年 turns the year into a cardinal: set `rules: zh`, or add the pair [\" 年\", \"年\"]"),
-    (r"−", "the voice does not read − (U+2212): write 负 or 减 for it in a `say` pair (`rules: zh` covers − before a figure)"),
+     "the English magnitude word is read as English, and not the same way twice (\"265 美元 billion\", \"32.5 个 billion 元\"): "
+     "set `rules: zh`, or write the Chinese amount in a `say` pair", True),
+    (r"\d{4}\s+年", "a space before 年 turns the year into a cardinal: set `rules: zh`, or add the pair [\" 年\", \"年\"]", False),
+    (r"−", "the voice does not read − (U+2212): write 负 or 减 for it in a `say` pair (`rules: zh` covers − before a figure)", False),
     (rf"(?<![{LATIN}.%)])-(?=\s*\$?[\d零一二两三四五六七八九十])",
-     "a hyphen before a figure was never tried on the voice: write − for a negative number, 到 for a range, or listen to the beat"),
-    (rf"\d(?:\.\d+)?x(?![{LATIN}])", "\"1.5x\" is read \"1.5 X\": set `rules: zh`, or write 一点五倍 in a `say` pair"),
-    (r"&", "the voice skips &: spell the name in a `say` pair (AT&T -> A T and T)"),
+     "a hyphen before a figure was never tried on the voice: write − for a negative number, 到 for a range, or listen to the beat", False),
+    (rf"\d(?:\.\d+)?x(?![{LATIN}])", "\"1.5x\" is read \"1.5 X\": set `rules: zh`, or write 一点五倍 in a `say` pair", True),
+    (r"&", "the voice skips &: spell the name in a `say` pair (AT&T -> A T and T)", False),
 )
 
 
@@ -151,16 +169,58 @@ def span(at: list[int]) -> str:
 
 
 def speech_warnings(lesson: "Lesson") -> list[str]:
-    """Spoken lines holding something the Mandarin voice is known to misread. Chinese lessons with a speak.yaml only."""
+    """Spoken lines holding something a voice is known to misread. Chinese lessons with a speak.yaml only. Five of the six
+    classes were heard on the MiniMax Mandarin voice (a hyphen before a figure was never synthesized); a Gemini voice is
+    warned about the two it was heard to get wrong as well."""
     if lesson.meta["lang"] != "zh" or not (lesson.dir / "speak.yaml").exists():
         return []
-    spoken = [re.sub(r"<#[\d.]+#>", "", lesson.spoken(b["t"])) for b in lesson.beats]
+    spoken = [re.sub(MARKUP, "", lesson.spoken(b["t"])) for b in lesson.beats]
     out = []
-    for pattern, what in SPEECH:
+    for pattern, what, gemini_too in SPEECH:
+        if lesson.gemini and not gemini_too:
+            continue
         hits = [(i + 1, m.group(0)) for i, text in enumerate(spoken) for m in [re.search(pattern, text, flags=re.I)] if m]
         if hits:
             out.append(f"speech, beat {span([i for i, _ in hits])}: \"{hits[0][1]}\": {what}")
     return out
+
+
+def delivery_warnings(lesson: "Lesson") -> list[str]:
+    """Directions that leave the reading to chance or make it even. An even reading is what they are there to prevent."""
+    if not (lesson.dir / "speak.yaml").exists():
+        return []
+    given = [b["d"] for b in lesson.beats]
+    if not lesson.gemini:
+        return []
+    out = []
+    if bare := [i + 1 for i, d in enumerate(given) if not d]:
+        out.append(f"delivery, beat {span(bare)}: no direction, so the voice picks its own reading: write D('...', beat)")
+    start = 0
+    for i in range(1, len(given) + 1):
+        if i == len(given) or given[i] != given[start]:
+            if given[start] and i - start >= 3:
+                out.append(f"delivery, beat {start + 1}-{i}: the same direction {i - start} times in a row: \"{given[start]}\"")
+            start = i
+    if long := [i + 1 for i, d in enumerate(given) if len(d) > 160]:
+        out.append(f"delivery, beat {span(long)}: a direction over 160 characters; long style text is what makes the voice drift")
+    return out
+
+
+def pace_warnings(lesson: "Lesson") -> list[str]:
+    """Fresh clips that run far slower or faster than the lesson's own pace for a line that long. A pace word in a
+    direction (`slowly`, `rapidly`) or a pause tag can double or halve one beat; only listening says whether it should."""
+    if not (lesson.dir / "speak.yaml").exists():
+        return []
+    pace = {}
+    for i, b in enumerate(lesson.beats):
+        if b["t"].strip() and not stale(lesson, i, b["t"]):
+            with wave.open(str(lesson.clips / f"{i + 1:03d}.wav")) as w:
+                pace[i] = w.getnframes() / w.getframerate() / units(b["t"])
+    if len(pace) < 8:
+        return []
+    usual = sorted(pace.values())[len(pace) // 2]
+    return [f"pace, beat {i + 1}: {p * units(lesson.beats[i]['t']):.1f} s, {p / usual:.1f}x the lesson's usual time for a line this long: listen to it"
+            for i, p in pace.items() if not 0.6 < p / usual < 1.6]
 
 
 # ---------- lesson model ----------
@@ -215,7 +275,7 @@ class Lesson:
         for ci, chapter in enumerate(self.script):
             for scene, lines in chapter["scenes"]:
                 for step, line in enumerate(lines):
-                    out.append({"ch": ci, "scene": scene, "step": step, "t": line["t"], "wait": line["wait"]})
+                    out.append({"ch": ci, "scene": scene, "step": step, "t": line["t"], "wait": line["wait"], "d": line.get("d", "")})
         return out
 
     @property
@@ -231,7 +291,18 @@ class Lesson:
                     die(f"{path}: \"{key}\" is required")
             if self._speak.get("rules", "none") not in ("none", "zh"):
                 die(f"{path}: rules must be \"zh\" or \"none\"")
+            if self.gemini:
+                if self._speak.get("speed") or "speed_default" in self._speak:
+                    die(f"{path}: a Gemini voice is sent no speed: remove speed and speed_default, and write the pace "
+                        "in the beat's direction, D('...', beat)")
+                if "<#" in str(self._speak.get("pause", "")) + "".join(str(p[1]) for p in self._speak.get("say") or []):
+                    die(f"{path}: <#0.18#> is MiniMax pause markup: a Gemini voice takes <short pause> or <long pause>")
         return self._speak
+
+    @property
+    def gemini(self) -> bool:
+        """A Gemini TTS voice: it is sent each beat's direction and no speed, answers in raw PCM and bills by the second."""
+        return "gemini" in str((self._speak or self.speak)["model"]).lower()
 
     def spoken(self, text: str) -> str:
         cfg = self.speak
@@ -239,7 +310,7 @@ class Lesson:
             text = text.replace(phrase, phrase + cfg.get("pause", ""))
         for pair in cfg.get("say") or []:
             text = text.replace(str(pair[0]), str(pair[1]))
-        return read_zh(text) if cfg.get("rules") == "zh" else text   # after the pairs: what the author wrote by hand wins
+        return read_zh(text, dollars=self.gemini) if cfg.get("rules") == "zh" else text   # after the pairs: what the author wrote by hand wins
 
     def rate(self, i: int) -> float:
         """Speech speed for 0-based beat i; speak.yaml keys its overrides by the 1-based number the player shows."""
@@ -247,8 +318,11 @@ class Lesson:
         return float((cfg.get("speed") or {}).get(i + 1, cfg.get("speed_default", 1.0)))
 
     def sig(self, i: int, text: str) -> str:
+        """Everything a clip was made from: a clip whose signature differs is stale. Line 1 ends with the one thing
+        besides the words that the model is sent: the beat's direction on a Gemini voice, the speed on any other."""
         cfg = self.speak
-        return f"{cfg['model']}|{cfg['voice']}|{self.rate(i)}\n{self.spoken(text)}"
+        how = self.beats[i]["d"] if self.gemini else self.rate(i)
+        return f"{cfg['model']}|{cfg['voice']}|{how}\n{self.spoken(text)}"
 
     def narration(self) -> dict | None:
         """Timings written by `mix`, or None. Raises Fail when they no longer match script.js + speak.yaml."""
@@ -346,6 +420,17 @@ def scene_map(lesson: Lesson) -> dict[str, dict] | None:
     return rows
 
 
+def chapter_chain(lesson: Lesson) -> str | None:
+    """The brief's chapter chain in outline.md: its "Chapter chain" bullet and the indented lines under it, or None
+    when the outline has no such bullet."""
+    lines = lesson.part("outline.md").splitlines()
+    first = next((i for i, line in enumerate(lines) if re.match(r"\s*[-*]\s*\**\s*chapter chain\b", line, flags=re.I)), None)
+    if first is None:
+        return None
+    last = next((i for i in range(first + 1, len(lines)) if not lines[i].strip() or not lines[i].startswith((" ", "\t"))), len(lines))
+    return "\n".join(lines[first:last])
+
+
 def static_check(lesson: Lesson) -> tuple[list[str], list[str]]:
     errors, warns = [], []
     markup = re.sub(r"<!--.*?-->", "", lesson.part("scenes.html"), flags=re.S)   # markup quoted in a comment is not markup
@@ -400,6 +485,11 @@ def static_check(lesson: Lesson) -> tuple[list[str], list[str]]:
                 warns.append(f"outline.md {what}: {', '.join(lacking)}")
         if plan and all(row["after"] is None for row in plan.values()):
             warns.append("outline.md scene map has no `raised by` column: which earlier scene leaves the viewer asking each question?")
+        chain = chapter_chain(lesson)
+        if chain is None:
+            warns.append("outline.md has no chapter chain: which question does each chapter answer, and what does its answer leave short?")
+        elif lacking := [c["ch"] for c in lesson.script if c["ch"] not in chain]:
+            warns.append(f"outline.md leaves out of its chapter chain: {', '.join(lacking)}")
 
     beats = lesson.beats
     for i, b in enumerate(beats):
@@ -407,6 +497,10 @@ def static_check(lesson: Lesson) -> tuple[list[str], list[str]]:
             errors.append(f"beat {i + 1} ({b['scene']}) is empty")
         elif units(b["t"]) > MAX_UNITS:
             errors.append(f"beat {i + 1} ({b['scene']}) is {units(b['t']):g} units, over {MAX_UNITS}: split it into two beats")
+        if "\n" in b["d"]:
+            errors.append(f"beat {i + 1} ({b['scene']}): a direction is one line")
+        if "TODO" in b["d"]:
+            errors.append(f"beat {i + 1} ({b['scene']}): its direction is still a TODO placeholder")
     waits = sum(b["wait"] for b in beats)
     want = 2 if len(beats) >= 40 else 1
     if waits < want:
@@ -495,8 +589,9 @@ def cmd_build(args) -> int:
 
 
 def cmd_thread(args) -> int:
-    """The script as its viewer meets it. Printed: each scene's opening beat under the beat before it and the question
-    the scene map gives it, which is where a jump shows. Written: DIR/thread/, one page per scene (00 = the first
+    """The script as its viewer meets it. Printed: the chapter names in a row, which should read as the argument, then
+    each scene's opening beat under the beat before it and the question the scene map gives it, which is where a jump
+    shows. Written: DIR/thread/, one page per scene (00 = the first
     screen), for a reader who says what they want to know before opening the next page (references/cold-read.md)."""
     lesson = Lesson(args.dir)
     plan = scene_map(lesson) or {}
@@ -516,7 +611,8 @@ def cmd_thread(args) -> int:
     pages = lesson.dir / "thread"
     shutil.rmtree(pages, ignore_errors=True)
     pages.mkdir()
-    (pages / "00.txt").write_text(f"{lesson.meta['title']}\nChapters: {' · '.join(c['ch'] for c in lesson.script)}\n", encoding="utf-8")
+    (pages / "00.txt").write_text(f"{lesson.meta['title']}\nChapters: {' | '.join(c['ch'] for c in lesson.script)}\n", encoding="utf-8")
+    print("chapters  " + " → ".join(c["ch"] for c in lesson.script))
     n, page, last = 0, 0, None
     for chapter in lesson.script:
         print(f"\n== {chapter['ch']}")
@@ -679,11 +775,20 @@ def stale(lesson: Lesson, i: int, text: str) -> bool:
 
 def cost(lesson: Lesson, texts: list[str]) -> str:
     """Size of a synth request, with a price when speak.yaml gives one. MiniMax bills a non-ASCII character as two
-    (measured 2026-10-12), so the estimate runs high for CJK text on a model that counts every character once."""
+    (measured 2026-10-12), so the estimate runs high for CJK text on a model that counts every character once.
+    A Gemini voice bills the sound it returns, so its estimate is a guess at the length: `synth` prints the real one."""
     chars, price = sum(map(len, texts)), lesson.speak.get("price")
+    if lesson.gemini:
+        seconds, price = sum(units(re.sub(MARKUP, "", t)) for t in texts) / GEMINI_UNITS, lesson.speak.get("price_audio")
+        return f"{chars} characters, about {seconds / 60:.1f} min of sound" + (f", about ${sound_cost(seconds, price):.3f}" if price else "")
     if not price:
         return f"{chars} characters"
     return f"{chars} characters, about ${sum(1 if ord(c) < 128 else 2 for t in texts for c in t) * float(price) / 1e6:.3f}"
+
+
+def sound_cost(seconds: float, price) -> float:
+    """USD for Gemini TTS output at `price` per million audio tokens. The text sent is billed too: under 1% of four calls."""
+    return seconds * AUDIO_TOKENS * float(price) / 1e6
 
 
 def cmd_say(args) -> int:
@@ -696,10 +801,15 @@ def cmd_say(args) -> int:
         missing = stale(lesson, i, beats[i]["t"])
         lines.append(spoken)
         new += [spoken] if missing else []
-        print(f"{i + 1:3d} {lesson.rate(i):.2f} {'*' if missing else ' '} {spoken}")
+        if lesson.gemini:   # the direction on its own line under the words it is for
+            print(f"{i + 1:3d} {'*' if missing else ' '} {spoken}\n        > {beats[i]['d'] or '(no direction)'}")
+        else:
+            print(f"{i + 1:3d} {lesson.rate(i):.2f} {'*' if missing else ' '} {spoken}")
     print(f"-- {len(lines)} beats, {cost(lesson, lines)}; {len(new)} without a fresh clip (*): {cost(lesson, new)}")
-    for line in speech_warnings(lesson):
+    for line in speech_warnings(lesson) + delivery_warnings(lesson) + pace_warnings(lesson):
         print("warn", line)
+    if not lesson.gemini and (directed := sum(bool(b["d"]) for b in beats)):   # nothing to fix, so not a warning
+        print(f"note: {directed} beats carry a direction, which {lesson.speak['model']} is not sent")
     return 0
 
 
@@ -727,8 +837,11 @@ def cmd_synth(args) -> int:
 
     def one(i: int):
         stem = lesson.clips / f"{i + 1:03d}"
-        body = {"model": cfg["model"], "input": lesson.spoken(beats[i]["t"]), "voice": cfg["voice"],
-                "response_format": "mp3", "speed": lesson.rate(i)}
+        body = {"model": cfg["model"], "input": lesson.spoken(beats[i]["t"]), "voice": cfg["voice"]}
+        if lesson.gemini:   # raw PCM is the only format it returns here; the direction travels as `instructions`
+            body |= {"response_format": "pcm"} | ({"instructions": beats[i]["d"]} if beats[i]["d"] else {})
+        else:
+            body |= {"response_format": "mp3", "speed": lesson.rate(i)}
         for attempt in range(5):
             r = requests.post(url, headers=headers, json=body, timeout=180)
             if r.status_code == 200 and "json" not in r.headers.get("content-type", "") and len(r.content) > 1000:
@@ -738,18 +851,31 @@ def cmd_synth(args) -> int:
             time.sleep(3 * (attempt + 1))
         else:
             raise Fail(f"beat {i + 1}: gave up after 5 attempts")
-        stem.with_suffix(".mp3").write_bytes(r.content)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(stem.with_suffix(".mp3")), "-ar", str(RATE), "-ac", "1",
-                        "-c:a", "pcm_s16le", str(stem.with_suffix(".wav"))], check=True)
+        if lesson.gemini:
+            kind = r.headers.get("content-type", "")
+            hz = re.search(r"rate=(\d+)", kind)
+            if "pcm" not in kind or not hz or re.search(r"channels=(?!1\b)", kind):
+                raise Fail(f"beat {i + 1}: expected mono PCM with a stated sample rate, got content-type \"{kind}\"")
+            source, sound = ["-f", "s16le", "-ar", hz.group(1), "-ac", "1", "-i", "-"], r.content
+        else:
+            stem.with_suffix(".mp3").write_bytes(r.content)
+            source, sound = ["-i", str(stem.with_suffix(".mp3"))], None
+        subprocess.run(["ffmpeg", "-v", "error", "-y", *source, "-ar", str(RATE), "-ac", "1",
+                        "-c:a", "pcm_s16le", str(stem.with_suffix(".wav"))], input=sound, check=True)
         stem.with_suffix(".txt").write_text(lesson.sig(i, beats[i]["t"]), encoding="utf-8")
         with wave.open(str(stem.with_suffix(".wav"))) as w:
             return i, w.getnframes() / RATE
 
     print(f"synthesizing {len(picks)} of {len(beats)} beats with {cfg['model']} / {cfg['voice']}: "
           f"{cost(lesson, [lesson.spoken(beats[i]['t']) for i in picks])}", flush=True)
+    total = 0.0
     with ThreadPoolExecutor(max_workers=int(cfg.get("workers", 2))) as pool:
         for i, seconds in pool.map(one, picks):
             print(f"{i + 1:3d} {seconds:5.1f}s", flush=True)
+            total += seconds
+    if lesson.gemini:
+        price = cfg.get("price_audio")
+        print(f"{total:.1f} s of sound" + (f", about ${sound_cost(total, price):.3f} at ${price:g} per million audio tokens" if price else ""))
     return 0
 
 
@@ -867,11 +993,7 @@ def cmd_init(args) -> int:
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         speak_path = target / "speak.yaml"
         speak = speak_path.read_text(encoding="utf-8")
-        swaps = [('"explainer:todo"', f'"explainer:{slug}"')]
-        if args.lang == "zh":
-            swaps += [('voice: "English_expressive_narrator"     # zh: "Chinese (Mandarin)_Radio_Host"', 'voice: "Chinese (Mandarin)_Radio_Host"'),
-                      ("\nrules: none\n", "\nrules: zh\n")]
-        for old, new in swaps:
+        for old, new in [('"explainer:todo"', f'"explainer:{slug}"')] + ([("\nrules: none\n", "\nrules: zh\n")] if args.lang == "zh" else []):
             if speak.count(old) != 1:
                 die(f"assets/starter/speak.yaml no longer holds `{old.strip()}`: update cmd_init with it")
             speak = speak.replace(old, new)

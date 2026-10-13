@@ -1,16 +1,20 @@
 // Chapters -> scenes -> beats. One beat = one subtitle = one spoken sentence, at most two subtitle lines.
+// A chapter's name is the question it answers, cut short enough for the control bar (outline.md, chapter chain).
 // A beat's index inside its scene is the `step` that data-at / data-to and HOOK.<scene>(step) see.
 // W('...') is a beat the lesson stops after until the viewer presses a [data-go] button.
+// D('direction', beat) tells the voice how to read that beat, in one English line: a stance toward the listener,
+// then where the reading changes inside this sentence. Write them once the words are final (authoring.md, Directions).
 // Numbers come from data.js: write `${V.key}`, never retype a value.
 const SCRIPT = [
-  {ch: 'Start', scenes: [
+  {ch: 'TODO the question', scenes: [
     ['intro', [
       'TODO the concrete situation and what we are trying to do.',
-      'TODO why the obvious approach leaves a question unresolved.',
+      D('TODO how this turn should sound, e.g. curious, like posing a puzzle to a friend; slower on the contrast',
+        'TODO why the obvious approach leaves a question unresolved.'),
       'TODO the question this lesson will answer, and its answer in one line.',
     ]],
   ]},
-  {ch: '1 TODO chapter name', scenes: [
+  {ch: 'TODO what that leaves', scenes: [
     ['context', [
       'TODO what this example or experiment is meant to find out, connected to the opening question.',
       'TODO what we will change or compare, and what stays fixed.',
