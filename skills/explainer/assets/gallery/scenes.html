@@ -1,0 +1,226 @@
+<!-- A scene is 1280x600 with 64px side padding: 1152px of usable width. Blocks are .layer boxes placed with top:…px;
+     data-at="N" shows a block from beat N of its scene on, data-to="M" hides it after beat M. -->
+
+<!-- ============ Start ============ -->
+<section class="scene" id="intro">
+  <div class="kick">explainer · pattern gallery</div>
+  <h1>Scene patterns<br>for three domains</h1>
+  <div class="lead">One pattern per scene: markup here, beats in script.js, behaviour in hooks.js.</div>
+  <ol class="road layer" style="top:330px" data-at="1">
+    <li><b>Chapter 1 · Finance</b>split bar, worked table, quiz, hurdle bars, live model</li>
+    <li><b>Chapter 2 · RL</b>update rule, value grid with a prediction, learning curve</li>
+    <li><b>Chapter 3 · Distributed systems</b>message lanes, replicated log with a decision, state machine</li>
+  </ol>
+  <div class="layer small" style="top:500px" data-at="2">Every number on screen is computed in data.js from the inputs typed there.<span class="tag">all examples are made up for this gallery</span></div>
+</section>
+
+<!-- ============ Finance ============ -->
+<!-- pattern: one quantity split into parts, then the term-level formula -->
+<section class="scene" id="fsplit">
+  <h2>What is the price paying for?</h2>
+  <div class="small">Pattern: one bar split into parts, then the formula in terms</div>
+  <div class="layer" style="top:130px">
+    <div class="split" id="fbar"></div>
+    <div class="small" style="margin-top:8px">one price: <span data-v="price"></span></div>
+  </div>
+  <div class="fx layer" style="top:256px" data-at="1"><span class="chipx">price</span><span class="op">=</span><span class="chipx">steady-state value</span><span class="op">+</span><span class="chipx hl">PVGO</span></div>
+  <div class="row layer" style="top:346px">
+    <div class="tile" data-at="2"><div class="l">steady-state value = NOPAT ÷ cost of capital = <span data-v="steadyHow"></span></div><div class="v" data-v="steady"></div><div class="l">what today's profit is worth if it never changes</div></div>
+    <div class="tile hl" data-at="3"><div class="l">PVGO = price − steady-state value = <span data-v="pvgoHow"></span></div><div class="v" data-v="pvgo"></div><div class="l">the part that is a bet on future investments</div></div>
+  </div>
+</section>
+
+<!-- pattern: worked table, one row per beat, arithmetic shown in the row -->
+<section class="scene" id="ftable">
+  <h2>ROIC, one row at a time</h2>
+  <div class="small">Pattern: worked table. Each beat adds a row and lights it</div>
+  <div class="layer" style="top:124px">
+    <table id="ftab"><thead><tr><th>Line</th><th style="text-align:left">How it is computed</th><th>Value</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="layer" style="top:462px" data-at="4">
+    <div class="fx" style="font-size:24px"><span class="chipx hl">ROIC <span data-v="roic"></span></span><span class="op">−</span><span class="chipx">cost of capital <span data-v="wacc"></span></span><span class="op">=</span><span>a spread of <span data-v="spread"></span></span></div>
+  </div>
+</section>
+
+<!-- pattern: you compute it. A wait beat, an input checked against a target, a button that goes on -->
+<section class="scene" id="fquiz">
+  <h2>You compute it</h2>
+  <div class="small">Pattern: wait beat + input check + "show the answer"</div>
+  <div class="row layer" style="top:124px">
+    <div class="tile"><div class="v" data-v="nopat"></div><div class="l">NOPAT, unchanged</div></div>
+    <div class="tile"><div class="v" data-v="quizCapital"></div><div class="l">Invested capital, this time</div></div>
+  </div>
+  <div class="layer" style="top:300px;font-size:22px" data-at="0" data-to="0">
+    <div>ROIC = <input class="inp" id="fq" inputmode="decimal" placeholder="? %"><span class="fb" id="ffb"></span></div>
+    <div style="margin-top:22px"><button class="btn" data-go>Show the answer</button></div>
+  </div>
+  <div class="layer" style="top:300px" data-at="1">
+    <div class="fx" style="font-size:26px"><span>ROIC</span><span class="op">=</span><span data-v="quizHow"></span><span class="op">=</span><span class="chipx hl" data-v="quizRoic"></span></div>
+    <div class="card" style="margin-top:22px">Same profit, more capital tied up: the return on each unit of capital is lower.</div>
+  </div>
+</section>
+
+<!-- pattern: bars against a hurdle line -->
+<section class="scene" id="fbars">
+  <h2>Same profit, more capital</h2>
+  <div class="small">Pattern: horizontal bars, a hurdle mark, one bar singled out</div>
+  <div class="layer" style="top:130px" id="fbarsbox"></div>
+  <div class="legend layer" style="top:322px" data-at="1"><span><span class="sw" style="background:var(--ink);width:3px"></span>cost of capital <span data-v="wacc"></span></span></div>
+  <div class="layer" style="top:384px" data-at="2">
+    <div class="card"><div class="t">ROIC = cost of capital</div>The extra capital earns exactly what it costs. The company is larger; its owners are no richer.</div>
+  </div>
+</section>
+
+<!-- pattern: predict, change one parameter, observe a result from the same pure model -->
+<section class="scene" id="fmodel">
+  <h2>What if the same profit needs more capital?</h2>
+  <div class="small">NOPAT stays fixed at <span data-v="nopat"></span><span class="tag">illustrative model</span></div>
+  <div class="row layer" style="top:130px" data-at="0" data-to="0">
+    <div class="tile"><div class="v" data-v="modelCapital"></div><div class="l">Invested capital at baseline</div></div>
+    <div class="tile"><div class="v" data-v="modelRoic"></div><div class="l">ROIC at baseline</div></div>
+  </div>
+  <div class="layer" style="top:310px" data-at="0" data-to="0">
+    <div class="p">Predict: more capital, same profit — higher or lower ROIC?</div>
+    <button class="btn" data-go style="margin-top:20px">Try your prediction</button>
+  </div>
+  <div class="layer" style="top:130px" data-at="1" data-to="1">
+    <label for="capital-input" style="font-size:22px">Invested capital: <output id="capital-value" for="capital-input"></output></label>
+    <div style="display:flex;align-items:center;gap:24px;margin-top:16px">
+      <input id="capital-input" type="range" style="width:700px;accent-color:var(--g)">
+      <button class="btn" id="capital-reset">Reset baseline</button>
+    </div>
+    <div class="hb" style="margin-top:32px">
+      <div>ROIC</div><div class="trk"><div class="f g" id="capital-bar"></div><i class="mark" id="capital-mark"></i></div><div class="val" id="capital-roic"></div>
+    </div>
+    <div class="legend" style="margin-top:18px">White line: cost of capital <span data-v="wacc"></span></div>
+    <p class="p" id="capital-result" aria-live="polite"></p>
+    <button class="btn" data-go>What stays fixed?</button>
+  </div>
+  <div class="layer card" style="top:130px" data-at="2">
+    <div class="t">ROIC = NOPAT ÷ invested capital</div>
+    More capital for the same profit lowers the return. Only the denominator changes here.
+    <p>Real investment may also change profit; this model holds it fixed.</p>
+  </div>
+</section>
+
+<!-- ============ RL ============ -->
+<!-- pattern: plain-words rule first, the equation after, then the numbers through it -->
+<section class="scene" id="rleq">
+  <h2>How should one step change the estimate?</h2>
+  <div class="small">Pattern: the rule in words, then the equation (MathML), then one substitution</div>
+  <div class="fx layer" style="top:126px;font-size:23px" data-at="1"><span class="chipx">new estimate</span><span class="op">=</span><span class="chipx">old estimate</span><span class="op">+</span><span class="chipx">step size</span><span class="op">×</span><span class="op">(</span><span class="chipx hl">target</span><span class="op">−</span><span class="chipx">old estimate</span><span class="op">)</span></div>
+  <div class="layer" style="top:214px" data-at="1">
+    <math display="block"><mrow>
+      <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>←</mo>
+      <mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>+</mo><mi>α</mi><mo>[</mo>
+      <mrow id="rltarget"><mi>r</mi><mo>+</mo><mi>γ</mi><munder><mi>max</mi><mi>a′</mi></munder><mi>Q</mi><mo>(</mo><mi>s′</mi><mo>,</mo><mi>a′</mi><mo>)</mo></mrow>
+      <mo>−</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo>,</mo><mi>a</mi><mo>)</mo><mo>]</mo>
+    </mrow></math>
+  </div>
+  <div class="layer small" style="top:316px" data-at="2">One step, with <span data-v="tdGiven"></span></div>
+  <div class="row layer" style="top:352px">
+    <div class="tile hl" data-at="2"><div class="l">target = r + γ × best next Q</div><div class="v" style="font-size:30px" data-v="tdTarget"></div></div>
+    <div class="tile" data-at="3"><div class="l">TD error = target − old estimate</div><div class="v" style="font-size:30px" data-v="tdError"></div></div>
+    <div class="tile" data-at="3"><div class="l">new Q = old + α × TD error</div><div class="v" style="font-size:30px" data-v="tdNew"></div></div>
+  </div>
+</section>
+
+<!-- pattern: a grid of states whose values are recomputed per beat; a prediction before the reveal -->
+<section class="scene" id="rlgrid">
+  <h2>Value spreads one cell per sweep</h2>
+  <div class="small">Pattern: state grid driven by data, with a stop-and-predict beat</div>
+  <div class="layer" style="top:126px;right:auto;width:600px">
+    <div class="grid" id="ggrid"></div>
+    <div class="small" style="margin-top:10px" id="gk"></div>
+  </div>
+  <div class="layer card" style="top:126px;left:704px"><div class="t">One sweep</div>Every cell takes the best of its four neighbours: reward on arrival, plus <span data-v="gamma"></span> times that neighbour's current value.</div>
+  <!-- two blocks that take turns in the same place are two layers with the same top -->
+  <div class="layer card" style="top:300px;left:704px" data-at="1" data-to="1"><div class="t">Predict first</div>Which cells are no longer zero after the first sweep?<div style="margin-top:12px"><button class="btn" data-go>Show the sweep</button></div></div>
+  <div class="layer card" style="top:300px;left:704px" data-at="4"><div class="t">Converged after <span data-v="sweepCount"></span> sweeps</div>The arrows point at each cell's best neighbour. From the bottom-left start the path is <span data-v="shortest"></span> steps.</div>
+</section>
+
+<!-- pattern: a curve drawn from computed data, extended beat by beat, with a reference line -->
+<section class="scene" id="rlcurve">
+  <h2>Learning by trying</h2>
+  <div class="small">Pattern: line chart built in SVG from data.js, revealed in stages · Q-learning, <span data-v="qlSetup"></span></div>
+  <div class="layer" style="top:130px"><svg id="qsvg" width="1152" height="400" viewBox="0 0 1152 400"></svg></div>
+  <div class="legend layer" style="top:542px"><span><span class="sw n"></span>steps in one episode</span><span><span class="sw g"></span>trailing average</span><span data-at="2"><span class="sw m"></span>shortest possible path</span></div>
+</section>
+
+<!-- ============ Distributed systems ============ -->
+<!-- pattern: one lane per node, time left to right, a message per beat -->
+<section class="scene" id="dslanes">
+  <h2>An election, message by message</h2>
+  <div class="small">Pattern: lanes and arrows in inline SVG; each &lt;g data-at&gt; is one event</div>
+  <div class="layer" style="top:130px">
+    <svg width="1152" height="440" viewBox="0 0 1152 440">
+      <line class="ln" x1="120" y1="90" x2="1130" y2="90"/><line class="ln" x1="120" y1="230" x2="1130" y2="230"/><line class="ln" x1="120" y1="370" x2="1130" y2="370"/>
+      <rect class="node" id="na" x="20" y="66" width="76" height="48" rx="10"/><text class="ink" x="58" y="97" text-anchor="middle">A</text>
+      <rect class="node" x="20" y="206" width="76" height="48" rx="10"/><text class="ink" x="58" y="237" text-anchor="middle">B</text>
+      <rect class="node" x="20" y="346" width="76" height="48" rx="10"/><text class="ink" x="58" y="377" text-anchor="middle">C</text>
+      <text id="sa" x="120" y="122"></text><text id="sb" x="120" y="262"></text><text id="sc" x="120" y="402"></text>
+      <g data-at="1"><circle class="dot m" cx="330" cy="90" r="8"/><text x="330" y="62" text-anchor="middle">election timeout</text></g>
+      <g data-at="2">
+        <line class="msg" x1="370" y1="90" x2="500" y2="224"/><text x="462" y="150">RequestVote</text>
+        <line class="msg lost" x1="370" y1="90" x2="470" y2="300"/><text class="dim" x="482" y="312">✕ lost</text>
+      </g>
+      <g data-at="3">
+        <line class="msg m" x1="560" y1="230" x2="684" y2="100"/><text x="640" y="190">vote granted</text>
+        <circle class="dot m" cx="690" cy="90" r="8"/><text x="690" y="62" text-anchor="middle">2 of 3 votes</text>
+      </g>
+      <g data-at="4">
+        <line class="msg" x1="800" y1="90" x2="900" y2="224"/><line class="msg" x1="800" y1="90" x2="960" y2="364"/><text x="930" y="150">heartbeat</text>
+      </g>
+      <text class="dim" x="1130" y="424" text-anchor="end">time →</text>
+    </svg>
+  </div>
+</section>
+
+<!-- pattern: per-node state rows rebuilt per beat from a list of states; a decision before the reveal -->
+<section class="scene" id="dslog">
+  <h2>When is an entry committed?</h2>
+  <div class="small">Pattern: one row of cells per node, rebuilt from data per beat, with a choice to make</div>
+  <div class="layer" style="top:126px;right:auto;width:680px">
+    <div class="grid" id="lgrid" style="grid-template-columns:70px repeat(5,1fr)"></div>
+    <div class="legend" style="margin-top:14px"><span><span class="sw g"></span>committed</span><span><span class="sw" style="background:var(--ink)"></span>written, not committed</span></div>
+  </div>
+  <div class="layer tile" style="top:126px;left:784px"><div class="l">commit index</div><div class="v" id="lci"></div><div class="l" id="lwhy"></div></div>
+  <div class="layer" style="top:290px;left:784px">
+    <div class="card" data-at="2" data-to="2"><div class="t">Decide</div>Is entry 3 committed?
+      <div style="margin-top:12px;display:flex;gap:10px"><button class="btn" id="lyes">Committed</button><button class="btn" id="lno">Not yet</button></div>
+      <div class="small" style="margin-top:10px;min-height:22px" id="lfb"></div>
+      <div style="margin-top:8px"><button class="btn" data-go>Continue</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- pattern: state machine, the current state lit per beat, transitions revealed as they are named -->
+<section class="scene" id="dsstate">
+  <h2>One node, three states</h2>
+  <div class="small">Pattern: state machine in SVG; hooks.js lights the current state</div>
+  <div class="layer" style="top:130px">
+    <svg width="1152" height="420" viewBox="0 0 1152 420">
+      <rect class="node" id="stf" x="60" y="110" width="220" height="84" rx="14"/><text class="ink" x="170" y="160" text-anchor="middle" style="font-size:24px">Follower</text>
+      <rect class="node" id="stc" x="466" y="110" width="220" height="84" rx="14"/><text class="ink" x="576" y="160" text-anchor="middle" style="font-size:24px">Candidate</text>
+      <rect class="node" id="stl" x="872" y="110" width="220" height="84" rx="14"/><text class="ink" x="982" y="160" text-anchor="middle" style="font-size:24px">Leader</text>
+      <g data-at="1"><line class="arc" x1="286" y1="152" x2="460" y2="152"/><text x="373" y="136" text-anchor="middle">election timeout</text></g>
+      <g data-at="2"><line class="arc" x1="692" y1="152" x2="866" y2="152"/><text x="779" y="136" text-anchor="middle">majority of votes</text></g>
+      <g data-at="3">
+        <path class="arc" d="M576,200 C576,270 190,270 190,202"/><text x="383" y="282" text-anchor="middle">sees a higher term</text>
+        <path class="arc" d="M982,200 C982,400 130,400 130,202"/><text x="556" y="384" text-anchor="middle">sees a higher term</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ Close ============ -->
+<section class="scene" id="end">
+  <h2>What carries over</h2>
+  <div class="small">Pattern: three takeaways, then a way back to the start</div>
+  <div class="row layer" style="top:130px">
+    <div class="card" data-at="0"><div class="t">Question, then term</div>Ask it the way a newcomer would. Name the concept once they want the answer.</div>
+    <div class="card" data-at="1"><div class="t">One scene, one idea</div>Every beat reveals, moves or marks something. No sentence plays over a still screen.</div>
+    <div class="card" data-at="2"><div class="t">Commit, then reveal</div>A prediction or a computation the viewer makes first is what they remember.</div>
+  </div>
+  <div class="layer" style="top:440px" data-at="2"><button class="btn" data-restart>Watch again</button></div>
+</section>

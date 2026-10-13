@@ -1,0 +1,50 @@
+<!-- One <section class="scene" id="..."> per scene named in script.js. The scene is 1280x600 with 64px side padding.
+     Place blocks with class="layer" style="top:…px"; data-at="N" shows from beat N of the scene, data-to="M" hides after M.
+     Patterns to copy from: `lesson.py init DIR --gallery`, indexed in references/patterns.md. -->
+
+<section class="scene" id="intro">
+  <div class="kick">TODO series or source</div>
+  <h1>TODO title</h1>
+  <div class="lead">TODO the concrete situation</div>
+  <div class="layer card" style="top:280px" data-at="1">TODO what the obvious approach cannot tell us</div>
+  <div class="layer card" style="top:410px" data-at="2">TODO the question and why answering it matters</div>
+</section>
+
+<!-- Reuse this bridge for a new setup; merge into a shorter transition when context is already established. -->
+<section class="scene" id="context">
+  <h2>TODO what are we trying to find out?</h2>
+  <div class="layer card" style="top:130px">TODO purpose, connected to the opening problem</div>
+  <div class="layer card" style="top:260px" data-at="1">TODO show what changes and what stays fixed</div>
+  <div class="layer card" style="top:390px" data-at="2">TODO show what we will observe and how to interpret it</div>
+</section>
+
+<section class="scene" id="worked">
+  <h2>TODO the question, not the term</h2>
+  <div class="row layer" style="top:130px">
+    <div class="tile" data-at="1"><div class="v" data-v="a"></div><div class="l">TODO first input</div></div>
+    <div class="tile" data-at="2"><div class="v" data-v="b"></div><div class="l">TODO second input</div></div>
+    <div class="tile hl" data-at="3"><div class="v" data-v="ratio"></div><div class="l">TODO result</div></div>
+  </div>
+  <div class="layer small" style="top:300px" id="note"></div>
+</section>
+
+<section class="scene" id="compute">
+  <h2>TODO you compute it</h2>
+  <div class="layer" style="top:130px;font-size:22px" data-at="0" data-to="0">
+    <div>TODO result = <input class="inp" id="q1" inputmode="decimal" placeholder="? %"><span class="fb" id="q1fb"></span></div>
+    <div style="margin-top:22px"><button class="btn" data-go>Show the answer</button></div>
+  </div>
+  <div class="layer" style="top:130px" data-at="1">
+    <div class="fx"><span data-v="a"></span><span class="op">÷</span><span data-v="quizB"></span><span class="op">=</span><span class="chipx hl" data-v="quizAnswer"></span></div>
+  </div>
+</section>
+
+<section class="scene" id="end">
+  <h2>TODO what to keep</h2>
+  <div class="row layer" style="top:130px">
+    <div class="card" data-at="0"><div class="t">TODO</div>TODO</div>
+    <div class="card" data-at="1"><div class="t">TODO</div>TODO</div>
+    <div class="card" data-at="2"><div class="t">TODO</div>TODO</div>
+  </div>
+  <div class="layer" style="top:440px" data-at="2"><button class="btn" data-restart>Watch again</button></div>
+</section>
