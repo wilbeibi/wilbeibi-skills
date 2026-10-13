@@ -10,14 +10,16 @@ the learner knows Bellman backups, and whether they want to trace an update or i
 questionnaire about every possible preference. Once needed answers arrive, fill in `outline.md` (`init` leaves the
 skeleton) before writing any beat:
 
-- **The viewer:** who they are, what they already hold and where they got it (an earlier lesson in the series, their
-  job), and what starts from zero for them.
+- **The viewer:** who they are, what they can already explain or use, and the evidence for that starting point.
+  Separate confirmed knowledge, mere familiarity with a term, and assumptions about their background.
+  Reuse the user's context; ask only when an uncertain prerequisite would change the explanation.
 - **The opening problem**, and **the point in one line**: the answer the lesson arrives at.
 - What they can do afterward; focus, exclusions, length/depth, language and narration when established.
 - **The scene map**, one row per scene:
   `scene | question | raised by | likely misconception | visual action or prediction | source`.
   `question` is what the viewer is wondering as the scene starts, in their words. `raised by` is the earlier scene,
-  or `opening`, that left them wondering it.
+  or `opening`, that left them wondering it. Check what the viewer can infer at that point, not just which terms
+  have appeared. Note a missing prerequisite where the scene needs it, before introducing its details.
 
 Use page, section, figure, or notebook-cell locators. Mark invented examples and derived results in the scene map.
 The outline is an authoring aid, not a second copy of the subtitles or a new player input. Its questions become the
@@ -36,7 +38,9 @@ thinking jumps".
   author and a chapter list give none of this. (Failure: an opening that named the paper and listed its six chapters.)
 - **A chain of questions, not a table of contents.** Every scene answers a question the viewer already has, because
   the opening or an earlier scene raised it: that is the `raised by` cell. If nothing raised it, add the beat that
-  does to the end of the scene before, move the scene, or cut it. An opening that only works as a list item gives
+  establishes the missing uncertainty, move the scene, or cut it. Merely appending a question to announce the next
+  topic does not establish a need. Check whether the viewer could ask it before seeing that announcement.
+  An opening that only works as a list item gives
   the gap away: "另一个模型是…", "还有一种…", "最后是…", "the paper then turns to…".
 - **Open from what they hold.** A scene's first beat is the question in the viewer's words, the belief about to be
   corrected, or the last result turned into a question. Never a term, a model's name or a figure. Its last beat says
@@ -52,11 +56,16 @@ thinking jumps".
 - **One name, one meaning.** A term keeps its name, a roadmap keeps its wording, and a word the viewer already holds
   keeps the sense they hold it in. (Failures: CLV became LTV without a word; "value creation" meant price minus cost
   to a viewer who held it as ROIC minus WACC.)
-- **What they already hold costs a clause.** Recall it by where they met it ("ROIC 那课里的 steady-state value") and
-  move on. (Failure: a scene re-deriving the steady-state value / PVGO split for a viewer the brief said had finished
-  that lesson.)
+- **Recall what they understand; bridge what they only recognize.** A known concept costs a clause, not a new lesson.
+  Having read a lesson, seen a symbol, or heard a term is not proof that the viewer can use it here.
+  Supply the missing relation before relying on it. (Failures: re-teaching a familiar steady-state value / PVGO split;
+  mentioning amortization once, then assuming the viewer understands capitalization.)
 - **One step per beat, and none left out.** A figure the viewer cannot rebuild from what was said reads as a mistake.
   (Failure: "扣 $500 的 CAC，剩 $2,838" straight after $3,486; the new customer's own $3,338 was never said.)
+  Before using an input, establish what it measures, what it includes, and whether it is reported, assumed, or estimated.
+  If reconstructing it is outside scope, explain its basis and point to the source method. Correct arithmetic cannot
+  explain an unexplained input. (Failure: a Microsoft investment total appeared before its intangible component's
+  estimation basis; the viewer could subtract the numbers but could not assess them.)
 - **Close what you open.** The closing scene answers the opening's question in the opening's words. An opening case
   comes back; a quiz, a real company's number and a "we will return to this" each get their verdict. (Failures: a
   Blockbuster opening never mentioned again; "哪条路更持久？" followed by a scene on government policy.)
@@ -99,9 +108,13 @@ when it introduces a new layout or interaction risk.
   A worked example illustrates a step of the argument; it is never the lesson. (Failures: a "Netflix walkthrough"
   delivered when the request was the paper; a lesson that announced "这一课按论文的顺序走" and became a list; three
   scenes on market size and the adoption curve, after which the valuation took its customer count as a bare figure.)
+  A source without a continuous case does not need an invented one. Follow its argument using local examples,
+  contrasts, diagrams, or stepwise reasoning. Add an illustrative case only when it resolves a specific difficulty
+  within the user's scope, and label its assumptions; it supplies no evidence for the source's claims.
 - **Opening:** the concrete situation, why the obvious approach is insufficient, the question to resolve, and the
   answer in one line. Take the question from the source when it states one. A roadmap comes after these, if at all.
-- **One scene per complete idea.** If a scene needs more than about five beats, it holds two ideas.
+- **One scene per complete idea.** Split where the viewer's question changes. A longer calculation may need several
+  beats to make each inference visible; do not compress away those steps to meet a beat quota.
 - **Closing scene:** three takeaways, the first answering the opening's question, a restart button, and what to do
   next. No new material.
 - 40–110 beats has worked for full lessons (about 6–20 minutes narrated); use the agreed scope, not a minimum quota.
@@ -110,7 +123,8 @@ when it introduces a new layout or interaction risk.
 
 - **Plain question first, term second.** "How much of the price is a bet?" before "PVGO".
   Scene headings are questions the scene answers.
-- **Every abstract claim gets a number or a worked case** within the same scene.
+- **Make the missing relation visible.** Use the source's example, a contrast, a diagram, or a worked step that answers
+  the viewer's current question. A number or invented case is not required for every abstract claim.
 - **Every beat changes the screen**: a reveal, a highlight, a new row. `check` warns when one does not.
 - **Do not put the narration on screen twice.** The subtitle carries the sentence; the scene carries the structure
   (the table, the grid, the formula with one part lit).

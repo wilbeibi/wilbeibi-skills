@@ -24,6 +24,9 @@ After you read it:
 - **known**: anything explained at length that you already knew.
 
 Do not be generous. A page that is clear in itself still fails `met` when nothing before it made you want it.
+An announced transition is not proof you wanted that topic. Say when an ending question merely schedules the next page,
+or when you recognized a term but could not explain the relation the next page assumes. For a calculation, name any
+input whose meaning or estimation basis you cannot trace; do not mistake successful subtraction for understanding.
 Judge the order and the bridges, not the facts: you cannot check those.
 
 Report one row per page (`page | first words | want | met | lost | known`), then the five seams that lost you most,
@@ -33,7 +36,8 @@ and whether the end answered the question the opening raised.
 
 Read the report as measurements, not as a reviewer to argue with.
 
-- **`no`** is a scene nothing asked for. Add the beat that raises its question to the scene before, move it, or cut it.
+- **`no`** is a scene nothing asked for. Establish the missing uncertainty in the preceding reasoning, move it, or cut it.
+  Adding an announcement in question form is not a repair.
 - **The five seams** and **whatever the end left unanswered** are fixed before anything is drawn or voiced.
 - **`lost`** is triaged, not counted. A reader quotes something on almost every page, in a sound lesson too; most are
   one-beat fixes: a term never defined, a step left out, a name that changed, a reference to something not shown.

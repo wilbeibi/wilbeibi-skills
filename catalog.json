@@ -109,7 +109,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "9006f2569425eef07782f8d598fa4104c8f5c06192a7688b0bf4aaef23718e8f",
+          "sha256": "133603937c3647c9032ba79a7810a6c75134536706923ed48812de1304de48e2",
           "executable": false
         },
         {
@@ -159,7 +159,7 @@
         },
         {
           "path": "assets/starter/outline.md",
-          "sha256": "44d3cef6f237acffec364c10527fbad509dde595680fe739bb105348984bab1f",
+          "sha256": "7f2ee3c3f2672e8ef38c5fe7194204423ac32d304a2c345554a42be29777c6f8",
           "executable": false
         },
         {
@@ -179,12 +179,12 @@
         },
         {
           "path": "references/authoring.md",
-          "sha256": "d833b8c47ab8f34d6c9a4f24273245af419a8002f280edb2db4f54cc071e9d0c",
+          "sha256": "07354f0ea0e78c6158086b12d63e24d571c0985c32c876f67e7a06183065c53c",
           "executable": false
         },
         {
           "path": "references/cold-read.md",
-          "sha256": "24c862fe4ad1482e36ed3259286c2d4241407723cf030b0e63ac4d5845138149",
+          "sha256": "09c75d6595935dff095719eae78cd24b8702926665f21bcfa667853a2ed40cc7",
           "executable": false
         },
         {
