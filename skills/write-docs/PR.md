@@ -17,7 +17,7 @@ Read the complete diff and verification output before drafting. Use **natural** 
 
 1. **Problem** — what was wrong or missing, stated so it's understandable without the diff. If a reader can't tell why anyone would want this, nothing else in the message matters.
 2. **Approach** — what you did and, when a reasonable person would have done something else, why not that.
-3. **Consequences** — what changes for callers: behavior, performance, API surface, migration burden. Include what got worse.
+3. **Consequences** — what changes for callers: behavior, performance, API surface, migration burden. Include what got worse, with the change as its subject: “this drops X”, not “X is no longer supported”.
 
 ## Evidence, not adjectives
 

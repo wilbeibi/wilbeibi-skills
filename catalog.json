@@ -688,7 +688,7 @@
         },
         {
           "path": "CLARITY-REFERENCE.md",
-          "sha256": "66cba372af3086fec15819c22b2a61f72cf3dd2bef5f8ed54ca57617096d0e0a",
+          "sha256": "0630b3434484dc5b9ee279382ce1a793a6b538f32037fb358ce74b9891c742e2",
           "executable": false
         },
         {
@@ -708,7 +708,7 @@
         },
         {
           "path": "PR.md",
-          "sha256": "1139ac87f3c266b8671c0122311793ffc91a0ab154b9bb957a02c00f83b5175c",
+          "sha256": "12eb7faed2a67af5ed33af3a244daaa0d876422d8abf9a2051f58d3b49cc30b3",
           "executable": false
         },
         {
@@ -723,17 +723,17 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "47628eadb76fe285aad865260473ae417f769f8269b81327a4237634d416e7fd",
+          "sha256": "faa3161e2b11929dcf8c19ad50d762e4fee52102fd960331e600648b87479b64",
           "executable": false
         },
         {
           "path": "scripts/prose_lint.py",
-          "sha256": "421d0dac5362388e26b7e8c3e2933b6015e5dd3aa375174f4f68c1749065d0e1",
+          "sha256": "d6b876e563c0b8f0661bf4b29cdae5e85c46b02376bd27468ce3224869a1c8d3",
           "executable": false
         },
         {
           "path": "scripts/test_prose_lint.py",
-          "sha256": "2a864cff49f5ed03811f61145ad2b7cb9c130d082f5d5fbe3ec475934a187ae2",
+          "sha256": "04a5726bcfc9f7002c307372fb8f232ef0a14ccf19ccc0146d677515dbf66a5f",
           "executable": false
         }
       ]

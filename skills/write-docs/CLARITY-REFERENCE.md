@@ -32,6 +32,17 @@ Developer prose also needs voice and flow. Google's developer documentation guid
 
 Thus, strict rules apply to actions and safety. Natural prose keeps the same terminology and factual discipline without a controlled vocabulary or mechanical cadence.
 
+## What Williams adds
+
+Williams & Bizup, *Style: Lessons in Clarity and Grace*, supplies the reader-side rules that STE's sentence mechanics do not:
+
+- find the character and action in the first seven or eight words; an abstract noun as subject or a late verb means a nominalization hides them (Lessons 3 and 4);
+- open a sentence on known information and end it on the new term, and let that outrank active voice (Lessons 5 and 6);
+- cut redundant modifiers, wordy phrases, announcing metadiscourse, and intensifiers; one hedge is honest and a stack is mealy-mouthed (Lesson 9);
+- get to the main clause fast; a long introductory clause moves or splits (Lesson 10).
+
+These target the four habits of model-written prose: abstraction, long sentences and openings, quality adjectives, and hedging. Its paragraph-framing lesson is not repeated here, because each artifact file already orders its content for its reader. The book's own caveat keeps every derived check at review severity: applied as dogma, the rules produce dry prose. The quoted tests live in `skills/blog-review/references/REFERENCE.md`.
+
 ## What this skill rejects
 
 - The approximately 900-word STE dictionary: software needs precise domain terms and identifiers.
@@ -39,5 +50,6 @@ Thus, strict rules apply to actions and safety. Natural prose keeps the same ter
 - Global bans on contractions, semicolons, phrasal verbs, or passive voice.
 - American spelling when the project has a different house style.
 - A composite “slop score”: weighted surface features do not measure truth, completeness, or comprehension.
+- Williams' elegance lessons, punctuation as rhetoric, and hedge or intensifier counts: developer docs need the reader to act, not to admire the sentence.
 
 The checker was inspired by the experiment kit for [“The cure for AI slop is a 1986 aircraft manual”](https://github.com/woosal1337/blog/tree/main/videos/ep01-the-cure-for-ai-slop), but is an independent implementation. The upstream experiment is useful directional evidence, not a quality benchmark: it tests six tasks and scores outputs with rules that overlap the intervention.
