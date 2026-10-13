@@ -63,7 +63,7 @@ row in the scene map says what it leaves out.
 | script | `lesson.py say DIR` | every beat has its direction, `D('direction', beat)`, written by the rules in `references/authoring.md`; the preview reads right aloud in sequence and no `warn speech` or `warn delivery` line is left; fix pronunciation in `speak.yaml` and delivery in the direction, not by editing subtitles |
 | voice | `lesson.py synth DIR 1-3`, then `synth DIR changed` | clips exist; only changed beats are re-synthesized |
 | ears | `asr.py DIR`, `asr.py DIR --years`, then `say DIR` | you listened to every `LISTEN`, `NUMBER`, `YEAR` and `warn pace` beat; resynthesize what is actually wrong, `--accept` the rest |
-| final | `lesson.py mix DIR`, then `check DIR` | narrated `CHECK OK`; hand over `out/<slug>.html` + `out/<slug>-narration.mp3` together |
+| final | `lesson.py mix DIR`, then `check DIR` | narrated `CHECK OK`; hand over `out/<slug>.html` alone: the narration is embedded in it (see Publish) |
 
 Narration is optional: a silent lesson stops after the numbers gate. Ask before the voice gate if no TTS key or budget
 is established; it is a paid API call. `say` and `synth` print the estimated minutes of sound and, with `price_audio`
@@ -76,6 +76,23 @@ watching or sending as a single file. Nothing can be clicked in a film: each pau
 then answers itself. Run it after the final gate, and only when a video file is wanted; the HTML stays the lesson.
 A 14-minute lesson took under 5 minutes on 4 cores, because a frame is photographed only when the stage changed.
 If the film stands still where the page moves, rerun with `--every-frame`; `--scale 1.5` gives 1920×1080.
+
+## Publish
+
+The deliverable is one file. `build` and `mix` write the MP3 into the page as a `data:` URI, so `out/<slug>.html`
+plays, seeks and subtitles on its own (a 12 MB narration makes a 16.6 MB page that opened in 2 s from disk).
+The page header names the lesson directory it was built from: that directory is what gets edited, never the page.
+Do not run SingleFile or monolith on it; there is nothing external left to inline.
+
+```
+r2 pri -f out/<slug>.html            # p.wilbeibi.com/<slug>.html, flat, same URL on every re-upload
+r2 link <slug>.html --ttl <days>     # off-tailnet: the one link carries the whole lesson
+r2 pri -f out/<slug>.mp4             # only when a film was asked for; it is a separate format, not a companion
+```
+
+`--no-embed` on `build`, `check` or `mix` restores the two-file output (`<slug>.html` + `<slug>-narration.mp3` beside
+it) for a host that cannot take a 16 MB page. Experiments and comparisons go under `experiments/<name>-YYYYMMDD/`
+with an `index.html` opened by its full path: the gateway has no directory index.
 
 ## Lesson directory
 
@@ -92,7 +109,7 @@ speak.yaml    model, voice, say[[from, to]], rules, price_audio, pause, pause_af
               (the MiniMax fallback, assets/speak-minimax.yaml: speed_default, speed{beat: rate}, price)
 source.txt, numbers.allow                       inputs to the numbers gate
 asr-accept.json                                 transcripts you listened to and accepted (`asr.py --accept`)
-clips/ narration.json out/ shots/ thread/ asr.json   generated
+clips/ narration.json out/ shots/ thread/ asr.json   generated; out/<slug>.html is the deliverable, out/<slug>-narration.mp3 its input
 ```
 
 ## Hard rules

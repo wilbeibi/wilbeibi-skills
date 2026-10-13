@@ -115,8 +115,14 @@ def main() -> int:
             expect(r.returncode == 0, "fake clips are written", r.stdout + r.stderr)
             r = lesson("mix", str(gallery))
             narrated = page.read_bytes()
-            expect(r.returncode == 0 and b'"audio": "explainer-gallery-narration.mp3"' in narrated, "mix builds a narrated page",
+            expect(r.returncode == 0 and b'"audio": "data:audio/mpeg;base64,' in narrated, "mix builds a narrated page with the MP3 embedded",
                    r.stdout + r.stderr)
+            r = lesson("build", str(gallery), "--no-embed")
+            expect(r.returncode == 0 and b'"audio": "explainer-gallery-narration.mp3"' in page.read_bytes(),
+                   "--no-embed references the MP3 beside the page", r.stdout + r.stderr)
+            r = lesson("build", str(gallery))
+            narrated = page.read_bytes()
+            expect(r.returncode == 0 and narrated.count(b"data:audio/mpeg;base64,") == 1, "a plain build embeds again", r.stdout + r.stderr)
             for gate in (("shots", str(gallery), "1"), ("numbers", str(gallery))):
                 r = lesson(*gate)
                 expect(page.read_bytes() == narrated, f"{gate[0]} leaves the narrated page as it was", r.stdout + r.stderr)

@@ -109,7 +109,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "69c25b5aa5d0c437a67cdd820c6fea70d96dd0814ee6188905400f946a538f2b",
+          "sha256": "9cc80a6ebc5c278fbeffea01919eb2a863c559d6d0d5e36857a55a542b5b7c8e",
           "executable": false
         },
         {
@@ -139,7 +139,7 @@
         },
         {
           "path": "assets/player.html",
-          "sha256": "18df7110786a2622ca11abb966285015ea6cd4f7390757117919daa250b2013c",
+          "sha256": "7b1d9d9f7dd73e2a2b2622f4b382302e5981a17d0fbdacd3f8f5ea604504900c",
           "executable": false
         },
         {
@@ -214,12 +214,12 @@
         },
         {
           "path": "scripts/lesson.py",
-          "sha256": "06b1546d509e9a246cf678ec8b2999d2455632c7b16492e4af49eccf6217a9a6",
+          "sha256": "cb5900219682cf9aa0dabeb996d577825e1e08105598bc024a886f9d7825336f",
           "executable": true
         },
         {
           "path": "scripts/test_lesson.py",
-          "sha256": "5712513a71ce719263f0b2287947bdf5ed945b8bc4c2bba1585d850ad8b2a68b",
+          "sha256": "cf8d2d61c3983d08345e650e97f4af73056fcc5f57266ca7a6689e3116c00eba",
           "executable": false
         }
       ]
