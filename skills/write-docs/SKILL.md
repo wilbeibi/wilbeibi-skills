@@ -1,6 +1,6 @@
 ---
 name: write-docs
-description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for design docs or internal wikis.
+description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for blog posts (use blog-review), design docs, or internal wikis.
 ---
 
 # write-docs
@@ -16,7 +16,7 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 | `AGENTS.md` / `CLAUDE.md` operating guides | [AGENTSMD.md](AGENTSMD.md) | an agent with no memory of your project |
 | Commit messages, PR descriptions, changelog entries | [PR.md](PR.md) | a maintainer running `git log` in two years |
 
-Not this skill: design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
+Not this skill: blog posts and essays (use `blog-review`), design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
 
 ## Workflow
 
