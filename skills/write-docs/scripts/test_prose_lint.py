@@ -139,6 +139,71 @@ Don't perform an analysis; this seamless line is intentionally long enough to fa
         self.assertEqual(result.returncode, 0)
         self.assertEqual({item["rule"] for item in findings}, {"marketing-claim"})
 
+    def test_announcements_and_intensifiers_are_review_findings(self):
+        text = (
+            "This document describes the cache. Simply restart it.\n"
+            "This paragraph explains the design; the flag label is clear.\n"
+        )
+
+        result = run_lint(text, mode="natural")
+        findings = json.loads(result.stdout)["files"][0]["findings"]
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(
+            [(item["line"], item["rule"], item["severity"]) for item in findings],
+            [(1, "announcement", "review"), (1, "intensifier", "review")],
+        )
+
+    def test_abstract_subject_flags_hidden_actions_but_not_thing_nouns(self):
+        text = (
+            "The configuration of the server requires a restart.\n"
+            "The version of Python must be 3.12.\n"
+            "Running the tests takes a minute.\n"
+            "According to the schema, the field is optional.\n"
+            "In addition to the flags, the config file sets defaults.\n"
+        )
+
+        result = run_lint(text, mode="natural")
+        findings = json.loads(result.stdout)["files"][0]["findings"]
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(
+            [(item["line"], item["rule"]) for item in findings],
+            [(1, "abstract-subject")],
+        )
+
+    def test_hedges_are_review_in_strict_and_stacked_only_in_natural(self):
+        text = (
+            "You may need to restart the service.\n"
+            "The cache usually clears itself.\n"
+        )
+
+        strict = json.loads(run_lint(text).stdout)["files"][0]["findings"]
+        natural = json.loads(run_lint(text, mode="natural").stdout)["files"][0]["findings"]
+
+        self.assertEqual([(item["line"], item["rule"]) for item in strict], [(1, "hedge"), (2, "hedge")])
+        self.assertEqual(natural, [])
+
+        stacked = json.loads(
+            run_lint("This may possibly help in some cases.", mode="natural").stdout
+        )["files"][0]["findings"]
+        self.assertEqual([item["rule"] for item in stacked], ["stacked-hedge"])
+
+    def test_long_opening_wordy_phrase_and_redundant_modifier(self):
+        text = (
+            "If the service is still running after the timeout and the log shows no errors, restart it.\n"
+            "In order to deploy, update the future plans first.\n"
+        )
+
+        result = run_lint(text, mode="natural")
+        findings = json.loads(result.stdout)["files"][0]["findings"]
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(
+            [(item["line"], item["rule"]) for item in findings],
+            [(1, "long-opening"), (2, "redundant-modifier"), (2, "wordy-phrase")],
+        )
+
     def test_initialism_does_not_hide_a_long_strict_sentence(self):
         text = (
             "Use the U.S. region when the account needs residency controls and the "

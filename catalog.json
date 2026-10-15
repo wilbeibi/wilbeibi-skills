@@ -2,6 +2,25 @@
   "schema": 1,
   "skills": [
     {
+      "name": "blog-review",
+      "description": "Review a technical blog draft and report what loses its reader, ordered by cost. Use when asked to review, critique, give feedback on, or tighten a draft blog post, article, newsletter issue, or engineering essay, or to 审稿 / 看看这篇. Do NOT use for READMEs, guides, comments, or commit text (use write-docs), for design docs, or to write a post from scratch.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/blog-review",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "a1d830c853731288c776e8c6901fae527a0b0d854b847b15191724633bd5db71",
+          "executable": false
+        },
+        {
+          "path": "references/REFERENCE.md",
+          "sha256": "a15000c3c1232d818aaf616a9a28e42e56829b7a8131f590c5f748cf57c0b911",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "code-review",
       "description": "Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. Use when asked to review, audit, or polish code, vet a dependency, judge whether a change is too complex, or find what a new hire would not understand.",
       "compatibility": "",
@@ -90,7 +109,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "9006f2569425eef07782f8d598fa4104c8f5c06192a7688b0bf4aaef23718e8f",
+          "sha256": "9cc80a6ebc5c278fbeffea01919eb2a863c559d6d0d5e36857a55a542b5b7c8e",
           "executable": false
         },
         {
@@ -120,7 +139,12 @@
         },
         {
           "path": "assets/player.html",
-          "sha256": "905cc1ec80bb5fe310aa31a82669a1d0b895b1dd7ecb925d37fe6cf704e8445a",
+          "sha256": "7b1d9d9f7dd73e2a2b2622f4b382302e5981a17d0fbdacd3f8f5ea604504900c",
+          "executable": false
+        },
+        {
+          "path": "assets/speak-minimax.yaml",
+          "sha256": "34a775fbb3aae71172f6627b3721db509210687d61f7e30ae0de0c7a3ac6e304",
           "executable": false
         },
         {
@@ -135,12 +159,12 @@
         },
         {
           "path": "assets/starter/lesson.json",
-          "sha256": "ca01b7d0a7b9de8688df7b911236e7c42b51754346549dafad9c03f44f0805c7",
+          "sha256": "7e773c625948c9216fee2013db164d3696f309813222a25f33828d311ff2e8ef",
           "executable": false
         },
         {
           "path": "assets/starter/outline.md",
-          "sha256": "44d3cef6f237acffec364c10527fbad509dde595680fe739bb105348984bab1f",
+          "sha256": "25b8dd6d2f8861e6cf475265f0f71d2eb849d13f7489712d7dcf4de4a260811b",
           "executable": false
         },
         {
@@ -150,22 +174,22 @@
         },
         {
           "path": "assets/starter/script.js",
-          "sha256": "3a902efb686ce873ae06e161e9653d63a80bf03a28873cffb685df33abbfb3e2",
+          "sha256": "90c1e93e7aca0095cd42c9ab10f435558d74c640f2b72ffbee1dd90a740c39a7",
           "executable": false
         },
         {
           "path": "assets/starter/speak.yaml",
-          "sha256": "64f42f84a1f5a210a03866d921328316cde1ac9790c6ef63d071a54ab76d55e0",
+          "sha256": "b2dc05717bad472023c0da477fc3d28a16ea000c5b0c37522cfa48659e8e8586",
           "executable": false
         },
         {
           "path": "references/authoring.md",
-          "sha256": "d833b8c47ab8f34d6c9a4f24273245af419a8002f280edb2db4f54cc071e9d0c",
+          "sha256": "283700094607cf08eb178bc07f2493522d9475c4d8fdf2d3af761b24e992fdfe",
           "executable": false
         },
         {
           "path": "references/cold-read.md",
-          "sha256": "24c862fe4ad1482e36ed3259286c2d4241407723cf030b0e63ac4d5845138149",
+          "sha256": "5c408c275d64392dfeb3ab2e7d97bbb11ec70159c765a17c1222accb20e9529b",
           "executable": false
         },
         {
@@ -174,8 +198,13 @@
           "executable": false
         },
         {
+          "path": "references/source-read.md",
+          "sha256": "045e8c9f61ec9b70b67ac9dcc0feb5a9b0b8007ff97a4dee005649ef6bc66a6c",
+          "executable": false
+        },
+        {
           "path": "scripts/asr.py",
-          "sha256": "8ab8531de2337f1057a3fa8ff882b755b4d6a6998e942de78700a9768990439f",
+          "sha256": "53184a3d30e8fae7d9edd533ad0a8454f6e963405933cb386c55d5304cef490b",
           "executable": false
         },
         {
@@ -185,12 +214,12 @@
         },
         {
           "path": "scripts/lesson.py",
-          "sha256": "37f25a1ad3fe07fb38f51752d9c7275bad91227571539bb3cfb409af04d7909f",
+          "sha256": "cb5900219682cf9aa0dabeb996d577825e1e08105598bc024a886f9d7825336f",
           "executable": true
         },
         {
           "path": "scripts/test_lesson.py",
-          "sha256": "457caea0353ed360a9531cfb93d32a1d02f54bfcdd9a040b1942b8a249ffe307",
+          "sha256": "cf8d2d61c3983d08345e650e97f4af73056fcc5f57266ca7a6689e3116c00eba",
           "executable": false
         }
       ]
@@ -642,7 +671,7 @@
     },
     {
       "name": "write-docs",
-      "description": "Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for design docs or internal wikis.",
+      "description": "Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for blog posts (use blog-review), design docs, or internal wikis.",
       "compatibility": "",
       "agents": [],
       "path": "skills/write-docs",
@@ -659,7 +688,7 @@
         },
         {
           "path": "CLARITY-REFERENCE.md",
-          "sha256": "66cba372af3086fec15819c22b2a61f72cf3dd2bef5f8ed54ca57617096d0e0a",
+          "sha256": "0630b3434484dc5b9ee279382ce1a793a6b538f32037fb358ce74b9891c742e2",
           "executable": false
         },
         {
@@ -679,7 +708,7 @@
         },
         {
           "path": "PR.md",
-          "sha256": "1139ac87f3c266b8671c0122311793ffc91a0ab154b9bb957a02c00f83b5175c",
+          "sha256": "12eb7faed2a67af5ed33af3a244daaa0d876422d8abf9a2051f58d3b49cc30b3",
           "executable": false
         },
         {
@@ -694,17 +723,17 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "729bd237595836871c91f5d4099169dc0a1f1b6c07ec11824626aadffffa98a0",
+          "sha256": "faa3161e2b11929dcf8c19ad50d762e4fee52102fd960331e600648b87479b64",
           "executable": false
         },
         {
           "path": "scripts/prose_lint.py",
-          "sha256": "421d0dac5362388e26b7e8c3e2933b6015e5dd3aa375174f4f68c1749065d0e1",
+          "sha256": "d6b876e563c0b8f0661bf4b29cdae5e85c46b02376bd27468ce3224869a1c8d3",
           "executable": false
         },
         {
           "path": "scripts/test_prose_lint.py",
-          "sha256": "2a864cff49f5ed03811f61145ad2b7cb9c130d082f5d5fbe3ec475934a187ae2",
+          "sha256": "04a5726bcfc9f7002c307372fb8f232ef0a14ccf19ccc0146d677515dbf66a5f",
           "executable": false
         }
       ]

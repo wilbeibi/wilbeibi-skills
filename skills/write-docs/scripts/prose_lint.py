@@ -48,21 +48,14 @@ PHRASE_RULES = (
         "remove the empty introduction and state the fact directly",
     ),
     (
-        "stacked-hedge",
-        re.compile(
-            r"\b(?:may|might|could|should|would)\s+(?:potentially\s+)?"
-            r"(?:be able to|help to|serve to|possibly)\b",
-            re.IGNORECASE,
-        ),
-        "name the condition or confidence instead of stacking helper words",
-    ),
-    (
         "marketing-claim",
         re.compile(
             r"\b(?:seamless(?:ly)?|world-class|next-generation|revolutionary|"
             r"game-changing|best-in-class|cutting-edge|effortless(?:ly)?|"
             r"battle-tested|enterprise-grade|robust|powerful|instant|"
-            r"no[- ]re-explaining)\b",
+            r"no[- ]re-explaining|comprehensive|crucial|essential|"
+            r"significantly|optimal|intuitive|elegant|lightweight|"
+            r"flexible|scalable|thorough(?:ly)?)\b",
             re.IGNORECASE,
         ),
         "replace the quality claim with evidence or a bounded capability",
@@ -71,12 +64,88 @@ PHRASE_RULES = (
         "nominalized-action",
         re.compile(
             r"\b(?:perform an analysis|conduct a review|make a decision|"
-            r"provide an explanation|carry out an assessment)\b",
+            r"provide an explanation|carry out an assessment|"
+            r"is responsible for|serves? to|allows? for|"
+            r"(?:has|have) the ability to|is able to|"
+            r"leverages?|utilizes?|facilitates?)\b",
             re.IGNORECASE,
         ),
         "prefer a direct verb when it preserves the meaning",
     ),
+    (
+        "wordy-phrase",
+        re.compile(
+            r"\b(?:in order to|in the event that|due to the fact that|"
+            r"in spite of the fact that|at this point in time|prior to|"
+            r"for the purpose of|with regard to|in terms of|a large number of|"
+            r"the majority of|in a timely manner)\b",
+            re.IGNORECASE,
+        ),
+        "replace the phrase with its one-word form (to, if, because, before, now)",
+    ),
+    (
+        "redundant-modifier",
+        re.compile(
+            r"\b(?:future plans?|past history|end result|final outcome|"
+            r"basic fundamentals|advance planning|completely finished|"
+            r"each individual|various different|true facts?|"
+            r"important essentials|free gift|added bonus|unexpected surprise)\b",
+            re.IGNORECASE,
+        ),
+        "the modifier repeats the noun; delete it",
+    ),
+    (
+        "announcement",
+        re.compile(
+            r"\bthis (?:section|document|guide|readme|page|chapter) "
+            r"(?:describes|introduces|explains|covers|provides|will)\b",
+            re.IGNORECASE,
+        ),
+        "delete the announcement and state the content",
+    ),
+    (
+        "intensifier",
+        re.compile(
+            r"\b(?:obviously|undoubtedly|of course|needless to say|simply|"
+            r"easily|trivially)\b",
+            re.IGNORECASE,
+        ),
+        "readers assume the opposite; show the step or delete the word",
+    ),
 )
+
+HEDGE_RE = re.compile(
+    r"\b(?:may|might|possibly|perhaps|potentially|probably|likely|"
+    r"typically|usually|generally|often|sometimes|occasionally|"
+    r"in (?:some|certain|most) cases|tends? to|somewhat|relatively|"
+    r"arguably|apparently|seems? to|appears? to)\b",
+    re.IGNORECASE,
+)
+
+ABSTRACT_SUBJECT_RE = re.compile(
+    r"^(?!(?:in|by|with|for|on|at|from|as|under|within|after|before|during|"
+    r"according|regardless|instead|because|despite)\b)"
+    r"(?:(?:the|this|that|an?|our|its|their|your|such)\s+)?(?:\w+\s+)?"
+    r"(\w{4,}(?:tion|sion|ment|ance|ence|ity|ness|ism|ing))\s+(?:of|for|to)\b",
+    re.IGNORECASE,
+)
+
+# Nouns with these endings that name things, not hidden actions.
+THING_NOUNS = frozenset(
+    """version section function application documentation extension session
+    position option exception permission condition information environment
+    department document element equipment argument statement comment segment
+    instrument entity identity community security quality quantity priority
+    capacity utility facility city string setting mapping encoding""".split()
+)
+
+OPENING_SUBORDINATOR_RE = re.compile(
+    r"^(?:if|when|whenever|because|although|though|while|since|after|before|"
+    r"to|in order to|unless|once|as|given|for|with|without|where|even|"
+    r"despite|instead|during|until)\b",
+    re.IGNORECASE,
+)
+MAX_OPENING_WORDS = 10
 
 PERFECT_TENSE_RE = re.compile(
     r"\b(?:has|have|had)\s+(?:already\s+|just\s+|not\s+|never\s+)?"
@@ -301,6 +370,7 @@ def lint_text(text: str, mode: str) -> list[Finding]:
                         f"{count} words; {mode} mode uses a {max_words}-word review threshold",
                     )
                 )
+            findings.extend(sentence_findings(sentence, mode, line_for_offset(line_map, start)))
 
         if mode == "strict":
             for match in re.finditer(";", block_text):
@@ -349,11 +419,65 @@ def lint_text(text: str, mode: str) -> list[Finding]:
                     line_for_offset(line_map, match.start()),
                     "possible-passive",
                     "review",
-                    "name the actor if responsibility matters; keep passive voice when it does not",
+                    "name the actor if responsibility matters; keep passive voice when it does "
+                    "not, or when it keeps the opening on the previous sentence's topic",
                 )
             )
 
     return sorted(findings, key=lambda item: (item.line, item.rule, item.message))
+
+
+def sentence_findings(sentence: str, mode: str, line: int) -> list[Finding]:
+    findings: list[Finding] = []
+
+    subject = ABSTRACT_SUBJECT_RE.match(sentence)
+    if subject and subject.group(1).lower() not in THING_NOUNS:
+        findings.append(
+            Finding(
+                line,
+                "abstract-subject",
+                "review",
+                f"“{subject.group(1)}” is the subject; if it hides an action, "
+                "make the doer the subject and the action the verb",
+            )
+        )
+
+    if OPENING_SUBORDINATOR_RE.match(sentence):
+        head, comma, _ = sentence.partition(",")
+        if comma:
+            opening = len(WORD_RE.findall(head))
+            if opening > MAX_OPENING_WORDS:
+                findings.append(
+                    Finding(
+                        line,
+                        "long-opening",
+                        "review",
+                        f"{opening} words before the main clause; make the condition "
+                        "its own step or shorten it",
+                    )
+                )
+
+    hedges = HEDGE_RE.findall(sentence)
+    if mode == "strict" and hedges:
+        findings.append(
+            Finding(
+                line,
+                "hedge",
+                "review",
+                f"“{hedges[0]}” leaves the reader guessing; state the condition or the fact",
+            )
+        )
+    elif len(hedges) >= 2:
+        findings.append(
+            Finding(
+                line,
+                "stacked-hedge",
+                "review",
+                f"{len(hedges)} hedges in one sentence ({', '.join(hedges)}); keep one "
+                "or name the uncertainty",
+            )
+        )
+    return findings
 
 
 def read_inputs(paths: Iterable[str]) -> list[tuple[str, str]]:

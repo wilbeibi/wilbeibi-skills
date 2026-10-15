@@ -1,6 +1,6 @@
 ---
 name: write-docs
-description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for design docs or internal wikis.
+description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for blog posts (use blog-review), design docs, or internal wikis.
 ---
 
 # write-docs
@@ -16,7 +16,7 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 | `AGENTS.md` / `CLAUDE.md` operating guides | [AGENTSMD.md](AGENTSMD.md) | an agent with no memory of your project |
 | Commit messages, PR descriptions, changelog entries | [PR.md](PR.md) | a maintainer running `git log` in two years |
 
-Not this skill: design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
+Not this skill: blog posts and essays (use `blog-review`), design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
 
 ## Workflow
 
@@ -40,9 +40,12 @@ Apply modes by content block. A README quickstart can be strict while its motiva
 - Be genuine. Write as a maintainer helping a reader, not as a product sheet imitating confidence.
 - Use evidence instead of quality adjectives. Give the measurement, example, or boundary behind the claim.
 - Use one name for one thing. Do not rotate synonyms unless they identify different concepts.
-- Prefer a direct verb to a noun phrase: “analyze the log,” not “perform an analysis.”
+- Name the doer and the action within the first eight words of a sentence. An abstract noun as subject (`the configuration of`, `the handling of`) hides them: make the doer the subject and the action the verb.
+- One idea per sentence. Open on what the reader already holds and end on the new name or value; this outranks active voice. A condition longer than ten words becomes its own step.
 - Break noun stacks of four or more words: “calibration of the connection resistance,” not “connection resistance calibration procedure.”
 - Say each fact once. Omit template sections that do not change the reader's next action.
+- Cut words that announce or reassure: `This document describes`, `simply`, `obviously`. Readers assume the opposite of an intensifier, and `simply` blames them when the step fails.
+- A hedge in a procedure is a missing condition: write `if X, do Y`, not `you may need to do Y`. In explanation, one hedge states uncertainty and two in a sentence hide it.
 - State unsupported cases and tradeoffs. Simpler wording must not erase precise technical meaning.
 
 ## Check the draft

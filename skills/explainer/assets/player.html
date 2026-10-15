@@ -175,16 +175,17 @@ const RENDER = QS.has('render');   // ?render=MS: `lesson.py video` films the pa
 const UI = ({
   zh: {play: '播放/暂停（空格）', prev: '上一句（←）', next: '下一句（→）', speed: '倍速', jump: '跳到这一章',
        keys: '空格 播放/暂停 · ← → 上一句/下一句', cover: (m, n, c) => '约 ' + m + ' 分钟 · ' + n + ' 句 · ' + c + ' 章',
-       voiceOn: '旁白 开', voiceOff: '旁白 关', voiceGone: '旁白不可用', noAudio: '未找到旁白音频，请将 MP3 与本页面放在同一文件夹',
+       voiceOn: '旁白 开', voiceOff: '旁白 关', voiceGone: '旁白不可用', noAudio: '旁白音频无法加载：请用 lesson.py mix 重新生成本页', noAudioFile: '未找到旁白音频，请将 MP3 与本页面放在同一文件夹',
        blocked: '声音未能播放，请再次点击播放', waiting: '已暂停 · 想好了按空格或 ▶ 继续', right: '✓ 对', high: '偏高，再想想', low: '偏低，再想想'},
   en: {play: 'Play / pause (space)', prev: 'Previous line (←)', next: 'Next line (→)', speed: 'Playback speed', jump: 'Jump to this chapter',
        keys: 'Space play/pause · ← → previous/next line', cover: (m, n, c) => 'About ' + m + ' min · ' + n + ' lines · ' + c + ' chapters',
-       voiceOn: 'Voice on', voiceOff: 'Voice off', voiceGone: 'No voice', noAudio: 'Narration audio not found: keep the MP3 in the same folder as this page',
+       voiceOn: 'Voice on', voiceOff: 'Voice off', voiceGone: 'No voice', noAudio: 'Narration audio failed to load: rebuild this page with lesson.py mix', noAudioFile: 'Narration audio not found: keep the MP3 in the same folder as this page',
        blocked: 'Audio was blocked: press play again', waiting: 'Paused · press space or ▶ when you have an answer', right: '✓ correct', high: 'Too high, try again', low: 'Too low, try again'}
 })[LESSON.lang] || null;
 if (!UI) throw new Error('lesson.json lang must be "zh" or "en"');
 const $ = id => document.getElementById(id);
 const W = t => ({t, wait: true});   // a beat that pauses when it ends, for "stop and predict" / "you compute it"
+const D = (d, b) => ({...(typeof b === 'string' ? {t: b} : b), d});   // a beat with a delivery direction for the voice; the page does not use it
 
 // ---------- lesson data (data.js): plain values and pure functions, no DOM ----------
 /*__DATA__*/
@@ -242,7 +243,7 @@ if (narration) {
     pause();
     voice = false;
     $('voice').textContent = UI.voiceGone; $('voice').classList.remove('onx'); $('voice').disabled = true;
-    if (!STILL) hint(UI.noAudio);
+    if (!STILL) hint(String(LESSON.audio).startsWith('data:') ? UI.noAudio : UI.noAudioFile);
   });
   narration.addEventListener('ended', () => {
     if (!playing || !voice) return;
