@@ -1,16 +1,33 @@
 ---
 name: grok-repo
-description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).
+description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, design tradeoffs, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).
 ---
 
 # grok-repo
 
 Read declared intent, structure, mechanics, then history for the *why*; judge taste only after evidence.
-Pick one mode by the question; every claim cites a file path or commit:
+Pick one mode by the question; keep claims traceable to code and first-party sources:
 
 - **Scoped question** ("how does X work?", "where does Y come from?") → a **dataflow trace**.
 - **Change question** ("why was X added?", "how did this feature evolve?") → **change archaeology**.
 - **Whole-repo question** ("explain this codebase", "give me a tour") → the **full briefing**.
+
+## DeepWiki for open-source repositories
+
+For a public open-source repository, check its existing DeepWiki when accessible. Use the
+actual repository's `owner/repo`: with DeepWiki MCP, start with `read_wiki_structure`, then
+read relevant sections from `read_wiki_contents`; use `ask_wiki_question` for focused gaps.
+The website at `https://deepwiki.com/<owner>/<repo>` is another reading route.
+
+Record the indexed revision or date when shown and compare it with the checkout; if absent,
+treat the wiki's version as unknown. Use its explanations of flows, data representations,
+and lifecycles to find missed questions and clearer ways to explain the system. Verify
+consequential claims against the pinned code, tests, and first-party history, especially
+when the wiki compresses a guarantee or disagrees with the initial model. Cite those
+verified sources for design conclusions; keep generated explanations distinct from author intent.
+
+If unavailable or unindexed, continue with primary sources. Start indexing only when the
+user explicitly requests it.
 
 ## Dataflow trace (scoped mode)
 
@@ -124,9 +141,13 @@ git log -S '<symbol>' --oneline           # when/why a concept appeared or died
 
 ## Briefing contract
 
-The briefing is a map for the reader to learn the code themselves, not a substitute for
-reading it — every concept must point at the file that teaches it. Produce these sections,
-in this order; cite `path:line` or short SHAs throughout.
+Choose the output shape from the reader's purpose, independently of the research mode.
+For **code navigation**, use the sections below in order and point concepts at the files
+that teach them. For **design analysis**, establish the product and boundary model, walk
+one representative operation when needed, then explain consequential decisions, alternatives,
+benefits, and costs. Use the sections below as coverage, adapting their grouping to the
+reader's questions. Keep implementation citations as supporting evidence; include class
+names and code excerpts when they help explain a decision.
 
 0. **Problem & users** — what pain it removes, for whom, and what the project deliberately
    does *not* do (non-goals are often stated in README/docs or early commits). Issues closed as
@@ -135,6 +156,12 @@ in this order; cite `path:line` or short SHAs throughout.
    GitHub issue search has no `OR`, so run one qualifier at a time. Cite the issue number.
 1. **Architecture** — the 3-7 major components and the shape connecting them (pipeline,
    hub-and-spoke, layered, plugin host…). One paragraph plus a compact diagram or list.
+   Check that the reader can distinguish the user-facing interface from internal contracts,
+   name what crosses important boundaries, and locate authoritative state. Mark process or
+   network boundaries where library boxes could look like separate services. Follow the
+   representative operation through the map; add another view only when changes over time
+   or in data representation remain unclear. Keep concept and implementation labels together
+   when they denote one role.
 2. **Design taste** — the authors' consistent choices, each backed by two or more examples:
    dependency policy, error-handling style, abstraction depth, naming, testing philosophy,
    concurrency model. Taste is what repeats; one instance is noise.
@@ -145,7 +172,7 @@ in this order; cite `path:line` or short SHAs throughout.
 4. **History & rationale** — 3-6 pivotal commits/eras and what each reveals about why the
    design is what it is (e.g. "storage was swapped behind an interface in <sha> after X").
 5. **Beautiful code** — if evidence warrants it, show 1-3 pieces that are novel,
-   dense-but-clear, or do a lot with a little. Quote a short excerpt and say precisely what
+   dense-but-clear, or do a lot with a little. Quote a short excerpt when useful and explain what
    makes it good: the invariant it protects, the cases it collapses, or the API it keeps honest.
    Include small utilities and test harnesses when useful, not just core algorithms. State
    the assumptions and costs that determine where a technique can be reused.

@@ -255,14 +255,14 @@
     },
     {
       "name": "grok-repo",
-      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).",
+      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, design tradeoffs, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).",
       "compatibility": "",
       "agents": [],
       "path": "skills/grok-repo",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "c56904c778cc2d4b68248e5e97afb7580a1056ebf4470ee34768b0306a731dfc",
+          "sha256": "96005149a1acc02c7d53658899b7610bfae6221b0bd17942d418cd556d138885",
           "executable": false
         },
         {
