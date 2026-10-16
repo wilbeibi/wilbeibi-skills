@@ -2,7 +2,7 @@
 # /// script
 # dependencies = ["PyYAML>=6.0.2"]
 # ///
-"""Generate metadata and file checksums without publishing skill bodies in the catalog."""
+"""Generate metadata and file checksums without publishing skill bodies in the catalog, and the skill table in README.md."""
 import argparse
 import hashlib
 import json
@@ -11,6 +11,27 @@ import yaml
 
 # Keep in sync with AGENT_DIRS in skills/route-skill/scripts/route_skill.py.
 AGENTS = {"claude", "codex", "pi", "hermes"}
+README_START = "<!-- skills-table:start -->"
+README_END = "<!-- skills-table:end -->"
+
+
+def purpose(description: str) -> str:
+    """First sentence of the description, before any trigger clause."""
+    head = description.split(" Use when")[0].split(" Use for")[0].split(" Use it")[0]
+    head = head.split(". ")[0].rstrip(".")
+    return head + "."
+
+
+def readme_text(root: Path, rows: list) -> str:
+    readme = root / "README.md"
+    text = readme.read_text()
+    start, end = text.index(README_START), text.index(README_END)
+    lines = ["| Skill | Use it for |", "|---|---|"]
+    for row in rows:
+        note = f" ({'/'.join(a.capitalize() for a in row['agents'])} only)" if row["agents"] else ""
+        lines.append(f"| [{row['name']}]({row['path']}/SKILL.md) | {purpose(row['description'])}{note} |")
+    table = "\n".join(lines)
+    return text[: start + len(README_START)] + "\n" + table + "\n" + text[end:]
 
 
 def main():
@@ -43,11 +64,15 @@ def main():
             raise ValueError(f"name must match directory: {skill}")
     text = json.dumps({"schema": 1, "skills": rows}, indent=2, ensure_ascii=False) + "\n"
     destination = root / "catalog.json"
+    readme = readme_text(root, rows)
     if args.check:
         if not destination.is_file() or destination.read_text() != text:
             raise SystemExit("catalog is stale; run uv run scripts/build_catalog.py")
+        if (root / "README.md").read_text() != readme:
+            raise SystemExit("README skill table is stale; run uv run scripts/build_catalog.py")
     else:
         destination.write_text(text)
+        (root / "README.md").write_text(readme)
     print(f"Catalog: {len(rows)} skills")
 
 

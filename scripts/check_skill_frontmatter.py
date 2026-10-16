@@ -43,6 +43,9 @@ def main() -> int:
             value = data.get(key)
             if not isinstance(value, str) or not value.strip():
                 errors.append(f"{path}: {key} must be a non-empty string")
+            raw = next((line for line in frontmatter.splitlines() if line.startswith(f"{key}:")), "")
+            if " #" in raw and not raw[len(key) + 1 :].lstrip().startswith(('"', "'")):
+                errors.append(f"{path}: {key} contains ' #', which YAML reads as a comment; quote the value or drop the '#'")
 
     if errors:
         print("\n".join(errors), file=sys.stderr)
