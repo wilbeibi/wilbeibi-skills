@@ -6,16 +6,41 @@ These are the skills I keep around for Claude Code and Codex. Most began as a pr
 
 Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a `SKILL.md` at its root, so you can copy a single folder into your agent's skills directory and ignore the rest of the repo.
 
-## Engineering workflows
+## What's here
 
-These workflows adapt selected [pstack](https://github.com/cursor/plugins/tree/850d7f2e9f5e55dff7eb00a0a479337fe79eb22f/pstack) skills for use across agents. Each folder retains its upstream MIT notice. Existing `grok-repo`, `code-review`, `test-writing`, and `write-docs` cover the overlapping work.
-
+<!-- skills-table:start -->
 | Skill | Use it for |
 |---|---|
-| [blast-radius](skills/blast-radius/SKILL.md) | Trace indirect effects of a change and execute checks of its safety assumptions. |
-| [benchmark-checklist](skills/benchmark-checklist/SKILL.md) | Check whether a performance measurement supports its claim or comparison. |
-| [agent-guardrails](skills/agent-guardrails/SKILL.md) | Turn recurring project mistakes into constraints and replay the errors to prove the checks work. |
-| [create-verification-skill](skills/create-verification-skill/SKILL.md) | Generate and execute a project-local workflow for driving the real app and retaining evidence. |
+| [agent-guardrails](skills/agent-guardrails/SKILL.md) | Turn recurring agent mistakes in a project into enforceable constraints. |
+| [benchmark-checklist](skills/benchmark-checklist/SKILL.md) | Check whether a measured performance claim supports a comparison or decision. |
+| [blast-radius](skills/blast-radius/SKILL.md) | Trace what a change could break beyond its diff and verify the assumptions its safety depends on. |
+| [blog-review](skills/blog-review/SKILL.md) | Review a technical blog draft and report what loses its reader, ordered by cost. |
+| [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. |
+| [create-verification-skill](skills/create-verification-skill/SKILL.md) | Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. |
+| [dataviz](skills/dataviz/SKILL.md) | Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. (Codex only) |
+| [explainer](skills/explainer/SKILL.md) | Turn a paper, notebook, chapter, or design doc into a narrated, self-paced HTML lesson — one self-contained file with chapters, subtitles, worked numbers, pause-and-predict questions, and optional TTS narration; the finished lesson can also be filmed into one MP4. |
+| [grill-me](skills/grill-me/SKILL.md) | Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
+| [grok-repo](skills/grok-repo/SKILL.md) | Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. |
+| [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. |
+| [karpathy-planning](skills/karpathy-planning/SKILL.md) | Develop a scoped implementation plan when explicitly asked to plan a coding task. |
+| [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent-todo queue via scripts/capture.py. |
+| [obsidian-search](skills/obsidian-search/SKILL.md) | Search an Obsidian vault for topics, exact text, tags, recent notes, and tasks. |
+| [paper-search](skills/paper-search/SKILL.md) | Find and rank research papers by relevance, recency, field-adjusted impact, venue, and author affiliation. |
+| [readback](skills/readback/SKILL.md) | Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. |
+| [repo-eval](skills/repo-eval/SKILL.md) | Evaluate a public GitHub repository's momentum and maintenance health. |
+| [route-skill](skills/route-skill/SKILL.md) | Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. |
+| [sherlock](skills/sherlock/SKILL.md) | Work an open question like a case — graded clues, competing theories in a consistency matrix, eliminate by evidence, backtrack, converge, with a casebook on disk for long cases. |
+| [show-me](skills/show-me/SKILL.md) | Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. |
+| [sketch-concept](skills/sketch-concept/SKILL.md) | Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. (Codex only) |
+| [skill-curator](skills/skill-curator/SKILL.md) | Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. |
+| [test-writing](skills/test-writing/SKILL.md) | Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. |
+| [tla-model](skills/tla-model/SKILL.md) | Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. |
+| [web-recap](skills/web-recap/SKILL.md) | Search browser history for URLs by topic or visit statistics. |
+| [write-docs](skills/write-docs/SKILL.md) | Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. |
+| [write-skill](skills/write-skill/SKILL.md) | Author or update compact agent skills under skills/<name>/SKILL.md. |
+<!-- skills-table:end -->
+
+`blast-radius`, `benchmark-checklist`, `agent-guardrails`, and `create-verification-skill` adapt selected [pstack](https://github.com/cursor/plugins/tree/850d7f2e9f5e55dff7eb00a0a479337fe79eb22f/pstack) skills for use across agents; each folder retains its upstream MIT notice. The table is generated from `catalog.json`; edit a skill's `description`, not the table.
 
 ## Let the router pick
 

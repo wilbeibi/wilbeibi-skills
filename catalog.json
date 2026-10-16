@@ -338,17 +338,22 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "96005149a1acc02c7d53658899b7610bfae6221b0bd17942d418cd556d138885",
+          "sha256": "d4478f2d397e18af92668741c37e4ecb0feed3dce7afe32baaa7121bad3ed7d0",
           "executable": false
         },
         {
           "path": "scripts/archaeology.sh",
-          "sha256": "bc0d66b1d68daf14bdaeca2a93e00af35d778da0074268b283b4b6a6040d4287",
+          "sha256": "bdc660107b3aeaa2b13bc9f4fda8ac4d439b523b9171b7f5e3cb7dcc955305c2",
+          "executable": true
+        },
+        {
+          "path": "scripts/prose-check.py",
+          "sha256": "f3c862e27f3a20dc54a87408452d5ab6cda36db849d78fc1ba808e7909dff9d2",
           "executable": true
         },
         {
           "path": "scripts/test_archaeology.sh",
-          "sha256": "07d0eef6be455393b8aef1f65dfe05fe0717af709c1eaa3717a6342f42b5235e",
+          "sha256": "e80e5a0978f30288183d2418ddf55f61e244141f9ea1bda8dc7c31b13da8524c",
           "executable": true
         }
       ]
@@ -393,14 +398,14 @@
     },
     {
       "name": "obsidian-capture",
-      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent's",
+      "description": "Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent-todo queue via scripts/capture.py. Use when asked to add a todo, note something down, log this, capture an idea, set a due date, record a weekly reflection, or list or close the agent's tasks (\"看你的 todo\", \"干活\"). Not for searching notes (use obsidian-search) or standalone long-form notes.",
       "compatibility": "",
       "agents": [],
       "path": "skills/obsidian-capture",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "0704898bdc076353b4fa1d5ad8553067dff5ce2474c593f2efa9368cb378331d",
+          "sha256": "d8500b4fa467edebb397919992b276bd106e358241bd8d7eaf57273ecf1f4303",
           "executable": false
         },
         {
