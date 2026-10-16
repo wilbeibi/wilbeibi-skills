@@ -2,6 +2,63 @@
   "schema": 1,
   "skills": [
     {
+      "name": "agent-guardrails",
+      "description": "Turn recurring agent mistakes in a project into enforceable constraints. Use when the user keeps correcting the same mistake or asks to prevent a repeated class of errors. Do NOT use for a single bug fix, general code review, or skill-library cleanup.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/agent-guardrails",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "18469318ad60f8429db28c2ae4f70c60218dba165c4b51e0ccbed9d9a2d54892",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "benchmark-checklist",
+      "description": "Check whether a measured performance claim supports a comparison or decision. Use when running benchmarks, reporting a measured speedup or regression, or choosing between implementations from timing results. Do NOT use for interpreting published benchmarks without running them or for general debugging.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/benchmark-checklist",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "cb818464b77acbf02f12280562a7f0dae3f2ad970d6b139202d0706fff7abf46",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "blast-radius",
+      "description": "Trace what a change could break beyond its diff and verify the assumptions its safety depends on. Use for \"blast radius\", \"what could this break\", or indirect compatibility and lifecycle risks. Use code-review for a general diff review.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/blast-radius",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c0e05f96ba9c91e91ca604108421cdaac715f5fccac52ef8b704e30f6d1cde6a",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "blog-review",
       "description": "Review a technical blog draft and report what loses its reader, ordered by cost. Use when asked to review, critique, give feedback on, or tighten a draft blog post, article, newsletter issue, or engineering essay, or to 审稿 / 看看这篇. Do NOT use for READMEs, guides, comments, or commit text (use write-docs), for design docs, or to write a post from scratch.",
       "compatibility": "",
@@ -74,12 +131,31 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "8d12d104d9ec4101e9c7c2afb7e01a8e4807a7da27bf97595dee55ee77c68c04",
+          "sha256": "38fd78feb56911bf324307daa0271a5ee068049f3fa2dd4af1d7d59875a2c92c",
           "executable": false
         },
         {
           "path": "scripts/slop.py",
           "sha256": "cb6e31af3b4bd945318c45c0aa530684522b47704c8b930d00a01735348c10ab",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "create-verification-skill",
+      "description": "Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. Use when asked to create a reusable verification workflow or control skill for a project. Do NOT use for a one-off smoke check or ordinary unit-test writing.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/create-verification-skill",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "7330f2e76be626bf4e37b4543f809ddb87f428f941e4e6b36076ad7a408df660",
           "executable": false
         }
       ]
@@ -255,14 +331,14 @@
     },
     {
       "name": "grok-repo",
-      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).",
+      "description": "Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, design tradeoffs, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).",
       "compatibility": "",
       "agents": [],
       "path": "skills/grok-repo",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "c56904c778cc2d4b68248e5e97afb7580a1056ebf4470ee34768b0306a731dfc",
+          "sha256": "96005149a1acc02c7d53658899b7610bfae6221b0bd17942d418cd556d138885",
           "executable": false
         },
         {
@@ -596,7 +672,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "8d099731b64439c4718a4474e74ab2857d08b20bca501e1f20d055547c7ccbd1",
+          "sha256": "5b84cee249fe3cd997c6292d4ff8e0a1e357f99772d6c2f72a77bb0b23b13991",
           "executable": false
         }
       ]

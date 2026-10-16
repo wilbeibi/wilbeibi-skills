@@ -20,6 +20,8 @@ Verify aggressively; commit sparingly. A generated test costs nothing to write a
    - Its name claims no more than its input exercises.
 
    Exploration found a bug → shrink it to the smallest stable case and admit only that. Found nothing → delete it.
+
+   What fails the gate is still verified, by adversarial review instead of a committed test: `code-review` (BurntSushi lens) by a reader who did not write the code, whose every finding must name the input that breaks it. A confirmed break re-enters step 3 as a regression.
 5. **Write it in long-lasting form.** Test logic once; cases as data — table rows, `testdata` files, txtar archives, scripts. Failures print input, got, and want. Golden files regenerate through an update flag, and every regenerated diff is read. Done when the next regression is a one-line or one-file addition.
 6. **See it fail.** Break the behavior — revert the fix for a regression, otherwise mutate the line the contract rests on — and run the suite. The test fails for its stated reason, and its failure names one cause. An existing test also going red means yours is a duplicate unless it reaches a risk that owner cannot; drop or move it. For a negative assertion, remove the guard under test: still green means it passed on another guard. Restore the code and rerun green. Done when every kept test has been red for its own reason.
 

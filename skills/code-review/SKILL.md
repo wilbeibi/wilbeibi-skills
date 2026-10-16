@@ -12,7 +12,7 @@ Then pick **one** lens and read only that file (`/code-review <lens>` names it d
 | The question in front of you | Lens | Read |
 |---|---|---|
 | Should this exist at all? Is it at the right layer? Does the diff/package/dependency earn its maintenance cost? Asked to "audit", "polish", or "refactor" something | **Russ Cox** | [RUSS-COX.md](RUSS-COX.md) |
-| Will it behave as advertised? Can it panic, silently truncate, or cost more than it looks? Are the defaults and error contracts honest? Reviewing a library API or a patch that changes complexity | **BurntSushi** | [BURNTSUSHI.md](BURNTSUSHI.md) |
+| Will it behave as advertised? Can it panic, silently truncate, or cost more than it looks? Are the defaults and error contracts honest? Reviewing a library API or a patch that changes complexity. Asked to break it, or reviewing in place of a test (`test-writing` step 4) | **BurntSushi** | [BURNTSUSHI.md](BURNTSUSHI.md) |
 | Is this being held to the right standard? Should the dumb version ship, or does this need to stay stable for years? Reviewing a public interface, a breaking change, or product code that looks over-engineered | **Mitsuhiko** | [MITSUHIKO.md](MITSUHIKO.md) |
 | Is a *proposed* change worth its complexity, and which layer owns it? Asked before a substantial design change, or when necessity is contested mid-review | **Complexity** | [COMPLEXITY.md](COMPLEXITY.md) |
 | What would a competent engineer who just joined fail to understand? Asked for an onboarding review, a handover check, or what to document first | **Newcomer** | [NEWCOMER.md](NEWCOMER.md) |
@@ -42,7 +42,7 @@ Reading the output:
 - Clone hits are the mechanical form of the "existing primitive" search above. The finding is the pair that will diverge, named on both sides.
 - Slop accumulates across sessions because each agent run, reviewer included, starts without memory of the last. The base-to-head counts are the only view of that drift you get; when a package's numbers only ever rise, say so in the summary even if no single hit is a finding.
 
-Not this skill: writing the commit or PR message (use `write-docs`) or building your own understanding of an unfamiliar codebase (use `grok-repo`).
+Not this skill: writing the commit or PR message (use `write-docs`), building your own understanding of an unfamiliar codebase (use `grok-repo`), or turning a confirmed `Failure` line into the regression that pins it (use `test-writing`).
 
 ## Output contract — all lenses
 

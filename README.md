@@ -6,6 +6,17 @@ These are the skills I keep around for Claude Code and Codex. Most began as a pr
 
 Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a `SKILL.md` at its root, so you can copy a single folder into your agent's skills directory and ignore the rest of the repo.
 
+## Engineering workflows
+
+These workflows adapt selected [pstack](https://github.com/cursor/plugins/tree/850d7f2e9f5e55dff7eb00a0a479337fe79eb22f/pstack) skills for use across agents. Each folder retains its upstream MIT notice. Existing `grok-repo`, `code-review`, `test-writing`, and `write-docs` cover the overlapping work.
+
+| Skill | Use it for |
+|---|---|
+| [blast-radius](skills/blast-radius/SKILL.md) | Trace indirect effects of a change and execute checks of its safety assumptions. |
+| [benchmark-checklist](skills/benchmark-checklist/SKILL.md) | Check whether a performance measurement supports its claim or comparison. |
+| [agent-guardrails](skills/agent-guardrails/SKILL.md) | Turn recurring project mistakes into constraints and replay the errors to prove the checks work. |
+| [create-verification-skill](skills/create-verification-skill/SKILL.md) | Generate and execute a project-local workflow for driving the real app and retaining evidence. |
+
 ## Let the router pick
 
 If you don't want to decide up front, link the router once (Python 3.10+):
