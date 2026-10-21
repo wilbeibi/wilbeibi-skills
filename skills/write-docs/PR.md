@@ -38,6 +38,7 @@ Paste real output. A pasted `before:`/`after:` block is worth more than any sent
 - **Deviations get bullets.** If the implementation diverged from an agreed design or a review comment, list each divergence explicitly. Never let a reviewer discover it in the diff.
 - **Hedge honestly.** Uncertainty stated with a planned follow-up ("this doesn't handle X; issue #123") reads as competence. Uncertainty hidden reads as a bug.
 - **Link the issue,** and say what the link contains so the reader can decide whether to open it.
+- **Write for non-native readers.** Reviewers and translation tools read this text. Give each word one meaning, and use the plain verb instead of an idiom or phrasal verb (`start`, not `spin up`). Keep sentences under 25 words.
 - **No mechanical summaries.** "Updates 12 files" and "refactors the handler" tell the reader nothing they can't get from `--stat`.
 
 ## PR descriptions

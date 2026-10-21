@@ -36,7 +36,7 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [test-writing](skills/test-writing/SKILL.md) | Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. |
 | [tla-model](skills/tla-model/SKILL.md) | Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. |
 | [web-recap](skills/web-recap/SKILL.md) | Search browser history for URLs by topic or visit statistics. |
-| [write-docs](skills/write-docs/SKILL.md) | Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. |
+| [write-docs](skills/write-docs/SKILL.md) | Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. |
 | [write-skill](skills/write-skill/SKILL.md) | Author or update compact agent skills under skills/<name>/SKILL.md. |
 <!-- skills-table:end -->
 

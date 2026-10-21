@@ -752,7 +752,7 @@
     },
     {
       "name": "write-docs",
-      "description": "Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for blog posts (use blog-review), design docs, or internal wikis.",
+      "description": "Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs or ADRs (grill-me), or skills (write-skill).",
       "compatibility": "",
       "agents": [],
       "path": "skills/write-docs",
@@ -789,7 +789,7 @@
         },
         {
           "path": "PR.md",
-          "sha256": "12eb7faed2a67af5ed33af3a244daaa0d876422d8abf9a2051f58d3b49cc30b3",
+          "sha256": "e207af7180ce999f78c1467fb77f19d61410e425ea9e6a4bf234b3f8004470b5",
           "executable": false
         },
         {
@@ -804,7 +804,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "faa3161e2b11929dcf8c19ad50d762e4fee52102fd960331e600648b87479b64",
+          "sha256": "1546804a4d7d9ac0aa52b34342c5e65d875247b0f363829e50822c9623c9bee2",
           "executable": false
         },
         {

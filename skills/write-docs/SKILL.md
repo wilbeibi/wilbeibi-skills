@@ -1,6 +1,6 @@
 ---
 name: write-docs
-description: Write or critique prose that ships with a codebase — READMEs, developer guides and runbooks, CLI text, code comments, agent guides, and commit or PR descriptions. Use when drafting, improving, or reviewing these artifacts. Do NOT use for blog posts (use blog-review), design docs, or internal wikis.
+description: Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs or ADRs (grill-me), or skills (write-skill).
 ---
 
 # write-docs
