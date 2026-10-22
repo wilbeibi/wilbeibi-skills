@@ -1,10 +1,12 @@
 # blog-review reference
 
-Two sources, layered. Post, opening, structure, evidence, and voice checks come from
+Three sources, layered. Post, opening, structure, evidence, and voice checks come from
 [writethatblog.substack.com](https://writethatblog.substack.com/) (35 posts read 2026-10-13: the
 synthesis posts and 25 interviews). Paragraph and sentence checks come from Williams & Bizup,
 *Style: Lessons in Clarity and Grace*, 12th ed. (2016), lessons 3 to 10 and 12. Counts are the
-number of distinct posts that state a rule. Quotes under 40 words.
+number of distinct posts that state a rule. Quotes under 40 words. The event-post opening, quote-then-gloss,
+labeled estimates, and unearned-shrug checks come from Matt Levine's *Money Stuff* (Bloomberg;
+57 issues close-read 2026-06 to 10, 247 sections); see [Money Stuff](#money-stuff).
 
 Williams' ranking, which the passes follow: readers want characters as subjects even more than
 actions as verbs; a passage's cohesion "trumps the clarity of individual sentences"; and "readers
@@ -240,3 +242,25 @@ Run these only on sentences where the reader stalled. All quotes are Williams.
 - Williams' golden rule, the final test on any suggestion: "what really counts... is not what
   writers think they have put into a passage but what readers get out of it." Would the author,
   standing where this reader stands, accept the passage as is?
+
+## Money Stuff
+
+Counts are sections of 150 words or more, hand-coded by six readers on one rubric.
+
+- Mechanism before the news (~170/247). A principle or toy model comes first; the news arrives
+  300 to 1,300 words in, and setup scales with section length. "The basic business of finance is
+  slicing up cash flows." The best case: the news turns out to be the extreme the hypothetical
+  already predicted. This is information, so do not flag it as a delaying anecdote.
+- Quote, then translate (most sections that quote). A 100 to 300 word quote, then one sentence
+  saying what the source does not: "it never says Susquehanna *lost* $71.4 million."
+- Labeled toy numbers. "Those numbers are made up, and I don't know the actual threshold". The
+  label makes a mechanism concrete; it is not cover for vagueness.
+- Endings add something new; about one in eight sections closes by restating. No summary
+  paragraph, no call to action.
+- Unearned shrug: every reader flagged it independently as the move imitators get wrong. "Fine."
+  and "Sure?" land only after 500 or more words of mechanism make the absurdity visible.
+- Headlines: median five words, a plain claim naming the lead story in the author's restatement,
+  often understated ("Bank of America Missed Some Bad Guys"); section labels stay flat.
+  Already covered by the Post pass.
+- Does not transfer to a monthly blog: "around here" callbacks and running gags need a daily
+  reader who remembers yesterday. Restate in one line and link.
