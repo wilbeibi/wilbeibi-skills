@@ -1,0 +1,23 @@
+catalog.json
+  s_8a6e863a95166c::t_03d2123780430b 755,792,807
+skills/write-docs/SKILL.md
+  s_8a6e863a95166c::t_03d2123780430b 3
+skills/write-docs/PR.md
+  s_8a6e863a95166c::t_ec9281b23f78e5 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "37862f3eea694b5f7e03992db11d9d33f77c4dd4",
+  "prompts": {},
+  "sessions": {
+    "s_8a6e863a95166c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53fda006-9ffc-48d8-9b83-881619e49bec",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
