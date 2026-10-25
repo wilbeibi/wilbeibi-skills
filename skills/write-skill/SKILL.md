@@ -11,7 +11,7 @@ Create compact skills under `skills/<name>/` that load only the behavior needed 
 ## Workflow
 
 1. Clarify only missing essentials: capability, triggers, non-triggers, tool/script needs, and portability.
-2. Pick a unique kebab-case name.
+2. Read every `description` in `catalog.json`. If a skill already owns the capability, extend it instead. Otherwise pick a unique kebab-case name; where another skill's triggers could also fire, add `Do NOT use ... (use <other>)` to both descriptions.
 3. Draft `SKILL.md` as an operator card: what to run, when to run it, what output means, what traps matter. End each step with a checkable completion criterion.
 4. Add helper files only when they remove repeated deterministic work.
 5. Compress once; add one README row; do not commit unless asked.
@@ -116,10 +116,10 @@ skill in `skills/`.
 
 ## Final Check
 
-- Name is unique kebab-case.
+- Name is unique kebab-case, no existing skill owns the capability, and overlapping skills point at each other.
 - Description has concrete `Use when ...` triggers and needed `Do NOT use ...` boundaries.
 - `SKILL.md` is under ~120 lines, preferably 30-60 for tool wrappers.
 - Helpers are invoked, not duplicated in prose.
-- Positive cross-skill pointers name a skill that exists in `skills/`.
+- Positive cross-skill pointers name a skill that exists in `skills/`; `scripts/check_skill_frontmatter.py` also rejects description `(use X)` pointers to a skill not in `skills/`.
 - Agent- or OS-only requirements are declared in `compatibility:`, not worked around.
 - Update the existing catalog row if the skill's purpose or invocation changes.

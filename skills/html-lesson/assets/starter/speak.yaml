@@ -5,7 +5,7 @@ voice: "Charon"     # one voice per lesson, picked for its subject: Charon, Sula
 
 # Request labels and where the key comes from. The key is read from the environment and never printed.
 headers:
-  x-turnpike-client: "explainer:todo"
+  x-turnpike-client: "html-lesson:todo"
 key_env: OPENROUTER_API_KEY
 # base_url: defaults to $OPENROUTER_BASE_URL, then https://openrouter.ai/api/v1
 

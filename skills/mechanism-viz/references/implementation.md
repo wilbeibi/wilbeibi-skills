@@ -62,13 +62,12 @@ Bars grow at one speed, so the faster implementation's bar lands first:
 along the x axis (thread count). Changing a selector replays the chart. Bars are square at the baseline and rounded
 at the data end (radius at most 4).
 
-Chart rules that travel:
+Chart rules from bbtree (general chart hygiene, such as zero baselines and shared scales, belongs to `dataviz`):
 
 - The reader picks the card; nothing auto-rotates.
 - A one-sentence conclusion above each card is computed from the data.
-- Draw at the card's real width, one unit per pixel; on narrow screens move the legend below.
-- Axes start at zero; panels in one card share a scale; a concurrency axis is proportional, so linear scaling is a
-  straight line through the origin.
+- Draw at the card's real width, one unit per pixel.
+- A concurrency axis is proportional from zero, so linear scaling is a straight line through the origin.
 - Memory is resident set after build, with the build-time peak as a lighter extension. Bytes requested hide
   allocator size classes: mimalloc gives a 192 B leaf a 224 B block, +21%.
 - Annotation lines stay under 75 characters and link to the competitor's code.

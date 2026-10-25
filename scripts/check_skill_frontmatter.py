@@ -4,9 +4,14 @@
 # ///
 
 from pathlib import Path
+import re
 import sys
 
 import yaml
+
+# Cross-pointers in descriptions: "(use show-me)" anywhere, or a bare "(grill-me)" after "Do NOT".
+USE_POINTER = re.compile(r"\(use `?([a-z0-9-]+)`?\)")
+BARE_POINTER = re.compile(r"\(([a-z0-9]+(?:-[a-z0-9]+)+)\)")
 
 
 def main() -> int:
@@ -15,6 +20,7 @@ def main() -> int:
         print("No skill files found under skills/*/SKILL.md", file=sys.stderr)
         return 1
 
+    names = {path.parent.name for path in skill_files}
     errors: list[str] = []
 
     for path in skill_files:
@@ -46,6 +52,11 @@ def main() -> int:
             raw = next((line for line in frontmatter.splitlines() if line.startswith(f"{key}:")), "")
             if " #" in raw and not raw[len(key) + 1 :].lstrip().startswith(('"', "'")):
                 errors.append(f"{path}: {key} contains ' #', which YAML reads as a comment; quote the value or drop the '#'")
+
+        description = data.get("description") if isinstance(data.get("description"), str) else ""
+        targets = set(USE_POINTER.findall(description)) | set(BARE_POINTER.findall(description.partition("Do NOT")[2]))
+        for target in sorted(targets - names):
+            errors.append(f"{path}: description points to '{target}', which is not a skill under skills/")
 
     if errors:
         print("\n".join(errors), file=sys.stderr)

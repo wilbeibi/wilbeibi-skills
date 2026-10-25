@@ -1,10 +1,10 @@
 ---
-name: explainer
+name: html-lesson
 description: Turn a paper, notebook, chapter, or design doc into a narrated, self-paced HTML lesson — one self-contained file with chapters, subtitles, worked numbers, pause-and-predict questions, and optional TTS narration; the finished lesson can also be filmed into one MP4. Use when asked for a tutorial/teaching video "as HTML", an explainer or lesson for a source, or to preview/teach a topic in finance, RL/ML, or distributed systems. Do NOT use for an in-chat diagram (use show-me), a chart of real data (use dataviz), a single illustration (use sketch-concept), a post or explorer showing how your own system's mechanism works (use mechanism-viz), or animation-first math video (this is not Manim).
 compatibility: uv (scripts run as uv scripts, Python 3.10+); node for evaluating the lesson script (22 or newer for `video`); Chromium or Chrome for the per-beat check, screenshots and `video`; ffmpeg for narration and `video`; an OpenAI-compatible /audio/speech endpoint for narration (optional); asr.py downloads a Whisper model on first run.
 ---
 
-# explainer
+# html-lesson
 
 A lesson is a directory of small parts that `scripts/lesson.py` assembles into one HTML file (plus one mp3 if narrated).
 The player, layout checks, and narration plumbing are fixed; you write the content. Read `references/authoring.md`

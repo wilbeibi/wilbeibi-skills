@@ -1,6 +1,6 @@
 ---
 name: mechanism-viz
-description: Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. Use when writing a deep-dive or launch post for your own system, or visualizing how a request, lock, scheduler, cache, protocol, storage engine, or concurrent data structure behaves step by step. Do NOT use for a narrated lesson built from someone else's source (use explainer), an in-chat diagram (use show-me), a single illustration (use sketch-concept), or a standalone chart (use dataviz).
+description: Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. Use when writing a deep-dive or launch post for your own system, or visualizing how a request, lock, scheduler, cache, protocol, storage engine, or concurrent data structure behaves step by step. Do NOT use for a narrated lesson built from someone else's source (use html-lesson), an in-chat diagram (use show-me), a single illustration (use sketch-concept), or a standalone chart (use dataviz).
 ---
 
 # mechanism-viz

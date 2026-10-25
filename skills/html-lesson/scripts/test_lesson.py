@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke test for the explainer skill: python3 scripts/test_lesson.py
+"""Smoke test for the html-lesson skill: python3 scripts/test_lesson.py
 
 The gallery must build and pass every check; a fresh starter must fail only on its TODO placeholders;
 `check` must name the scenes the scene map leaves out and the chapters the chain leaves out, and `thread` must write
@@ -104,7 +104,7 @@ def main() -> int:
         expect(r.returncode == 0, "init --gallery", r.stdout + r.stderr)
         r = lesson("check", str(gallery))
         expect(r.returncode == 0 and "CHECK OK" in r.stdout, "gallery passes check", r.stdout + r.stderr)
-        page = gallery / "out" / "explainer-gallery.html"
+        page = gallery / "out" / "html-lesson-gallery.html"
         expect(page.exists(), "gallery html is written")
 
         if shutil.which("ffmpeg"):
@@ -118,7 +118,7 @@ def main() -> int:
             expect(r.returncode == 0 and b'"audio": "data:audio/mpeg;base64,' in narrated, "mix builds a narrated page with the MP3 embedded",
                    r.stdout + r.stderr)
             r = lesson("build", str(gallery), "--no-embed")
-            expect(r.returncode == 0 and b'"audio": "explainer-gallery-narration.mp3"' in page.read_bytes(),
+            expect(r.returncode == 0 and b'"audio": "html-lesson-gallery-narration.mp3"' in page.read_bytes(),
                    "--no-embed references the MP3 beside the page", r.stdout + r.stderr)
             r = lesson("build", str(gallery))
             narrated = page.read_bytes()
@@ -128,7 +128,7 @@ def main() -> int:
                 expect(page.read_bytes() == narrated, f"{gate[0]} leaves the narrated page as it was", r.stdout + r.stderr)
             if any(shutil.which(b) for b in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable")):
                 r = lesson("video", str(gallery), "1-3")
-                film = gallery / "out" / "explainer-gallery-1-3.mp4"
+                film = gallery / "out" / "html-lesson-gallery-1-3.mp4"
                 took = re.search(r"picture ([\d.]+) s, sound ([\d.]+) s, timeline ([\d.]+) s", r.stdout)
                 expect(r.returncode == 0 and film.exists() and took and took.group(1) == took.group(3) == "1.50",
                        "video films three half-second beats into 1.5 s of picture and sound", r.stdout + r.stderr)
@@ -190,7 +190,7 @@ def main() -> int:
         zh = Path(tmp) / "zh"
         r = lesson("init", str(zh), "--title", "烟雾测试", "--slug", "smoke-zh", "--lang", "zh")
         speak = (zh / "speak.yaml").read_text(encoding="utf-8") if r.returncode == 0 else ""
-        expect("google/gemini-3.8-flash-tts" in speak and '"Charon"' in speak and "\nrules: zh\n" in speak and '"explainer:smoke-zh"' in speak,
+        expect("google/gemini-3.8-flash-tts" in speak and '"Charon"' in speak and "\nrules: zh\n" in speak and '"html-lesson:smoke-zh"' in speak,
                "init --lang zh sets the directed voice, the reading rules and a request label", r.stdout + r.stderr + speak)
         script = (zh / "script.js").read_text(encoding="utf-8").replace(
             "TODO the concrete situation and what we are trying to do.", "2020 年收入 $32.5 billion，利润率 −5%，估值 1.5x，每月 $60.37。")
