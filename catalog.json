@@ -178,14 +178,14 @@
     },
     {
       "name": "explainer",
-      "description": "Turn a paper, notebook, chapter, or design doc into a narrated, self-paced HTML lesson — one self-contained file with chapters, subtitles, worked numbers, pause-and-predict questions, and optional TTS narration; the finished lesson can also be filmed into one MP4. Use when asked for a tutorial/teaching video \"as HTML\", an explainer or lesson for a source, or to preview/teach a topic in finance, RL/ML, or distributed systems. Do NOT use for an in-chat diagram (use show-me), a chart of real data (use dataviz), a single illustration (use sketch-concept), or animation-first math video (this is not Manim).",
+      "description": "Turn a paper, notebook, chapter, or design doc into a narrated, self-paced HTML lesson — one self-contained file with chapters, subtitles, worked numbers, pause-and-predict questions, and optional TTS narration; the finished lesson can also be filmed into one MP4. Use when asked for a tutorial/teaching video \"as HTML\", an explainer or lesson for a source, or to preview/teach a topic in finance, RL/ML, or distributed systems. Do NOT use for an in-chat diagram (use show-me), a chart of real data (use dataviz), a single illustration (use sketch-concept), a post or explorer showing how your own system's mechanism works (use mechanism-viz), or animation-first math video (this is not Manim).",
       "compatibility": "uv (scripts run as uv scripts, Python 3.10+); node for evaluating the lesson script (22 or newer for `video`); Chromium or Chrome for the per-beat check, screenshots and `video`; ffmpeg for narration and `video`; an OpenAI-compatible /audio/speech endpoint for narration (optional); asr.py downloads a Whisper model on first run.",
       "agents": [],
       "path": "skills/explainer",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "9cc80a6ebc5c278fbeffea01919eb2a863c559d6d0d5e36857a55a542b5b7c8e",
+          "sha256": "bf4dc9182cb2fb50d4c84ee56a43233bcb061d0f5541a520b1eec1f1c38377cf",
           "executable": false
         },
         {
@@ -392,6 +392,30 @@
         {
           "path": "agents/openai.yaml",
           "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "mechanism-viz",
+      "description": "Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. Use when writing a deep-dive or launch post for your own system, or visualizing how a request, lock, scheduler, cache, protocol, storage engine, or concurrent data structure behaves step by step. Do NOT use for a narrated lesson built from someone else's source (use explainer), an in-chat diagram (use show-me), a single illustration (use sketch-concept), or a standalone chart (use dataviz).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/mechanism-viz",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "1d877682283386964caee0cc8c60fc78d4eb0ce6e03637ac2629405387f4db13",
+          "executable": false
+        },
+        {
+          "path": "references/bbtree-case.md",
+          "sha256": "66e4d4699932964851ffd03c85316ce393984aa090fa5500e9a45c1d6567c717",
+          "executable": false
+        },
+        {
+          "path": "references/implementation.md",
+          "sha256": "e9660e781d7f6008823d96d0154861c3fb78b5edbb555ce81a7c377a674b95d2",
           "executable": false
         }
       ]

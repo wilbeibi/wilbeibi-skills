@@ -23,6 +23,7 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [grok-repo](skills/grok-repo/SKILL.md) | Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Develop a scoped implementation plan when explicitly asked to plan a coding task. |
+| [mechanism-viz](skills/mechanism-viz/SKILL.md) | Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. |
 | [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent-todo queue via scripts/capture.py. |
 | [obsidian-search](skills/obsidian-search/SKILL.md) | Search an Obsidian vault for topics, exact text, tags, recent notes, and tasks. |
 | [paper-search](skills/paper-search/SKILL.md) | Find and rank research papers by relevance, recency, field-adjusted impact, venue, and author affiliation. |
