@@ -17,7 +17,7 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [blog-review](skills/blog-review/SKILL.md) | Review a technical blog draft and report what loses its reader, ordered by cost. |
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. |
 | [create-verification-skill](skills/create-verification-skill/SKILL.md) | Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. |
-| [dataviz](skills/dataviz/SKILL.md) | Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. (Codex only) |
+| [dataviz](skills/dataviz/SKILL.md) | Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. |
 | [grill-me](skills/grill-me/SKILL.md) | Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
 | [grok-repo](skills/grok-repo/SKILL.md) | Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. |
@@ -32,7 +32,7 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [route-skill](skills/route-skill/SKILL.md) | Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. |
 | [sherlock](skills/sherlock/SKILL.md) | Work an open question like a case — graded clues, competing theories in a consistency matrix, eliminate by evidence, backtrack, converge, with a casebook on disk for long cases. |
 | [show-me](skills/show-me/SKILL.md) | Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. |
-| [sketch-concept](skills/sketch-concept/SKILL.md) | Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. (Codex only) |
+| [sketch-concept](skills/sketch-concept/SKILL.md) | Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. |
 | [test-writing](skills/test-writing/SKILL.md) | Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. |
 | [tla-model](skills/tla-model/SKILL.md) | Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. |

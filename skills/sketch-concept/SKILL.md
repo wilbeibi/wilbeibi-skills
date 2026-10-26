@@ -1,6 +1,5 @@
 ---
 name: sketch-concept
-agents: [codex]
 description: Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).
 ---
 
@@ -35,6 +34,8 @@ Examples:
 Prefer a before/after pair when contrast is the lesson. Prefer a three-object left-to-right scene for a single data path. Use a hand-drawn chart only when the trend itself is the lesson.
 
 ## Generate a draft
+
+Without an image-generation tool, skip this draft: author the final illustration as SVG under the same story and visual-language rules, with every label as real text.
 
 Use the image-generation tool for the illustration. State the use case as `infographic-diagram`, and include:
 

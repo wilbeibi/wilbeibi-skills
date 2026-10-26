@@ -164,14 +164,12 @@
       "name": "dataviz",
       "description": "Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. Use when asked for a benchmark graph, data illustration, performance chart, tradeoff plot, small multiple, or an editorial chart in React/Recharts or a static plotting stack. Do NOT use for text-only diagrams (use show-me), hand-drawn conceptual art (use sketch-concept), or dashboard UI design.",
       "compatibility": "",
-      "agents": [
-        "codex"
-      ],
+      "agents": [],
       "path": "skills/dataviz",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "cc45e74b32316e9622b092cff01dbd6ad83661840e2ceffcdd5a8974abbba24e",
+          "sha256": "5b56cca2948655cc5a7bef48b585853310e8b043843dd3daeee629a75fe8d6a9",
           "executable": false
         }
       ]
@@ -656,14 +654,12 @@
       "name": "sketch-concept",
       "description": "Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).",
       "compatibility": "",
-      "agents": [
-        "codex"
-      ],
+      "agents": [],
       "path": "skills/sketch-concept",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "20bb1dee622cb3c70cf0dbd3d8f2a744d472cc7aa50e537160be3463efb50a52",
+          "sha256": "fdff5f7e858500bace51aaa14eec72b5404e391683589e3061c5e3c752a53614",
           "executable": false
         }
       ]
