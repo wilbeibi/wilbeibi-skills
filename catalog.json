@@ -67,12 +67,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "f408b06e7f3c68e69da99d519f46220dfcadbaeef92a6f91f946c54814d0423c",
+          "sha256": "cae43f72c91a434081d83951ba4678e7b9bb9827dade47550029d3dbdf9c7c65",
           "executable": false
         },
         {
           "path": "references/REFERENCE.md",
-          "sha256": "28cc99ef9127df35334e7163c93a3db70624d6616b73ff433f4b89d00aaacfcc",
+          "sha256": "cf5a634a7bdb93b83a59c0a6ea1d2e741d6e522f42a833454ca0dbe3cfbd9021",
           "executable": false
         }
       ]

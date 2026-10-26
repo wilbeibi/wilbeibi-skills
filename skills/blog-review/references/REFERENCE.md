@@ -77,6 +77,42 @@ Blog-side:
 - Failed openings the blog names: a strawman of the opposing view (willison had to apologize); a
   post pitched to the wrong audience (poder took it down).
 
+## Path
+
+The house-tour test, from one review of a cold-reader explainer: the restructure that worked put an
+orientation section (problem, three ideas, one overview table, four plain-language turns) before
+the chronology, and moved provenance evidence from the top to the end. The checks below map to
+[Laws of UX](https://lawsofux.com/); each law is written for interfaces, and a page is an interface the reader
+navigates once, in order.
+
+- Map first. [Mental Model](https://lawsofux.com/mental-model/): "A compressed model based on what we think we know
+  about a system and how it works." Without one, every detail is unplaceable. Test: after the
+  opening, can the reader name the parts and the order they will meet them?
+- Carry little. [Working Memory](https://lawsofux.com/working-memory/), [Miller's Law](https://lawsofux.com/millers-law/),
+  [Cognitive Load](https://lawsofux.com/cognitive-load/). Count items held but not yet used: undefined terms,
+  figure labels that a later section explains (a diagram showing "DAMON" before DAMON is
+  introduced), numbers used three sections later. Define or move each to where it is used.
+- Use the words the reader already has. [Jakob's Law](https://lawsofux.com/jakobs-law/): readers spend most of
+  their time elsewhere and bring that vocabulary. Prefer the source's or the field's term to a
+  coined metaphor; if a coinage is unavoidable, define it at first use and never vary it.
+- Group. [Chunking](https://lawsofux.com/chunking/): sections are rooms; one idea per section; headings are the
+  questions the reader asks next.
+- Few forks at the door. [Hick's Law](https://lawsofux.com/hicks-law/): an opening that offers ten links or ten
+  table rows delays the start; give the overview, link the rest from where it is used.
+- Keep moving toward the goal. [Goal-Gradient Effect](https://lawsofux.com/goal-gradient-effect/): a long detour
+  just before the main part (a paper-version diff before the system the title names) is where
+  readers leave. Fold it.
+- Skippable goes aside. [Selective Attention](https://lawsofux.com/selective-attention/): caveats, inferences, and
+  pointers mid-route split attention; a margin note keeps them available without blocking the
+  path. [Tesler's Law](https://lawsofux.com/teslers-law/): the complexity is irreducible, so it moves (folds,
+  asides, an appendix), it does not vanish. Moving is not deleting.
+- Emphasis is scarce. [Von Restorff Effect](https://lawsofux.com/von-restorff-effect/): one callout or one bold
+  line per section is remembered; five are not.
+- First and last positions carry. [Serial Position Effect](https://lawsofux.com/serial-position-effect/),
+  [Peak-End Rule](https://lawsofux.com/peak-end-rule/): the opening and the ending are what remain. The ending
+  should hand over the reader's next decision (which premise to check on their own system), not
+  a summary or a list of sources.
+
 ## Structure
 
 Williams, Lessons 6 and 8:
