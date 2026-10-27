@@ -32,7 +32,7 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [route-skill](skills/route-skill/SKILL.md) | Discovers skills in the wilbeibi-skills catalog and loads explicitly selected skills from local files or cache, fetching missing skills. |
 | [sherlock](skills/sherlock/SKILL.md) | Work an open question like a case — graded clues, competing theories in a consistency matrix, eliminate by evidence, backtrack, converge, with a casebook on disk for long cases. |
 | [show-me](skills/show-me/SKILL.md) | Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. |
-| [sketch-concept](skills/sketch-concept/SKILL.md) | Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. |
+| [sketch-concept](skills/sketch-concept/SKILL.md) | Draw a hand-drawn SVG illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. |
 | [test-writing](skills/test-writing/SKILL.md) | Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. |
 | [tla-model](skills/tla-model/SKILL.md) | Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. |

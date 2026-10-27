@@ -1,75 +1,110 @@
 ---
 name: sketch-concept
-description: Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).
+description: Draw a hand-drawn SVG illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).
+compatibility: Python 3.10+, stdlib only; Chromium or Chrome for `sketch.py check`.
 ---
 
 # sketch-concept
 
-Make an abstract technical mechanism feel like a small physical world. The illustration should communicate one insight at a glance, not attempt to be a complete architecture diagram.
+One figure, one idea, in the notation the reader already knows, drawn with a wobbly pen. `scripts/sketch.py`
+(paths are relative to this skill's directory) draws it as static SVG and checks it in a real browser at phone
+and desktop width, light and dark.
 
-## Visual language
+## Steps
 
-- Use thick, slightly wobbly black outlines, flat colors, generous whitespace, and a handwritten font resembling Virgil or Patrick Hand.
-- Use a soft paper-colored or saturated single-color background. Keep the palette to 4–5 colors: sky blue, pale lemon, ochre, coral, lavender, plus black.
-- Reuse one visual identity for like things: people for requests/tenants, small packages for chunks/messages, a warehouse for remote storage, a cabinet for cache, a ticket booth or tent for admission control.
-- Turn each important system component into a friendly physical metaphor. Make the metaphor support the actual behavior rather than decorate it.
-- Use direct arrows for the happy path. Reserve a large curved arrow for retry, queueing, timeout, or feedback loops.
-- Put the conclusion in the composition itself (color, position, missing item) and reinforce it with one short caption.
+1. **Choose the story.** Write the picture as `actor → decision or absence → visible consequence`, e.g. a file
+   read → one chunk is missing → only that chunk is fetched. Contrast is the lesson → a before/after pair, or
+   columns that differ in one place. One data path → three objects, left to right. Layers are the lesson → a
+   stack, top to bottom. A trend is the lesson → its shape, hand-drawn, without real values. Done when the line
+   names one consequence a reader can point at.
+2. **Pick the glyphs.** The field has a standard notation → draw it: the reader's mental map is already built
+   from it, and a metaphor makes them translate. It has none → one physical metaphor per kind of thing, reused
+   for every instance. Done when each glyph is the usual one or a consistent metaphor, and the claim shows in
+   the composition (a colour, a position, a missing item), not only in the caption.
 
-Avoid dashboards, gradients, glossy vector UI, generic cloud-service logos, dense boxes, and more than one central claim.
+   | Thing | Glyph | Pen |
+   |---|---|---|
+   | container | box standing on a shared host-kernel bar | `box` |
+   | VM, microVM | dashed boundary around the app and its own guest-kernel strip | `box(dash="7 6")` |
+   | disk, object storage | cylinder | `cylinder` |
+   | memory, page cache | module with pins | `memory` |
+   | queue | row of slots | one `box` per slot |
+   | request or data flow | straight arrow; one big curved arrow for retry, timeout or feedback | `arrow(bend=...)` |
+   | more of the same | three dots | `dots` |
 
-## Choose the story
+3. **Draw.** Write a script against `Pen`; this one passes `check`:
 
-Before generating, express the picture as:
+   ```python
+   import sys; sys.path.insert(0, "<skill dir>/scripts")
+   from pathlib import Path
+   from sketch import Pen, page
 
-`actor → decision or absence → visible consequence`
+   p = Pen(seed=3)
+   for x, name in ((24, "app A"), (100, "app B")):           # containers stand on the host kernel
+       p.box(x, 44, 64, 70, fill="sky")
+       p.text(x + 32, 84, name, maxw=56)
+   p.box(188, 16, 156, 108, fill="wash", dash="7 6")         # the VM boundary
+   p.text(266, 36, "microVM", size=13, color="ink-2", maxw=140)
+   p.box(204, 46, 124, 34, fill="sky")
+   p.text(266, 68, "app C", maxw=110)
+   p.box(204, 86, 124, 28, fill="ochre")                     # its own kernel
+   p.text(266, 105, "guest kernel", maxw=110)
+   p.box(16, 134, 328, 36, fill="lavender")
+   p.text(180, 157, "host kernel", maxw=300)
+   fig = p.svg(360, 186, label="Two containers share the host kernel; a microVM runs its own guest kernel")
+   Path("kernels.html").write_text(page(fig, "Kernels", caption="Containers share the host kernel; a microVM brings its own."))
+   ```
 
-Examples:
+   - Units are CSS px at full size, and later calls paint on top. `text` takes the baseline: centre a label in
+     a box at its middle + size × 0.35. Give every label `maxw`, the room it has.
+   - Start the viewBox near 360 wide: a 375 px phone gives the figure about 343 px, and 14-unit labels must
+     still render at 11 px or more.
+   - Colours are palette names: `paper ink ink-2 wash card lid sky sky-2 lemon ochre coral lavender`. Ink reads
+     on every fill in both modes; muted `ink-2` only on paper, wash and card. Use four or five fills, give each
+     one meaning (lemon = shared), and name that meaning in the caption.
+   - Labels are a word or three; sentences go in the caption. No gradients, logos, glossy UI or second claim.
+   - Patrick Hand and Virgil draw Latin script only. For CJK or another script, add a hand font that covers it,
+     e.g. `svg(font="'Patrick Hand', 'ZCOOL KuaiLe', sans-serif")`, and its stylesheet link to `page(head=...)`.
+   - `svg()` returns one self-contained `<svg>` (no `<style>` or script) that pastes into any page and falls
+     back to the light palette. A host page gets dark mode by adding `sketch.TOKENS_CSS` to its stylesheet;
+     `page()` already includes it.
 
-- A file read → one chunk is missing → fetch only that chunk.
-- Requests arrive → capacity runs out → the newest request is served first.
-- Writes accumulate → small files are merged → reads become cheaper.
-- A retrying client → a budget is exhausted → retries stop before overload spreads.
+   Done when every label has `maxw`, the `label` alt text states the claim, and the seed is fixed: the same
+   calls give the same bytes.
+4. **Check.** Run it on the figure page, then on the page that embeds the figure, whose column, fonts and
+   theme are what readers see. `check` opens a local file: if that page links root paths like `/style.css`,
+   check a copy whose links are relative.
 
-Prefer a before/after pair when contrast is the lesson. Prefer a three-object left-to-right scene for a single data path. Use a hand-drawn chart only when the trend itself is the lesson.
+   ```bash
+   python3 scripts/sketch.py check kernels.html --shots shots/
+   ```
 
-## Generate a draft
+   Each `FAIL` line names one fault and, when it is not everywhere, the widths and modes it shows in; the last
+   line is `CHECK OK` or `CHECK FAILED` (exit 1). On the embedding page it reads every `<svg>`, diagrams you
+   did not draw included; act on the lines about yours. Change the drawing, not the check:
 
-Without an image-generation tool, skip this draft: author the final illustration as SVG under the same story and visual-language rules, with every label as real text.
+   - label too wide, overlapping or past the edge → shorter words first, then move or widen the box;
+   - text below 11 px → fewer, larger labels or a narrower viewBox, never smaller text;
+   - contrast → `ink`, or muted text only on paper, wash or card;
+   - a font missing, or characters no listed font has → load a font that covers them;
+   - drawing past the viewBox → widen the viewBox;
+   - `warn … same in dark mode` → add `TOKENS_CSS` to the page.
 
-Use the image-generation tool for the illustration. State the use case as `infographic-diagram`, and include:
+   Then open the four screenshots: arrows point the way the system moves, and the claim reads at 375 px. Done
+   when the figure page prints `CHECK OK`, no line from the embedding page is about your figure, and the
+   screenshots show the story line from step 1.
 
-1. A precise scene and the metaphor for each component.
-2. Layout direction and the one flow or transition being shown.
-3. A fixed palette and the visual-language constraints above.
-4. Every required label as verbatim quoted text.
-5. A reminder: flat colors, legible labels, no logos, no gradients, no watermark.
+## Optional: an image-model draft
 
-For reference images, treat them as style references only; do not reproduce their specific composition or characters.
-
-## Verify and refine
-
-Inspect the result for three things:
-
-- **Meaning:** the arrow direction, state transition, and physical metaphor agree with the system behavior.
-- **Legibility:** every important label is readable; remove secondary text rather than shrinking it.
-- **Coherence:** line weight, handwriting, and the asset language remain consistent.
-
-If the draft misses one of these, make one targeted regeneration request. When exact data values or dense labels must be guaranteed, use the generated image as an art-direction reference and create the final diagram in SVG, Figma, or Excalidraw instead.
-
-## Prompt skeleton
+When an image-generation tool is available and the composition is still open, a draft can settle it. The final
+figure stays SVG drawn with `Pen`: generated text and notation drift. Treat any reference image as style only.
 
 ```text
 Use case: infographic-diagram
-Asset type: technical blog illustration
-Primary request: Explain [one mechanism] as [one visual story].
-Scene/backdrop: [single background color].
-Subject: [left / center / right objects and the physical metaphor for each].
-Composition/framing: [before/after, left-to-right path, or chart].
-Style/medium: whimsical hand-drawn systems illustration; thick wobbly black ink
-outlines; handwritten Virgil-like lettering; flat colors; generous whitespace.
-Color palette: [up to five colors].
+Primary request: Explain [one mechanism] as [the story line from step 1].
+Subject: [left / centre / right objects, each in its field's standard notation].
+Style: hand-drawn systems sketch; thick wobbly ink outlines; handwritten lettering; flat colours on paper;
+generous whitespace; palette [up to five colours].
 Text (verbatim): "[label 1]"; "[label 2]".
-Constraints: exactly one main takeaway; all text legible; no gradients, logos,
-watermark, generic dashboard panels, or photorealism.
+Constraints: one takeaway; every label legible; no gradients, logos, watermark, dashboards or photorealism.
 ```

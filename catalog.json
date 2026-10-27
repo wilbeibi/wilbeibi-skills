@@ -652,14 +652,24 @@
     },
     {
       "name": "sketch-concept",
-      "description": "Generate a playful hand-drawn illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).",
-      "compatibility": "",
+      "description": "Draw a hand-drawn SVG illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. Use when asked for an illustration, a hand-drawn or Excalidraw-style visual, or a picture that makes one engineering idea click. Do NOT use for answering in-chat with a text diagram (use show-me), for charts of real data (use dataviz), or for an animated or interactive step-by-step walkthrough of your own system (use mechanism-viz).",
+      "compatibility": "Python 3.10+, stdlib only; Chromium or Chrome for `sketch.py check`.",
       "agents": [],
       "path": "skills/sketch-concept",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "fdff5f7e858500bace51aaa14eec72b5404e391683589e3061c5e3c752a53614",
+          "sha256": "28566e5683c8070049bc09d4ce3d24014f0da7cf266699332d7782d7f5271463",
+          "executable": false
+        },
+        {
+          "path": "scripts/sketch.py",
+          "sha256": "98790d24fef13a6d179d7a11fa99f9f6dae27f7ab20b5823dc78a19e68388920",
+          "executable": false
+        },
+        {
+          "path": "scripts/test_sketch.py",
+          "sha256": "0a8464303b7afa8cdc7b235ee556c77b4fc7bc8b2bec73c838fdded5c5ed5d50",
           "executable": false
         }
       ]
