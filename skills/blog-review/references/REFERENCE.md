@@ -85,6 +85,11 @@ the chronology, and moved provenance evidence from the top to the end. The check
 [Laws of UX](https://lawsofux.com/); each law is written for interfaces, and a page is an interface the reader
 navigates once, in order.
 
+- Trace the circulation. Circulation is the architect's word for how people move through a building.
+  Read paragraph by paragraph and write the reader's map after each: what they hold, what was
+  added, what is still open. Path findings are read off that trace rather than from a general impression.
+  Added 2026-10-26 after a review whose sharpest finding, a title that held only under a
+  non-default option, showed up only when the reader's map was tracked against the title.
 - Map first. [Mental Model](https://lawsofux.com/mental-model/): "A compressed model based on what we think we know
   about a system and how it works." Without one, every detail is unplaceable. Test: after the
   opening, can the reader name the parts and the order they will meet them?
