@@ -14,7 +14,7 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 | CLI flags, subcommands, `--help`, error text, output contracts | [CLI.md](CLI.md) | someone typing at a prompt, and the script that wraps them |
 | Code comments, docstrings, inline rationale | [COMMENTS.md](COMMENTS.md) | the maintainer reading this during an outage |
 | `AGENTS.md` / `CLAUDE.md` operating guides | [AGENTSMD.md](AGENTSMD.md) | an agent with no memory of your project |
-| Commit messages, PR descriptions, changelog entries | [PR.md](PR.md) | a maintainer running `git log` in two years |
+| Commit messages, PR descriptions, changelog entries | [PR.md](PR.md) | a maintainer running `git log` in two years; for a PR, also the reviewer who must act today |
 
 Not this skill: blog posts and essays (use `blog-review`), design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
 
