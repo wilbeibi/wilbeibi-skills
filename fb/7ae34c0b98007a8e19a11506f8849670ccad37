@@ -1,0 +1,65 @@
+README.md
+  s_8dfa08e1113e62::t_8f9105ca3d1cc8 19,22-23,28,40-41,44
+catalog.json
+  s_8dfa08e1113e62::t_2771c729c6f419 144-167,170,182,202-203,206,210,214-215,220,222-231,233-234,420-444,456,463,753-790,800,805,812,834,864-882,899,951
+skills/create-formal-verification-skill/LICENSE.pstack
+  s_8dfa08e1113e62::t_e0aa8f6df2c0bd 1-21
+skills/create-formal-verification-skill/SKILL.md
+  s_8dfa08e1113e62::t_d8c1243328c916 1-49
+skills/create-verification-skill/SKILL.md
+  s_8dfa08e1113e62::t_d893d7888fa6fa 3
+skills/domain-modeling/ADR-FORMAT.md
+  s_8dfa08e1113e62::t_9f31914834d45f 3
+skills/domain-modeling/GLOSSARY-FORMAT.md
+  s_8dfa08e1113e62::t_f96ec3f5211cfa 1,3-5,45,47,50,54-55,62
+skills/domain-modeling/SKILL.md
+  s_8dfa08e1113e62::t_3b315a5462886a 1-42
+skills/grill-me/SKILL.md
+  s_8dfa08e1113e62::t_5e977d206dada7 3,8,10,12-13,15,17,19,21-26,28-30,32-39,43
+skills/karpathy-planning/SKILL.md
+  s_8dfa08e1113e62::t_41dcf206bf5e13 13
+skills/maintain-formal-verification-skill/LICENSE.pstack
+  s_8dfa08e1113e62::t_e18e283dc43d73 1-21
+skills/maintain-formal-verification-skill/SKILL.md
+  s_8dfa08e1113e62::t_ee3b51d2c9976a 1-60
+skills/maintain-formal-verification-skill/agents/openai.yaml
+  s_8dfa08e1113e62::t_af6ccc31de8cfc 1-2
+skills/mechanism-viz/SKILL.md
+  s_8dfa08e1113e62::t_82442d6a46a76d 3
+skills/state-prototype/SKILL.md
+  s_8dfa08e1113e62::t_f45f1e3987cf2d 1-40
+skills/statechart/LICENSE.pstack
+  s_8dfa08e1113e62::t_9ffc26dafc4616 1-21
+skills/statechart/SKILL.md
+  s_8dfa08e1113e62::t_599041d0b5f844 1-87
+skills/statechart/scripts/statechart
+  s_8dfa08e1113e62::t_dba0108c82280b 1-36
+skills/test-writing/REFERENCE.md
+  s_8dfa08e1113e62::t_d5aa4a6b7f2985 73-84
+skills/test-writing/SKILL.md
+  s_8dfa08e1113e62::t_38d6e12b6d83f8 39
+skills/tla-model/SKILL.md
+  s_8dfa08e1113e62::t_29ec1a8c21f598 3,41
+skills/wait-what/SKILL.md
+  s_8dfa08e1113e62::t_0b50b87f986bc3 1-19
+skills/wait-what/agents/openai.yaml
+  s_8dfa08e1113e62::t_a8da299a24ca2a 1-2
+skills/write-docs/SKILL.md
+  s_8dfa08e1113e62::t_fcc6948bdb8ee4 3,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fb7ae34c0b98007a8e19a11506f8849670ccad37",
+  "prompts": {},
+  "sessions": {
+    "s_8dfa08e1113e62": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0611c837-4152-4767-8344-71b108cddee1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
