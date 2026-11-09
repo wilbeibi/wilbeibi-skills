@@ -1,6 +1,6 @@
 ---
 name: write-docs
-description: Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs or ADRs (grill-me), or skills (write-skill).
+description: Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs (grill-me), ADRs or glossaries (domain-modeling), or skills (write-skill).
 ---
 
 # write-docs
@@ -16,7 +16,7 @@ Pick the artifact, read that file, then write. Do not load more than one — the
 | `AGENTS.md` / `CLAUDE.md` operating guides | [AGENTSMD.md](AGENTSMD.md) | an agent with no memory of your project |
 | Commit messages, PR descriptions, changelog entries | [PR.md](PR.md) | a maintainer running `git log` in two years; for a PR, also the reviewer who must act today |
 
-Not this skill: blog posts and essays (use `blog-review`), design docs, ADRs (use `grill-me`), internal service wikis, or authoring a skill (use `write-skill`).
+Not this skill: blog posts and essays (use `blog-review`), design docs (use `grill-me`), ADRs and glossaries (use `domain-modeling`), internal service wikis, or authoring a skill (use `write-skill`).
 
 ## Workflow
 

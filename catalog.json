@@ -142,8 +142,32 @@
       ]
     },
     {
+      "name": "create-formal-verification-skill",
+      "description": "Generates a project-local skill that formally verifies the code where a bug costs the most and tests reach the least, in any language, with whichever verification tool fits. Use for /create-formal-verification-skill, \"verify this subsystem\", or when concurrency, retries, state machines, parsers, or unsafe code need more than tests. Do NOT use for one ad hoc TLA+ spec (use tla-model) or to drive a running app for evidence (use create-verification-skill).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/create-formal-verification-skill",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "4c2e70e536e4d6a8d693e69fb3723510e40bdd6c7c99d4945975994de0d1b563",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "create-verification-skill",
-      "description": "Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. Use when asked to create a reusable verification workflow or control skill for a project. Do NOT use for a one-off smoke check or ordinary unit-test writing.",
+      "description": "Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. Use when asked to create a reusable verification workflow or control skill for a project. Do NOT use for a one-off smoke check, ordinary unit-test writing, or formal verification of a design or invariant (use create-formal-verification-skill).",
       "compatibility": "",
       "agents": [],
       "path": "skills/create-verification-skill",
@@ -155,7 +179,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "7330f2e76be626bf4e37b4543f809ddb87f428f941e4e6b36076ad7a408df660",
+          "sha256": "7f98cefad3451a3ef86099aa8193b06b14ac2a3e57014c71d09e855d3118b2db",
           "executable": false
         }
       ]
@@ -175,30 +199,39 @@
       ]
     },
     {
+      "name": "domain-modeling",
+      "description": "Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. Use when a term, status, or field means two things, when naming a new concept or state, or when editing a glossary, GLOSSARY.md, or ADR. Do NOT use to interview the user about a plan (use grill-me) or to write a design doc.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/domain-modeling",
+      "files": [
+        {
+          "path": "ADR-FORMAT.md",
+          "sha256": "f9038a533249891085f90fd1de2ff4d95f0396d74953a7c55be0c576abe333c0",
+          "executable": false
+        },
+        {
+          "path": "GLOSSARY-FORMAT.md",
+          "sha256": "694124430fe8b2e6b65d2ba675f8b985ae622b52c8ab725abcc1c7289c0ab879",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "ffd315d2e001d76bc900e63e12213bf7ebced40708bf7587ec43933ace8bbd25",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "grill-me",
-      "description": "Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. Use when asked to \"grill me,\" stress-test a design, or challenge assumptions before implementation.",
+      "description": "Resolves the open decisions of a plan or design with the user in short rounds of numbered questions, each with its context, options, and a recommended answer. Use when asked to \"grill me\" or stress-test a design, or when a plan has two or more open decisions only the user can make, including from karpathy-planning, state-prototype, or domain-modeling. Do NOT use for one quick clarifying question, or to collect comments on a long document (use readback).",
       "compatibility": "",
       "agents": [],
       "path": "skills/grill-me",
       "files": [
         {
-          "path": "ADR-FORMAT.md",
-          "sha256": "bd01fdc48ad5e39a4f065db6abbd524658512d5e6e81e1a08ffc2cb98b5ed069",
-          "executable": false
-        },
-        {
-          "path": "CONTEXT-FORMAT.md",
-          "sha256": "00c70fb2c97717f1119d6c5c3f0269d65c2ccc040b376e124e62352c2fa36de5",
-          "executable": false
-        },
-        {
           "path": "SKILL.md",
-          "sha256": "327bacda23ade4f49f57ae7e3d714705d9ed616884d306c01e93e6fed0db0701",
-          "executable": false
-        },
-        {
-          "path": "agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "sha256": "dc34af727a5cbf6e933c30d2ce68aa76420e391ab3924efb4d05cb066555cd5d",
           "executable": false
         }
       ]
@@ -384,7 +417,31 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "98bbef9e8dd90ce8488e8e3f08a79ba4fb970b68b5dff6c382103c9b622b494e",
+          "sha256": "16c5d64dfbe2a76c93aa599542120083ee3550cc39e7f2af69b2ad781e381076",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "maintain-formal-verification-skill",
+      "description": "Brings a project's formal verification back in line with the code after the code changes, and says whether each failure is drift in the verification or a bug in the code. Use for /maintain-formal-verification-skill, \"is the model still true to the code\", or after merges and refactors that touched verified code without rechecking it. Do NOT use to create the first verification (use create-formal-verification-skill).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/maintain-formal-verification-skill",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "3d959f66161e665d9126f537fa6b417bf3c62727d34e546ef4c634c50a16a2c8",
           "executable": false
         },
         {
@@ -396,14 +453,14 @@
     },
     {
       "name": "mechanism-viz",
-      "description": "Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. Use when writing a deep-dive or launch post for your own system, or visualizing how a request, lock, scheduler, cache, protocol, storage engine, or concurrent data structure behaves step by step. Do NOT use for a narrated lesson built from someone else's source (use html-lesson), an in-chat diagram (use show-me), a single illustration (use sketch-concept), or a standalone chart (use dataviz).",
+      "description": "Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. Use when writing a deep-dive or launch post for your own system, or visualizing how a request, lock, scheduler, cache, protocol, storage engine, or concurrent data structure behaves step by step. Do NOT use for a narrated lesson built from someone else's source (use html-lesson), an in-chat diagram (use show-me), a single illustration (use sketch-concept), a demo of a proposed state model (use state-prototype), or a standalone chart (use dataviz).",
       "compatibility": "",
       "agents": [],
       "path": "skills/mechanism-viz",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "a2b8061ba436030d76b449566a40fc41574a73f1a68353f0c02705802c8b22e7",
+          "sha256": "638a28a2aa296967d269f3a27372547a210cef0ca10b68faa3a4167701dc5ba6",
           "executable": false
         },
         {
@@ -694,6 +751,44 @@
       ]
     },
     {
+      "name": "state-prototype",
+      "description": "Builds a throwaway single-file HTML demo of a proposed state model, driven by an explicit transition table, with free-play buttons and scenario tabs a person can click through. Use when asked to prototype, sanity-check, or feel out a state machine, lifecycle, or status design before implementing it. Do NOT use to explain an existing mechanism (use mechanism-viz), to check every interleaving (use tla-model), to chart a checked model (use statechart), or for a static diagram (use show-me).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/state-prototype",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "914cf42442ebb8e30bb9d15d0bfba4e1550bc67a73baed66d7941291235b8a93",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "name": "statechart",
+      "description": "Checks a TLA+ model of a system that moves between states, such as a product flow, a protocol, or a service lifecycle, and draws it as a Mermaid statechart in the reader's words, with the shortest path to each state that breaks a rule. Use for /statechart, to show a TLC counterexample as a path through states, or to chart a checked model for a reviewer. Do NOT use for a proposed design with no model (use state-prototype) or a hand-drawn diagram (use show-me).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/statechart",
+      "files": [
+        {
+          "path": "LICENSE.pstack",
+          "sha256": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+          "executable": false
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "795077e2eaeb5bb2bf8328c07d7e2e9061aa693c4fa6cc89985eb5836b7347f0",
+          "executable": false
+        },
+        {
+          "path": "scripts/statechart",
+          "sha256": "09c441a6cb5456521a476cb874cacad03ecd2625031564be1d4f97e9cabf4c41",
+          "executable": true
+        }
+      ]
+    },
+    {
       "name": "test-writing",
       "description": "Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. Use when writing or reviewing tests, choosing a test seam, scope, or mocks, adding property, fuzz, or regression tests, fixing brittle tests, auditing a bloated suite, or deciding whether a failing test means the code or the test is wrong. Do NOT use for TLA+ model checking (use tla-model).",
       "compatibility": "",
@@ -702,19 +797,19 @@
       "files": [
         {
           "path": "REFERENCE.md",
-          "sha256": "66c3df743556a204b762757cb160dc63a55f87a45017825a51ababd81522f0af",
+          "sha256": "90a20a69cdb081cec6e2975e4d686e7ddc45b1994e2d9a741163d80c086e7854",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "5b84cee249fe3cd997c6292d4ff8e0a1e357f99772d6c2f72a77bb0b23b13991",
+          "sha256": "52c98bfb7462cb1db94669c5fb6e3b79fb97cab2bda15cdc8c909103426a6780",
           "executable": false
         }
       ]
     },
     {
       "name": "tla-model",
-      "description": "Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. Use when asked to write, review, or debug a TLA+ spec, .tla/.cfg files, or TLC output, or to model-check or formally verify a protocol, lock, lease, consensus, replication, WAL, retry, or race condition. Do NOT use for unit or property-based tests (use test-writing) or for Lean, Coq, Dafny, or Verus proofs.",
+      "description": "Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. Use when asked to write, review, or debug a TLA+ spec, .tla/.cfg files, or TLC output, or to model-check or formally verify a protocol, lock, lease, consensus, replication, WAL, retry, or race condition. Do NOT use for unit or property-based tests (use test-writing), a click-through demo of a proposed state model (use state-prototype), a reader's chart of a checked model (use statechart), a verify skill kept in a repo (use create-formal-verification-skill), or Lean, Coq, Dafny, or Verus proofs.",
       "compatibility": "uv (scripts/tlc.py runs as a uv script, Python 3.10+, no dependencies); Java 11+ and tla2tools.jar (scripts/tlc.py fetch downloads it).",
       "agents": [],
       "path": "skills/tla-model",
@@ -736,7 +831,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "ff710f76a2f3940dea3b731cdf3ef0c39e055dba5fa9792873af50e31fe20d19",
+          "sha256": "da19ccafdf730e796fe162e34c2bcfeb003057682398e22c6502991f5de43b67",
           "executable": false
         },
         {
@@ -767,6 +862,25 @@
       ]
     },
     {
+      "name": "wait-what",
+      "description": "Re-pitches the agent's last message after it did not land, with context first, every label explained, and plain short sentences. Use when the user types /wait-what or says the last message was unclear.",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/wait-what",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "e30c0a71b74a9c538bdb38e85606ef75412f6cd6f49783fad0e948e76b5f9ee8",
+          "executable": false
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "web-recap",
       "description": "Search browser history for URLs by topic or visit statistics. Use when asked about visited sites, browsing history, or recent online activity. Do NOT use for project/git recaps or agent-session history.",
       "compatibility": "",
@@ -782,7 +896,7 @@
     },
     {
       "name": "write-docs",
-      "description": "Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs or ADRs (grill-me), or skills (write-skill).",
+      "description": "Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. Use when drafting or editing these, including commits and PRs written as part of another task. Do NOT use to review the code in a PR (use code-review), or for blog posts (blog-review), design docs (grill-me), ADRs or glossaries (domain-modeling), or skills (write-skill).",
       "compatibility": "",
       "agents": [],
       "path": "skills/write-docs",
@@ -834,7 +948,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "024199063e6732044746b9d620382b0ed87d6370043dc6a46fd0404a3ad67626",
+          "sha256": "2031994df21087c285097ea674cb12eb100165631d60dd8860b7b1f2c9ab6c64",
           "executable": false
         },
         {

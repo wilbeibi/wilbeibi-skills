@@ -1,6 +1,6 @@
 ---
 name: tla-model
-description: Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. Use when asked to write, review, or debug a TLA+ spec, .tla/.cfg files, or TLC output, or to model-check or formally verify a protocol, lock, lease, consensus, replication, WAL, retry, or race condition. Do NOT use for unit or property-based tests (use test-writing) or for Lean, Coq, Dafny, or Verus proofs.
+description: Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. Use when asked to write, review, or debug a TLA+ spec, .tla/.cfg files, or TLC output, or to model-check or formally verify a protocol, lock, lease, consensus, replication, WAL, retry, or race condition. Do NOT use for unit or property-based tests (use test-writing), a click-through demo of a proposed state model (use state-prototype), a reader's chart of a checked model (use statechart), a verify skill kept in a repo (use create-formal-verification-skill), or Lean, Coq, Dafny, or Verus proofs.
 compatibility: uv (scripts/tlc.py runs as a uv script, Python 3.10+, no dependencies); Java 11+ and tla2tools.jar (scripts/tlc.py fetch downloads it).
 ---
 
@@ -38,7 +38,7 @@ A question about an existing spec or TLC output needs only `check` and the match
    - Classify it: design, spec, property, config/bounds, mapping, or fairness/assumption.
    - REQUIRED: change exactly one of model, property, or cfg per round. Replay the trace, then rerun the whole matrix.
    - Never weaken a property, add fairness, or add a `CONSTRAINT` to turn a run green without the user's approval.
-7. **Back to code.** A design-class counterexample is confirmed only when a test or fault-injection run against the implementation reproduces it and has actually been run. Otherwise report it as unconfirmed with the missing step. For high-stakes specs, add refinement or trace validation ([REFERENCE.md](REFERENCE.md#linking-spec-to-code)).
+7. **Back to code.** A design-class counterexample is confirmed only when a test or fault-injection run against the implementation reproduces it and has actually been run. Otherwise report it as unconfirmed with the missing step. Keep the reproducing test as a committed regression, one step per model step (test-writing). To show a counterexample or the checked model to a reader, use statechart. For high-stakes specs, add refinement or trace validation ([REFERENCE.md](REFERENCE.md#linking-spec-to-code)).
 8. **Independent review.** Hand only the brief, spec, cfgs, and report to a reviewer with fresh context, such as a new session or another person. Ask them to attack it with the review checklist in [REFERENCE.md](REFERENCE.md#review-checklist). Fold the findings into step 6.
 
 ## Report (`spec/report.md`)

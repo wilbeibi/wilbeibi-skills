@@ -16,13 +16,16 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [blast-radius](skills/blast-radius/SKILL.md) | Trace what a change could break beyond its diff and verify the assumptions its safety depends on. |
 | [blog-review](skills/blog-review/SKILL.md) | Review a technical blog draft and report what loses its reader, ordered by cost. |
 | [code-review](skills/code-review/SKILL.md) | Review a diff, package, or API through one of five lenses — necessity and layering (Russ Cox), honest invariants and costs (BurntSushi), product-versus-library fit (Mitsuhiko), a complexity gate before a design change, or newcomer clarity. |
+| [create-formal-verification-skill](skills/create-formal-verification-skill/SKILL.md) | Generates a project-local skill that formally verifies the code where a bug costs the most and tests reach the least, in any language, with whichever verification tool fits. |
 | [create-verification-skill](skills/create-verification-skill/SKILL.md) | Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. |
 | [dataviz](skills/dataviz/SKILL.md) | Design and implement evidence-first charts from real data for technical blogs, reports, READMEs, and product explainers. |
-| [grill-me](skills/grill-me/SKILL.md) | Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. |
+| [domain-modeling](skills/domain-modeling/SKILL.md) | Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. |
+| [grill-me](skills/grill-me/SKILL.md) | Resolves the open decisions of a plan or design with the user in short rounds of numbered questions, each with its context, options, and a recommended answer. |
 | [grok-repo](skills/grok-repo/SKILL.md) | Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. |
 | [hammerspoon](skills/hammerspoon/SKILL.md) | Operate macOS via Hammerspoon, either one-off `hs -c` Lua (launch, quit, or focus apps and browser tabs; volume, wifi, caffeinate, alerts, clipboard) or persistent hotkeys, watchers, and menubar items in ~/.hammerspoon. |
 | [html-lesson](skills/html-lesson/SKILL.md) | Turn a paper, notebook, chapter, or design doc into a narrated, self-paced HTML lesson — one self-contained file with chapters, subtitles, worked numbers, pause-and-predict questions, and optional TTS narration; the finished lesson can also be filmed into one MP4. |
 | [karpathy-planning](skills/karpathy-planning/SKILL.md) | Develop a scoped implementation plan when explicitly asked to plan a coding task. |
+| [maintain-formal-verification-skill](skills/maintain-formal-verification-skill/SKILL.md) | Brings a project's formal verification back in line with the code after the code changes, and says whether each failure is drift in the verification or a bug in the code. |
 | [mechanism-viz](skills/mechanism-viz/SKILL.md) | Plan and build a trace-grounded explanation of how a mechanism in your own system works, as a post with animated figures, an interactive explorer that replays one real instance, and benchmark charts. |
 | [obsidian-capture](skills/obsidian-capture/SKILL.md) | Append todos, logs, learnings, and reflections to Obsidian daily or weekly notes and run the agent-todo queue via scripts/capture.py. |
 | [obsidian-search](skills/obsidian-search/SKILL.md) | Search an Obsidian vault for topics, exact text, tags, recent notes, and tasks. |
@@ -34,8 +37,11 @@ Browse [`skills/`](skills/) and take what fits. Each skill is one folder with a 
 | [show-me](skills/show-me/SKILL.md) | Explain code structure, dataflow, or proposed changes with a compact tree, pseudocode, type signature, diff, or diagram. |
 | [sketch-concept](skills/sketch-concept/SKILL.md) | Draw a hand-drawn SVG illustration that explains one technical mechanism or data insight — architecture, concurrency, storage, caching, queues, retries — for a blog post, doc, or slide. |
 | [skill-curator](skills/skill-curator/SKILL.md) | Audit a skill library for duplicated guidance, contradictions, bloat, dead references, and defects. |
+| [state-prototype](skills/state-prototype/SKILL.md) | Builds a throwaway single-file HTML demo of a proposed state model, driven by an explicit transition table, with free-play buttons and scenario tabs a person can click through. |
+| [statechart](skills/statechart/SKILL.md) | Checks a TLA+ model of a system that moves between states, such as a product flow, a protocol, or a service lifecycle, and draws it as a Mermaid statechart in the reader's words, with the shortest path to each state that breaks a rule. |
 | [test-writing](skills/test-writing/SKILL.md) | Writes, reviews, and prunes tests so the committed suite protects contracts and invariants rather than implementation. |
 | [tla-model](skills/tla-model/SKILL.md) | Models concurrent and distributed designs in TLA+ or PlusCal and checks them with the TLC model checker. |
+| [wait-what](skills/wait-what/SKILL.md) | Re-pitches the agent's last message after it did not land, with context first, every label explained, and plain short sentences. |
 | [web-recap](skills/web-recap/SKILL.md) | Search browser history for URLs by topic or visit statistics. |
 | [write-docs](skills/write-docs/SKILL.md) | Write or critique prose that ships with a codebase — READMEs, guides and runbooks, CLI help and error text, code comments, AGENTS.md/CLAUDE.md, commit messages, PR titles and descriptions, and changelog entries. |
 | [write-skill](skills/write-skill/SKILL.md) | Author or update compact agent skills under skills/<name>/SKILL.md. |

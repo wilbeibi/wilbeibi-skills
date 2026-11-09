@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Runs pstack's statechart at a pinned commit, fetched once into a cache.
+# The toolchain comes from the environment, not mise: TLA2TOOLS (tla2tools.jar)
+# and JAVA. Defaults: tla-model's cached jar and the java on PATH.
+set -euo pipefail
+PIN=6b0300214a09fd6029cfb7077043125758cd1fd2
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/statechart/$PIN"
+SRC="$CACHE/pstack/skills/statechart/scripts"
+
+if [ ! -f "$SRC/statechart.ts" ]; then
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  git clone -q --filter=blob:none --no-checkout https://github.com/cursor/plugins "$tmp/repo"
+  git -C "$tmp/repo" sparse-checkout set pstack/skills/statechart/scripts
+  git -C "$tmp/repo" checkout -q "$PIN"
+  mkdir -p "$(dirname "$CACHE")"
+  rm -rf "$CACHE" && mv "$tmp/repo" "$CACHE"
+fi
+
+if [ -z "${TLA2TOOLS:-}" ] && [ -f "$HOME/.cache/tla-model/tla2tools.jar" ]; then
+  export TLA2TOOLS="$HOME/.cache/tla-model/tla2tools.jar"
+fi
+if [ -z "${TLA2TOOLS:-}" ]; then
+  echo "statechart: set TLA2TOOLS to tla2tools.jar (tla-model: scripts/tlc.py fetch)" >&2
+  exit 3
+fi
+export JAVA="${JAVA:-$(command -v java || true)}"
+if [ -z "$JAVA" ] || ! "$JAVA" -version >/dev/null 2>&1; then
+  echo "statechart: set JAVA to a working java (11+)" >&2
+  exit 3
+fi
+
+if command -v bun >/dev/null 2>&1; then
+  exec bun "$SRC/statechart.ts" "$@"
+fi
+exec node "$SRC/statechart.ts" "$@"

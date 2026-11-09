@@ -1,6 +1,8 @@
-# CONTEXT.md Format
+# GLOSSARY.md Format
 
-`CONTEXT.md` records the shared language of a repository or bounded context. It should explain project-specific concepts that are easy to misuse, not general programming ideas or implementation details.
+Use this format only for a new glossary. An existing glossary keeps its own.
+
+`GLOSSARY.md` records the shared language of a repository or bounded context. It should explain project-specific concepts that are easy to misuse, not general programming ideas or implementation details.
 
 ## Template
 
@@ -40,21 +42,21 @@ _Avoid_: ambiguous synonym, overloaded synonym
 
 ## Single vs Multiple Contexts
 
-For most repositories, create one root `CONTEXT.md`.
+For most repositories, create one `GLOSSARY.md` in the docs location the agent guide names, or at the root when it names none.
 
-For multiple bounded contexts, create a root `CONTEXT-MAP.md`:
+For multiple bounded contexts, create a root `GLOSSARY-MAP.md`:
 
 ```md
-# Context Map
+# Glossary Map
 
 ## Contexts
 
-- [Ordering](./src/ordering/CONTEXT.md): receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md): generates invoices and processes payments
+- [Ordering](./src/ordering/GLOSSARY.md): receives and tracks customer orders
+- [Billing](./src/billing/GLOSSARY.md): generates invoices and processes payments
 
 ## Relationships
 
 - **Ordering -> Billing**: Ordering emits order events consumed by Billing.
 ```
 
-When `CONTEXT-MAP.md` exists, read it before editing context docs. If the current topic could belong to more than one context, ask which context owns it.
+When `GLOSSARY-MAP.md` exists, read it before editing context docs. If the current topic could belong to more than one context, ask which context owns it.

@@ -70,6 +70,18 @@ For anything with state behind a seam — a KV store, snapshot store, log, lease
 
 Libraries: Hypothesis stateful testing, `proptest-state-machine`, `rapid`. The model is the oracle, so it must come from the spec, not from the implementation's behavior. Crash semantics the model cannot express ("what does Read return after a crash mid-Save?") are spec questions — ask, do not guess. A protocol whose correctness is the question belongs in `tla-model` first.
 
+## Lifecycle and status machines
+
+For a row with a status column, a job with an attempt, or a writer with a disposition, the transition table is the oracle. Write it down first, from the design doc or the code that owns each transition.
+
+1. **One case per row of the table:** from-state, event, guard input, expected to-state, and the writer that performs it. Put the rows in a table, and keep one test function.
+2. **One case per refused event:** each (state, event) pair the table does not allow. It must be refused visibly, not ignored or written anyway.
+3. **Both sides of each guard:** the attempt id that matches, and the stale one that must not.
+4. **The failure cases:** the awaited attempt fails, an ambiguous timeout, a crash between two writes, a late or duplicate executor, two writers at once, a delete mid-flight. Each case either has a row or is named as out of scope.
+5. **Counterexamples from a model** (`tla-model`, `statechart`): replay each as a regression on the real code, one test step per model step, named after the property it breaks.
+
+A status that two writers set for different reasons fails step 1: one row cannot name its writer. Treat that as a design finding, not a test-writing problem.
+
 ## Compatibility fixtures
 
 On-disk formats, wire protocols, snapshot layouts: keep bytes written by old versions under `testdata/` and assert the new code reads them. These are the one kind of golden file you never regenerate — `-update` on a compatibility fixture deletes the promise it records. Add a fixture per released format version.

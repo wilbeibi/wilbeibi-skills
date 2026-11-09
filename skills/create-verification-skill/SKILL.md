@@ -1,6 +1,6 @@
 ---
 name: create-verification-skill
-description: Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. Use when asked to create a reusable verification workflow or control skill for a project. Do NOT use for a one-off smoke check or ordinary unit-test writing.
+description: Create a project-local skill for launching, driving, and collecting evidence from a real app, CLI, API, or library. Use when asked to create a reusable verification workflow or control skill for a project. Do NOT use for a one-off smoke check, ordinary unit-test writing, or formal verification of a design or invariant (use create-formal-verification-skill).
 ---
 
 # create-verification-skill

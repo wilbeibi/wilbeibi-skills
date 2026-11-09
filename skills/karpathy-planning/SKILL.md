@@ -10,6 +10,7 @@ Produce a plan that establishes scope, important assumptions, and verifiable com
 Include only the detail needed to choose an approach and carry out the task.
 
 - Resolve material ambiguities from available context. Ask when an answer would change the outcome; otherwise state a reasonable assumption.
+- When two or more decisions only the user can make stay open, run the grill-me skill on them before finishing the plan.
 - Prefer the simplest design that meets the request. Identify existing components to reuse and preserve unrelated work.
 - Pair success criteria with relevant verification. Complete required checks; broaden testing only for changes, failures, or unresolved concerns.
 - Describe substantial tradeoffs, dependencies, or irreversible steps when they matter.

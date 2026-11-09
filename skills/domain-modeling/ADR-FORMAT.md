@@ -1,6 +1,6 @@
 # ADR Format
 
-ADRs record decisions whose rationale is likely to matter later. They should be short by default.
+ADRs record decisions whose rationale is likely to matter later. They should be short by default. If the repo already records decisions elsewhere (numbered decisions in design docs), add the decision there instead.
 
 ## When To Offer An ADR
 

@@ -36,6 +36,7 @@ Place the suite where the complexity lives:
 - **Inside the process** — algorithms, parsers, domain rules. Test deeply through the public API; prefer properties or exhaustive small inputs over hand-picked examples.
 - **At the boundaries** — services, glue, orchestration. The service is the unit; test from its edges with realistic fixtures.
 - **In the state space** — storage, replication, recovery, concurrency. Random operation sequences against a sequential model, with crash, restart, and injected faults as operations. For the design itself, use `tla-model`.
+- **In a lifecycle or status machine** — test its transition table, table-driven: every (state, event) pair, refusals included, and both sides of each guard. Replay each model counterexample as a regression. See REFERENCE.
 
 Widen the boundary until setup gets expensive or the test stops being hermetic, then stop. IO is not the criterion: loopback HTTP, in-process SQLite, and a temp dir are cheap; a shared or remote target is not. A deployed environment earns only wiring and real third-party behavior. Trivial glue gets no test.
 

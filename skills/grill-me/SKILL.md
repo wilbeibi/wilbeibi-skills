@@ -1,45 +1,43 @@
 ---
 name: grill-me
-disable-model-invocation: true
-description: Interview the user one question at a time until a plan is resolved, capturing durable decisions in CONTEXT.md or ADRs when the repo warrants it. Use when asked to "grill me," stress-test a design, or challenge assumptions before implementation.
+description: Resolves the open decisions of a plan or design with the user in short rounds of numbered questions, each with its context, options, and a recommended answer. Use when asked to "grill me" or stress-test a design, or when a plan has two or more open decisions only the user can make, including from karpathy-planning, state-prototype, or domain-modeling. Do NOT use for one quick clarifying question, or to collect comments on a long document (use readback).
 ---
 
 # grill-me
 
-Interview the user about a plan or design until the key decisions needed to implement the current scope are resolved.
+Resolve a plan's open decisions with the user. Each question carries the context needed to answer it without opening anything else.
 
-## How to run it
+## Before the first round
 
-- Read the plan, linked docs, code, or local files needed to understand the topic first.
-- Ask **one** question at a time. Wait for the answer before the next question.
-- For each question, state **your recommended answer** and a one-line why.
-- Follow branches that affect implementation of the current scope; record optional or out-of-scope branches for later. Resolve dependencies between key decisions in order.
-- If a question can be answered by **exploring the codebase**, explore instead of asking.
-- Push on fuzzy words, hidden assumptions, edge cases, dependencies between decisions, and reversibility.
-- Stop when the key implementation decisions are resolved. Summarize the agreed plan and record remaining non-blocking questions as follow-ups.
+1. Read the plan, its linked docs, and the code. Find every fact yourself, delegating to a fresh-context helper when the harness has one. Never ask the user for a fact you can look up.
+2. Map the decisions as a tree: each decision and the decisions that depend on it. The frontier is every decision whose prerequisites are settled.
 
-## Question patterns
+Done when every frontier item is a decision, not a fact.
 
-- "What outcome would make this change a success?"
-- "Which existing concept owns this behavior?"
-- "What is the smallest scenario that proves the design works?"
-- "What breaks if this assumption is false?"
-- "What would a future maintainer be tempted to change back?"
-- "Which term should be canonical, and which aliases should be avoided?"
+## Each round
 
-## Capturing decisions
+Ask at most three frontier questions, the most consequential first. The rest wait for the next round. Use this shape (every slot REQUIRED):
 
-Only when the repo already keeps `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/`, or the interview resolves terminology or a decision worth outliving the conversation. Check for those files before proposing new ones.
+```md
+**Q1. <the decision, in a few words>**
+Context: what this decides, where it shows up (`path:line`, doc, or issue with a few words on what it is), and what is true today. Two or three sentences.
+Options: A: <choice and its main cost>. B: <choice and its main cost>.
+Recommend: B, because <one line>. "yes" accepts it.
+```
 
-- Update the appropriate `CONTEXT.md` as soon as terminology is resolved — it is a glossary and relationship map for project-specific language, not a spec or scratchpad.
-- Use `CONTEXT-MAP.md` only when the repository has multiple bounded contexts.
-- Offer an ADR only for decisions that are hard to reverse, surprising without context, and based on a real tradeoff.
-- Create docs lazily: no `CONTEXT.md` or `docs/adr/` until there is real resolved content, and keep them short enough that future agents actually read them.
+- Explain every label on first use: issue numbers, decision ids, phases, acronyms.
+- Reply in the user's language and keep code identifiers as they are.
+- Wait for the answers, then recompute the frontier. A question that depends on a still-open answer waits for a later round.
 
-For glossary format, read [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md). For ADR format and thresholds, read [ADR-FORMAT.md](ADR-FORMAT.md).
+Done when each answer maps to exactly one decision.
+
+## Finish
+
+1. Stop when the frontier is empty or the user accepts the remaining recommendations.
+2. Summarize the decisions as one list, plus the branches deferred for later.
+3. Record resolved terms and hard-to-reverse decisions with the domain-modeling skill.
+4. If the work was not already authorized, wait for the user to confirm the summary before acting.
 
 ## Notes
 
-- Preserve the requested one-question-at-a-time format while the interview is needed.
-- Stop earlier if the user asks to stop or accepts the remaining recommendations.
-- Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), adapted to this repo's conventions and voice.
+- Ported from [mattpocock/skills](https://github.com/mattpocock/skills) `grilling` (MIT). Adapted: a required context slot, rounds of at most three, and the user's language.
