@@ -84,3 +84,14 @@ Findings land when they carry the analysis, not the verdict. Applies under every
 - Instead of "Don't add this dependency": "This adds [concrete cost]. Alternative: [sketch]. It preserves [required guarantees] but trades away [capability or maintenance benefit]."
 - Instead of "This abstraction is wrong": "For this use case, [direct design] removes [specific coupling]. The tradeoff is [cost or lost guarantee]."
 - Instead of "Rewrite this": "Current approach: [analysis]. Maintenance implications: [list]. Alternative: [sketch]. Which fits our long-term goals?"
+
+## Commenting on a colleague's PR
+
+The output contract above is for the user. A comment posted on someone else's PR is read by its author, who must decide what to change. Write it for that decision.
+
+- **Post only what changes the author's next action.** Cut every point that does not, including true ones. A clean change gets a bare approval.
+- **Rank by impact, and let the structure show it.** The one thing to change goes first, in its own bullet. Group small items under "Smaller". Drop nits.
+- **Make the important point concrete.** Name the scenario (the inputs, the timing), what breaks, and what it blocks, so the author can judge severity without rereading the code.
+- **Give a direction, not the code.** Sketch the change in a clause, and add one sentence on why it is safe or cheap.
+- **Praise and "what I checked" earn a line only when they change what the author does.** Name a specific decision only if the author might otherwise undo it. Mention a check only if it saves the author running it.
+- **Put each point where it can be acted on.** A finding about code that lands in a later PR waits for that PR. A design question on an implementation PR goes to the plan, framed as a question, not a demand.
