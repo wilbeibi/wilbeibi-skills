@@ -1,0 +1,21 @@
+skills/code-review/SKILL.md
+  s_f59acd75fcbc15::t_9b1258b732bf22 87-97
+catalog.json
+  s_f59acd75fcbc15::t_f1b7697366dfb6 134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c2209b85d5d65230b111ba047e15c9ac2d2e35e5",
+  "prompts": {},
+  "sessions": {
+    "s_f59acd75fcbc15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb84d834-b6f1-4bd6-ac55-8638d5ee1b3f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Hongyi Shen <wilbeibi@gmail.com>"
+    }
+  }
+}
