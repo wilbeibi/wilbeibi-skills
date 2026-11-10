@@ -98,8 +98,8 @@ The output contract above is for the user. A comment posted on someone else's PR
 
 Form, so the author gets the point from the first sentence:
 
-- Open with `Thanks @author`, and no other greeting.
-- Give each finding one bold line that states the problem and its impact (`**Finding: ...**`), then one bold `**Suggestion:**`, or `**Idea:**` when the point was not asked for.
+- Open with one line written for this PR, not a formula: a thanks in your own words, agreement with the direction ("The direction looks right; two nitpicks."), or a heads-up when the author may not know the context, such as a PR that supersedes theirs. No "Hi".
+- Give each point a bold lead that names what kind of statement it is and states the problem and its impact, then one bold direction. Pick the word that fits the point (Finding, Conflict, Still needed, Context; Suggestion, or Idea when the point was not asked for). The same label on every point reads like an audit.
 - Write plain short sentences with no hedges or adjectives. Short comments get no tables or `##` headers.
 - Explain every label inline: an issue number, a decision id, or an acronym gets a few words on what it is.
 - Link only the key lines, as permalinks at a SHA (`?plain=1` for Markdown lines). Do not put line numbers in prose.
