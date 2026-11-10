@@ -91,7 +91,18 @@ The output contract above is for the user. A comment posted on someone else's PR
 
 - **Post only what changes the author's next action.** Cut every point that does not, including true ones. A clean change gets a bare approval.
 - **Rank by impact, and let the structure show it.** The one thing to change goes first, in its own bullet. Group small items under "Smaller". Drop nits.
-- **Make the important point concrete.** Name the scenario (the inputs, the timing), what breaks, and what it blocks, so the author can judge severity without rereading the code.
-- **Give a direction, not the code.** Sketch the change in a clause, and add one sentence on why it is safe or cheap.
-- **Praise and "what I checked" earn a line only when they change what the author does.** Name a specific decision only if the author might otherwise undo it. Mention a check only if it saves the author running it.
+- **Make the important point concrete.** Name the scenario as numbered steps with real numbers and names (the inputs, the timing), then what breaks and what it blocks, so the author can judge severity without rereading the code.
+- **Give a direction, not the code.** Sketch the change in a clause, and add one sentence on why it is safe or cheap. Say what it costs, and say so when it can be deferred.
+- **Praise and "what I checked" earn a line only when they change what the author does.** Name a specific decision only if the author might otherwise undo it. Mention a check only if it saves the author running it. Cite heavy evidence (a model check, a live test) in one clause as the source; do not make it the frame.
 - **Put each point where it can be acted on.** A finding about code that lands in a later PR waits for that PR. A design question on an implementation PR goes to the plan, framed as a question, not a demand.
+
+Form, so the author gets the point from the first sentence:
+
+- Open with `Thanks @author`, and no other greeting.
+- Give each finding one bold line that states the problem and its impact (`**Finding: ...**`), then one bold `**Suggestion:**`, or `**Idea:**` when the point was not asked for.
+- Write plain short sentences with no hedges or adjectives. Short comments get no tables or `##` headers.
+- Explain every label inline: an issue number, a decision id, or an acronym gets a few words on what it is.
+- Link only the key lines, as permalinks at a SHA (`?plain=1` for Markdown lines). Do not put line numbers in prose.
+- Address the work, not the person: "this plan", not "your plan"; "I suspect", not "I don't think"; "How about" or "Could we", not "you should".
+
+Before posting, give the draft to a subagent with no context from the review and ask what the author would take away and what would irritate them. Fix what it reports.
