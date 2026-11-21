@@ -194,11 +194,12 @@ def local_candidates(name):
     return sorted({p.resolve() for p in paths if (p / "SKILL.md").is_file()})
 
 
-# Relative skills directory per agent; used for both home and project scope.
+# Global skills directory per agent, relative to the home directory.
 AGENT_DIRS = {"claude": PurePosixPath(".claude/skills"),
               "codex": PurePosixPath(".codex/skills"),
               "pi": PurePosixPath(".pi/agent/skills"),
-              "hermes": PurePosixPath(".hermes/skills")}
+              "hermes": PurePosixPath(".hermes/skills"),
+              "antigravity": PurePosixPath(".gemini/config/skills")}
 
 
 def declared_agents(skill_dir):
@@ -231,8 +232,14 @@ def link_paths(name, project, agents=frozenset()):
             paths.append(Path.cwd() / ".claude/skills" / name)
         return paths
     home = Path.home()
-    mirrors = [home / AGENT_DIRS[a] for a in (sorted(agents) if agents else AGENT_DIRS)]
-    return [home / ".agents/skills" / name] + [d / name for d in mirrors if d.parent.is_dir()]
+    paths = [home / ".agents/skills" / name]
+    for agent in sorted(agents) if agents else AGENT_DIRS:
+        directory = home / AGENT_DIRS[agent]
+        if directory.parent.is_dir() or (
+            agent == "antigravity" and (home / ".gemini/antigravity-cli").is_dir()
+        ):
+            paths.append(directory / name)
+    return paths
 
 
 def change_links(root, names, project, remove=False):

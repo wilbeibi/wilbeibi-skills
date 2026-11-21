@@ -195,6 +195,25 @@ class Scenarios(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown agents"):
             self.run_cli("link", "chart")
 
+    def test_antigravity_global_links_follow_checkout_selection(self):
+        root = self.home / "checkout"
+        skill = root / "skills/chart"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_bytes(self.bodies["SKILL.md"])
+        self.checkout_mock.return_value = root
+
+        antigravity = self.home / ".gemini/config/skills"
+        link = antigravity / "chart"
+        self.run_cli("link", "chart")
+        self.assertFalse(antigravity.parent.exists())
+
+        (self.home / ".gemini/antigravity-cli").mkdir(parents=True)
+        self.run_cli("sync")
+        self.assertTrue(link.is_symlink())
+        self.assertEqual(link.resolve(), skill)
+        self.run_cli("unlink", "chart")
+        self.assertFalse(link.is_symlink())
+
     def test_links_work_when_canonical_dir_is_itself_a_symlink(self):
         """Hosts that keep the skills root elsewhere symlink ~/.agents/skills to it.
         Relative targets resolve against the physical dir, so the link must be

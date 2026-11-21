@@ -71,9 +71,11 @@ python3 ~/src/wilbeibi-skills/skills/route-skill/scripts/route_skill.py link tes
 python3 ~/src/wilbeibi-skills/skills/route-skill/scripts/route_skill.py unlink test-writing --project
 ```
 
-Global links go into `~/.agents/skills` and any Claude, Codex, Pi, or Hermes skill directories that already exist. Project links go into `.agents/skills` and `.claude/skills` in the current directory; keep them out of commits, for example with `.git/info/exclude`. The router never overwrites a real directory or a link it doesn't own.
+Global links go into `~/.agents/skills` and the skill directories of configured agents. Antigravity CLI (`agy`) and the desktop app share `~/.gemini/config/skills`. After Antigravity creates `~/.gemini/config` or `~/.gemini/antigravity-cli`, `link` and `bin/skills-sync` add the Antigravity links for selected skills. In a running `agy` session, run `/skills reload`, then `/skills` to check what loaded.
 
-To update, run `bin/skills-sync --pull`. It pulls with `--ff-only` and repairs the links this checkout owns. It never enables anything new. If you installed with `npx skills add … --all` or the old `load-skill`, follow [MIGRATION.md](MIGRATION.md) first.
+Project links go into `.agents/skills` and `.claude/skills` in the current directory. Antigravity reads the `.agents/skills` links. Keep project links out of commits, for example with `.git/info/exclude`. The router never overwrites a real directory or a link it doesn't own.
+
+To update, run `bin/skills-sync --pull`. It pulls with `--ff-only` and repairs links for skills already selected from this checkout. If you installed with `npx skills add … --all` or the old `load-skill`, follow [MIGRATION.md](MIGRATION.md) first.
 
 ## Limits
 

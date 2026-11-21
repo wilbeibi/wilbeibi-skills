@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 
 # Keep in sync with AGENT_DIRS in skills/route-skill/scripts/route_skill.py.
-AGENTS = {"claude", "codex", "pi", "hermes"}
+AGENTS = {"claude", "codex", "pi", "hermes", "antigravity"}
 README_START = "<!-- skills-table:start -->"
 README_END = "<!-- skills-table:end -->"
 
