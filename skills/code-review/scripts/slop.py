@@ -45,7 +45,7 @@ def die(msg):
 
 
 def git(*args):
-    r = subprocess.run(["git", *args], capture_output=True, text=True)
+    r = subprocess.run(["git", "-c", "core.quotePath=false", *args], capture_output=True, text=True)
     if r.returncode:
         die(f"git {' '.join(args)}: {r.stderr.strip()}")
     return r.stdout
@@ -219,7 +219,7 @@ class Materialized:
     def __enter__(self):
         self.tmp = tempfile.mkdtemp(prefix="slop-")
         if self.base is not None:
-            existing = git("ls-tree", "-r", "--name-only", self.base, "--", *self.files).split()
+            existing = git("ls-tree", "-r", "-z", "--name-only", self.base, "--", *self.files).split("\0")[:-1]
             if existing:
                 tar = subprocess.run(["git", "archive", self.base, "--", *existing],
                                      capture_output=True)
@@ -243,13 +243,13 @@ def touched_ranges(base):
     path = None
     for line in git("diff", "--no-prefix", "-U0", base, "--", ".").splitlines():
         if line.startswith("+++ "):
-            path = None if line == "+++ /dev/null" else line[4:]
+            path = None if line == "+++ /dev/null" else line[4:].rstrip("\t")
         elif line.startswith("@@") and path:
             hunk = line.split("+", 1)[1].split()[0]
             start, _, n = hunk.partition(",")
             start, n = int(start), int(n) if n else 1
             out.setdefault(path, []).append((start, max(start, start + n - 1)))
-    for path in git("ls-files", "--others", "--exclude-standard").split("\n"):
+    for path in git("ls-files", "-z", "--others", "--exclude-standard").split("\0"):
         if path:
             out[path] = [(1, 1 << 30)]
     return out
@@ -345,7 +345,14 @@ def main(argv):
     root = git("rev-parse", "--show-toplevel").strip()
     os.chdir(root)
     CONFIG.append(default_config(root))
+    try:
+        run(base, scope, show_all)
+    finally:
+        if CONFIG[0]:
+            shutil.rmtree(os.path.dirname(CONFIG[0]), ignore_errors=True)
 
+
+def run(base, scope, show_all):
     ranges = touched_ranges(base)
     files = sorted(ranges)
     if not files:
