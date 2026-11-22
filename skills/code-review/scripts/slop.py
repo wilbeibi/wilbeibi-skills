@@ -90,7 +90,8 @@ def scb(path, as_json=False):
 
 
 def parse_scb(text):
-    """Yield (kind, rule, msg, [(path, line)...], metric_str)."""
+    """Yield (kind, rule, msg, [(path, line, end)...], metric_str); end is None
+    when the tool reports only a start line."""
     cur = None
     for line in text.splitlines():
         m = HEADER.match(line)
@@ -103,7 +104,7 @@ def parse_scb(text):
             continue
         m = LOC.match(line)
         if m:
-            cur[3].append((os.path.normpath(m.group(1)), int(m.group(2))))
+            cur[3].append((os.path.normpath(m.group(1)), int(m.group(2)), None))
             continue
         m = METRIC.match(line)
         if m:
@@ -198,12 +199,12 @@ def lizard_findings(files, scope):
     for path, name, start, end, cc, nloc in funcs:
         if cc > CC_THRESHOLD:
             out.append(("erosion", None, f"function `{name}` exceeds complexity threshold",
-                        [(path, start)], f"complexity: {cc}, sloc: {nloc}"))
+                        [(path, start, end)], f"complexity: {cc}, sloc: {nloc}"))
     for g in groups:
         n = g[0][2] - g[0][1] + 1
         out.append(("duplicate-structure", None,
                     f"duplicated block ({n} lines, {len(g)} instances)",
-                    [(f, a) for f, a, _ in g], ""))
+                    list(g), ""))
     return out
 
 
@@ -254,8 +255,12 @@ def touched_ranges(base):
     return out
 
 
-def span(kind, msg, metric, line):
-    """Head-side line range a finding covers, for overlap with the diff."""
+def span(kind, msg, metric, line, end=None):
+    """Head-side line range a finding covers, for overlap with the diff. Without
+    a reported end, estimate from the size in the message; sloc undercounts a
+    function with comments or blank lines."""
+    if end is not None:
+        return line, end
     if kind in ("erosion", "cog_erosion"):
         m = re.search(r"sloc: (\d+)", metric)
     else:
@@ -288,8 +293,9 @@ def format_hits(findings, ranges, show_all):
     locations overlaps a touched range; the anchor is the touched one."""
     hits, skipped = [], 0
     for kind, rule, msg, locs, metric in findings:
-        in_diff = [(p, l) for p, l in locs
-                   if p in ranges and overlaps(span(kind, msg, metric, l), ranges[p])]
+        in_diff = [(p, l) for p, l, e in locs
+                   if p in ranges and overlaps(span(kind, msg, metric, l, e), ranges[p])]
+        locs = [(p, l) for p, l, _ in locs]
         if not in_diff and not show_all:
             skipped += 1
             continue
