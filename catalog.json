@@ -245,12 +245,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "d4478f2d397e18af92668741c37e4ecb0feed3dce7afe32baaa7121bad3ed7d0",
+          "sha256": "5bea9b1f2614420c9af1e29d49db3d10810977eeb8f3ca7c4acfe46f633985d9",
           "executable": false
         },
         {
           "path": "scripts/archaeology.sh",
-          "sha256": "bdc660107b3aeaa2b13bc9f4fda8ac4d439b523b9171b7f5e3cb7dcc955305c2",
+          "sha256": "daf220c3ef15a1803f207615b4f733a52db978899e57ecc78a0c4c7d8c7850d3",
           "executable": true
         },
         {
@@ -260,7 +260,7 @@
         },
         {
           "path": "scripts/test_archaeology.sh",
-          "sha256": "e80e5a0978f30288183d2418ddf55f61e244141f9ea1bda8dc7c31b13da8524c",
+          "sha256": "e091174c0e78ea676241800b8ab779974fd1dabad95e37e33c5dcf0de3cc9230",
           "executable": true
         }
       ]

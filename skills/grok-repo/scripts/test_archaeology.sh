@@ -53,6 +53,29 @@ git -C "$fixture_dir" add feature.txt
 git -C "$fixture_dir" commit -q -m 'Add a list endpoint' \
   -m 'Before this change the API returned nothing for lists. This change adds the endpoint and its tests.'
 
+printf 'cache\n' >"$fixture_dir/cache.txt"
+git -C "$fixture_dir" add cache.txt
+git -C "$fixture_dir" commit -q -m 'perf(cache): skip publish-time rehash' -m 'Cold resume p99 80 ms -> 8 ms (#449); lz4 +18%, zstd +106% vs raw 63.8 ms.'
+
+printf 'index\n' >"$fixture_dir/index.txt"
+git -C "$fixture_dir" add index.txt
+git -C "$fixture_dir" commit -q -m 'Speed up index lookup' -m 'Binary search replaces the scan: p99 4 ms -> 0.3 ms.'
+
+# Raw length must not win: a pasted stack trace and a squash-merge list are not post-mortems.
+printf 'race\n' >"$fixture_dir/race.txt"
+git -C "$fixture_dir" add race.txt
+trace=$(for i in {1..40}; do printf '3:     #%d N2::Net2::onMainThread(Promise<Void>&&, TaskPriority) /home/dev/flow/Net2.actor.cpp:%d:6 (libfdb_c.so)\n' "$i" "$i"; done)
+git -C "$fixture_dir" commit -q -m 'fix: data race in cancel' -m "TSAN output:" -m "$trace"
+printf 'squash\n' >"$fixture_dir/squash.txt"
+git -C "$fixture_dir" add squash.txt
+git -C "$fixture_dir" commit -q -m 'fix: squashed review rounds (#9)' \
+  -m "$(printf '* address the first round of review comments on the tracker\n* address the second round of review comments on the tracker\n* address the third round of review comments on the tracker\n')"
+
+printf 'pool\n' >"$fixture_dir/pool.txt"
+git -C "$fixture_dir" add pool.txt
+git -C "$fixture_dir" commit -q -m 'fix: move slot setup to the blocking pool (#12)' \
+  -m "$(printf '* fix: run slot setup on the blocking pool\n\nSlot setup used blocking syscalls on async workers; a burst stalled the runtime.\n\n* test: cover the lease\n')"
+
 git -C "$fixture_dir" rm -q deleted.txt
 git -C "$fixture_dir" commit -qm 'Remove temporary file'
 git -C "$fixture_dir" commit --allow-empty -qm 'Revert broken direction'
@@ -91,6 +114,7 @@ authors=$(awk '/^== COMMIT AUTHORS/{keep=1; next} /^==/{keep=0} keep' <<<"$repor
 hot=$(awk '/^== MOST-TOUCHED/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 fixes=$(awk '/^== CURRENT FILES TOUCHED BY FIX/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 reverts=$(awk '/^== REVERT\/ROLLBACK/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
+pitfalls=$(awk '/^== LONGEST FIX\/PERF BODIES/{keep=1; next} /^==/{keep=0} keep' <<<"$report")
 biggest=$(awk '/^== BIGGEST COMMITS/{keep=1; next} /^==/{keep=0} keep && NF' <<<"$report")
 
 assert_contains() {
@@ -124,6 +148,14 @@ assert_contains "$history" 'HISTORY: incremental'
 assert_contains "$bodies" 'median body'
 assert_contains "$reverts" 'Revert broken direction'
 assert_omits "$reverts" 'Discuss fix-prone files and reverts'
+assert_contains "$pitfalls" 'Add a database guard'
+assert_contains "$pitfalls" 'perf(cache): skip publish-time rehash'
+assert_contains "$pitfalls" 'Speed up index lookup'
+assert_omits "$pitfalls" 'Add a list endpoint'
+assert_contains "$pitfalls" 'fix: move slot setup to the blocking pool'
+assert_omits "$pitfalls" 'fix: data race in cancel'
+assert_omits "$pitfalls" 'fix: squashed review rounds'
+assert_omits "$pitfalls" 'fix: repair current behavior'
 ranked_shas=$(awk 'NR <= 4 {print $1}' <<<"$biggest")
 expected_shas=$(printf '%s\n' "$large_sha" "$delete_sha" "$mixed_sha" "$many_files_sha")
 if [[ "$ranked_shas" != "$expected_shas" ]]; then

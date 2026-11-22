@@ -111,7 +111,7 @@ repos; say what you sampled.
 3. **Map components and seams** — where modules meet: interfaces, wire protocols, DB schemas,
    queues, plugin points, process boundaries. For each seam ask *why here*: testability,
    swap-ability, deploy boundary, team boundary, or accident. Note which side owns the types.
-4. **Mine git history** for rationale (commands below). First check whether history is shallow,
+4. **Mine git history** for rationale and failure modes (commands below). First check whether history is shallow,
    squashed, imported, generated, or vendor-heavy; weak history produces clues, not rationale,
    and pushes the *why* into the issue tracker, or, when that is barely used, into PR review
    threads and commit bodies. The digest's HISTORY, BODIES and TRACKER lines say which.
@@ -135,11 +135,22 @@ scripts/archaeology.sh [repo-dir]         # digest first, then drill into what i
 git show --stat <sha>                     # read the big commits' messages in full
 git log --follow --oneline -- <hot-file>  # evolution of a load-bearing file
 git log -S '<symbol>' --oneline           # when/why a concept appeared or died
+gh pr list --state merged --search 'fix in:title' --limit 200 --json number,title,body \
+  --jq 'sort_by(-(.body|length))[:12][]|"#\(.number) \(.title)"'   # fix PRs by body length
 ```
 
 - Find "key changes" by their effect on behavior, invariants, or constraints. Size, recency,
   and words like "refactor" or "redesign" are leads; a small durability fix may matter more
   than a large rewrite. Commit messages can explain tradeoffs — read them with the diff.
+- Read the LONGEST FIX/PERF BODIES as one corpus of post-mortems: symptom, root cause,
+  before/after numbers. If BODIES is short or history is squashed, rank merged fix PRs instead
+  (command above). Keep failures that transfer and teach, i.e. a mechanism any system of the
+  same kind would hit; drop project-specific slips. Group by failure mode, not file; a mode
+  recurring across layers is the strongest finding (fsync on an I/O thread, blocking syscalls on
+  async workers: keep unbounded-latency calls off serving threads; an mmap cache on a full disk
+  turns ENOSPC into SIGBUS: preallocate). For each group give failure, root cause, fix, the rule,
+  and an entry point (regression test or fault to inject). Perf numbers confirm or overturn
+  design claims; cite them there.
 - Cross-reference **frequently touched × fix-touched** to choose files for closer reading.
   This is a lead, not proof of fragility: formatting, generated code, and long-lived files
   can dominate counts.

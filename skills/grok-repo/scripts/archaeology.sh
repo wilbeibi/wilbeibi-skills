@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # archaeology.sh [repo-dir] — one-shot git history digest for understanding a codebase.
 # Prints: founding commits, history depth (squash/import detection), recent direction, authors,
-# frequently touched current files, files touched by fix commits, reverts, the largest commits,
-# commit-body yield and, when gh can reach GitHub, issue-tracker usage and PR review threads.
+# frequently touched current files, files touched by fix commits, reverts, the longest fix/perf
+# commit bodies, the largest commits, commit-body yield and, when gh can reach GitHub, issue-tracker usage and PR review threads.
 # Read-only; stdlib git only.
 # No pipefail: every pipeline ends in head/sort/cut, and upstream git/grep
 # legitimately exit non-zero on SIGPIPE or empty match sets.
@@ -87,6 +87,39 @@ git log --no-merges --format='%h%x09%s' \
         if (subject ~ /^(revert(ed|s|ing)?|roll[ -]?back)([^[:alnum:]_]|$)/) print
       }' \
   | head -10
+
+section "LONGEST FIX/PERF BODIES (failure-mode corpus — read in full, group by mode)"
+# Fix commits as above plus perf subjects (perf: prefix, or speed up/faster/optimize/performance).
+# Ranks by prose, not raw length: indented code, fences, stack frames, mostly-symbol lines (pasted
+# logs) and trailers do not count. In a squash merge only the first "* " commit counts; later
+# entries are usually review rounds. What remains are the post-mortems, not the typo fixes.
+git log --no-merges --date=short --format='%H%x1f%s%x1f%h %ad %s%x1f%b%x1e' \
+  | awk '
+      BEGIN { RS = "\x1e"; FS = "\x1f" }
+      {
+        sha = $1; gsub(/[[:space:]]/, "", sha)
+        if (sha == "") next
+        subject = tolower($2)
+        perf = subject ~ /^perf(\([^)]*\))?!?:/ ||
+               subject ~ /(^|[^[:alnum:]_])(speed(s)? up|faster|optimi[sz](e|es|ed|ing)|performance)([^[:alnum:]_]|$)/
+        n = split($4, line, "\n"); prose = 0; bullets = 0
+        for (i = 1; i <= n; i++) {
+          l = line[i]
+          if (l ~ /^\* /) { if (++bullets > 1) break; continue }
+          if (l ~ /^(    |\t)/ || l ~ /^```/) continue
+          if (l ~ /#[0-9]+ / && (l ~ /0x[0-9a-fA-F]+/ || l ~ /[[:alnum:]_]\.[[:alpha:]]+:[0-9]+/)) continue
+          if (tolower(l) ~ /^(signed-off-by|co-authored-by|reviewed-by|change-id):/) continue
+          sub(/^[[:space:]]+/, "", l); len = length(l)
+          if (len < 20) continue
+          letters = l; nletters = gsub(/[[:alpha:]]/, "", letters)
+          if (nletters < len / 4) continue
+          prose += len
+        }
+        if (prose > 0) printf "%s\t%d\t%d\t%s\n", sha, perf, prose, $3
+      }' \
+  | awk -F '\t' 'FNR == NR { fix[$1] = 1; next } ($1 in fix) || $2 { printf "%09d\t%s\n", $3, $4 }' \
+      <(printf '%s\n' "$fix_shas") - \
+  | sort -rn | head -12 | awk -F '\t' '{ printf "%6d prose chars  %s\n", $1, $2 }'
 
 section "BIGGEST COMMITS (text lines added + deleted; binaries excluded — reading candidates)"
 git log --no-merges --pretty='@@COMMIT@@%h %ad %s' --date=short --numstat \
