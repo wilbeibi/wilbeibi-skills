@@ -12,10 +12,13 @@ Judge code by long-term maintenance cost: whether it should exist, whether it si
 3. **Dependency explosion** — What does the dependency actually do, what transitive cost arrives with it, and could 20-50 lines replace it? Heuristic: import what is hard, own what is core, copy what is small.
 4. **Quality debt** — Will a new maintainer understand it in six months, and is any debt paired with a concrete paydown trigger?
 
-For an agent-written diff, ask two more before pass 1, with `scripts/slop.py` output beside the diff (see SKILL.md "Measure before judging"):
+When a diff introduces or renames a resource, lock, path, or persisted state, trace all four lifecycle corners — **create, use, cleanup/GC, and crash-recovery** — for siblings that still expect the old shape.
+
+For an agent-written diff, ask three more before pass 1, with `scripts/slop.py` output beside the diff (see SKILL.md "Measure before judging"):
 
 - **Does it duplicate existing behavior?** Check callers, clone hits, and base-to-head counts for competing owners of the same behavior. An additive diff alone is not evidence of duplication.
 - **Folded in or separate?** Compare extending the existing owner with a separate component. Prefer folding in when it removes duplicated policy; preserve separation when it protects an ownership or trust boundary.
+- **Zero-payoff churn?** If a cleanup or refactor removes no concrete failure mode, shrinks no public surface, and moves no measured bottleneck, flag it to drop rather than merging noise.
 
 ## Package audit — six dimensions
 
@@ -39,5 +42,7 @@ These are principles, not a compliance checklist: translate each into the codeba
 ## Output — this lens
 
 Audit mode ends with a **Refactor plan**: steps ordered by payoff, each stating what it lets you delete or simplify. Each step must be independently shippable — reviewable as one PR, tests green at every point; flag any step that changes behavior.
+
+When a finding represents a project-wide invariant that agents will violate again across sessions, add a one-line **Promote to gate** note naming the mechanical check (lint rule, type boundary, or contract test) that should replace future review comments. Omit unless the invariant recurs.
 
 See [RUSS-COX-REFERENCE.md](RUSS-COX-REFERENCE.md) for the full philosophy, red-flag catalogs, and the exemplars behind each dimension.

@@ -19,7 +19,7 @@ Then pick **one** lens and read only that file (`/code-review <lens>` names it d
 
 Default to **Russ Cox** for an unqualified "review this diff." Reach for the others when the code is a library boundary (BurntSushi), when the product/library call is itself in question (Mitsuhiko), when the change does not exist yet (Complexity), or when the question is comprehension rather than correctness (Newcomer). The Complexity and Newcomer lenses are for explicit requests, not a ceremony before routine edits.
 
-In an established codebase, search for existing primitives before judging anything new — under any lens, the most common real finding is that a helper, interface, or package already does this.
+In an established codebase, search for existing primitives before judging anything new — under any lens, the most common real finding is that a helper, interface, or package already does this. Conversely, when a diff establishes or tightens a security, durability, or state invariant on one path, search sibling entrypoints (other handlers, verbs, backends, or platforms) for parallel paths that still bypass it.
 
 For contested designs, reconstruct the author's strongest rationale from the design docs, issues, and review discussion before drafting objections.
 Test the user's preferred alternative against the same constraints, including costs it reintroduces.
@@ -33,7 +33,7 @@ A model's opinion of how verbose or tangled code is is close to noise (the same 
 python3 scripts/slop.py [BASE] [--scope DIR] [--all]   # working tree vs BASE: HEAD for uncommitted work, main for a branch
 ```
 
-It wraps [scb-check](https://github.com/gabeorlanski/scb-check) (SlopCodeBench's tool; Python, Rust, JS, TS, Zig, Haskell, C++) and prints: line delta; base-to-head counts for the changed files (functions over cyclomatic complexity 10, clone lines, flagged lines, erosion and verbosity ratios); and every clone, complexity, or slop-rule hit that lands on a touched line, as `file:line`. Cross-repo clones need the full scan; if scb-check aborts on a file it cannot parse, the script says so and falls back to the changed files. For Go, Java, C#, Swift, Kotlin, Ruby, PHP and C it uses [lizard](https://github.com/terryyin/lizard) instead: same complexity metric, a weaker token-level clone detector, no slop rules. Lizard's ratios are comparable to the same repo's history, not to scb-check's reference points below.
+It wraps [scb-check](https://github.com/gabeorlanski/scb-check) (SlopCodeBench's tool; Python, Rust, JS, TS, Zig, Haskell, C++) and prints: line delta; base-to-head counts for the changed files (split into prod and tests when both change: functions over cyclomatic complexity 10, clone lines, flagged lines, erosion and verbosity ratios); and every clone, complexity, or slop-rule hit that lands on a touched line, as `file:line`. Cross-repo clones need the full scan; if scb-check aborts on a file it cannot parse, the script says so and falls back to the changed files. For Go, Java, C#, Swift, Kotlin, Ruby, PHP and C it uses [lizard](https://github.com/terryyin/lizard) instead: same complexity metric, a weaker token-level clone detector, no slop rules. Lizard's ratios are comparable to the same repo's history, not to scb-check's reference points below.
 
 Reading the output:
 
@@ -105,4 +105,4 @@ Form, so the author gets the point from the first sentence:
 - Link only the key lines, as permalinks at a SHA (`?plain=1` for Markdown lines). Do not put line numbers in prose.
 - Address the work, not the person: "this plan", not "your plan"; "I suspect", not "I don't think"; "How about" or "Could we", not "you should".
 
-Before posting, give the draft to a subagent with no context from the review and ask what the author would take away and what would irritate them. Fix what it reports.
+For substantial or contested PR comments, give the draft to a subagent with no context from the review and ask what the author would take away and what would irritate them. Fix what it reports.
