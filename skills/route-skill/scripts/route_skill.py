@@ -189,15 +189,13 @@ def project_dirs():
 def local_candidates(name):
     paths = [d / name for d in project_dirs()]
     paths += [Path.home() / ".agents" / "skills" / name,
-              Path.home() / ".claude" / "skills" / name,
-              Path.home() / ".codex" / "skills" / name]
+              Path.home() / ".claude" / "skills" / name]
     return sorted({p.resolve() for p in paths if (p / "SKILL.md").is_file()})
 
 
-# Global skills directory per agent, relative to the home directory.
+# Mirrors for agents that do not read ~/.agents/skills. Codex, OpenCode and Pi
+# read it natively; mirroring there would list every skill twice.
 AGENT_DIRS = {"claude": PurePosixPath(".claude/skills"),
-              "codex": PurePosixPath(".codex/skills"),
-              "pi": PurePosixPath(".pi/agent/skills"),
               "hermes": PurePosixPath(".hermes/skills"),
               "antigravity": PurePosixPath(".gemini/config/skills")}
 

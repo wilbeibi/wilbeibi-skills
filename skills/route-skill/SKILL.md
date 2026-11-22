@@ -48,7 +48,7 @@ python3 scripts/route_skill.py link route-skill
 python3 scripts/route_skill.py unlink dataviz --project
 ```
 
-A skill may restrict itself with `agents:` frontmatter (`agents: [codex]`; known: antigravity, claude, codex, hermes, pi).
+A skill may restrict itself with `agents:` frontmatter (`agents: [claude]`; known: antigravity, claude, hermes). Codex, OpenCode and Pi read `~/.agents/skills` directly, so a restriction cannot hide a skill from them.
 `link` then creates only those agent mirrors, prunes the ones it owns elsewhere, and keeps the canonical
 `.agents/skills` link so `sync` still tracks it. Omit the field to allow every agent.
 
