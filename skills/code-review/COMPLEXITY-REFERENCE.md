@@ -16,6 +16,8 @@ Wrong layer is also the *cause* of tangling, not merely a sibling of it: when la
 
 The third attractor named in question 1 — *the layer you already own* — is structural rather than cognitive: fixes land on org boundaries instead of problem boundaries, which is Conway's law applied to bug fixing. Its observable symptom is the same bug fixed N times in N teams' layers, none of them the owning one, so "has this been fixed somewhere else before?" is the cheapest wrong-layer detector available. For an agent the same attractor is the file already in its context.
 
+**Concrete layer-cut exemplars:** `thundersnap` mounts user data and secrets as nested btrfs subvolumes, so a native snapshot of the rootfs excludes them by construction — no exclusion lists. `strands-box` binds its egress listener inside the child's routeless network namespace and passes the fd back via `SCM_RIGHTS` instead of layering veth/iptables. **The over-cut flip side:** `nanvix` cuts Linux itself for fast cold start, then pays by reimplementing POSIX and in IPC overhead on every ordinary syscall — cut only layers that do not serve your actual contract.
+
 ## Two kinds of cost — weigh tangling harder
 
 A change adds cost two ways, and they are not equal:
@@ -50,11 +52,15 @@ The countable version: five booleans admit 2⁵ = 32 states; if six are legal, t
 
 Two stopping rules. Encode only the constraints a plausible caller would get wrong *and* that are cheap to express — types nobody can read are their own tangle. And on a public API this is a genuine trade: adding a field is compatible, adding a variant breaks exhaustive matches, so you buy safety now with evolution cost later.
 
+**Concrete exemplars:** `celld`'s `Channel` enum is deliberately *not* `#[non_exhaustive]`: adding an egress path breaks compilation until it is wired to the single `output_gate`, and `crates/logic` never branches on `Channel`, so per-channel policy cannot drift. `slatedb-txn-obj` enforces its GC boundary inside the protocol layer rather than trusting every caller to remember the create-if-absent ABA check.
+
 ## Reuse is not free — the boundary on "fold in"
 
 Question 4 defaults to folding in, and that default has an edge. Armstrong lists *reuse* among the reasons software got harder, against an earlier world whose advantages included "no reuse of code," "complete control," and being "understandable in its entirety." His accounting is in responsibility, not lines: *I reuse X in program P, I ship P to a customer, the customer reports an error in P, **I am responsible*** — you buy the function and pay in liability, and liability doesn't transfer. So folding in is right where you own both sides and wrong where you don't. Inside a trust boundary it removes duplication; across one it buys that removal with coupling to something you can't change and must still answer for.
 
 Two claims from the same talk are worth carrying alongside it. Complexity is infectious rather than additive — "bad code contaminates good code," which Armstrong rates the single thing to check before taking a job; a bolt-on shim is therefore not inert, and neither is the module it leans against. And entropy falls only when something forces deletion: early Unix discarded unused programs because the disk was small, natural selection by scarcity. Nothing plays that role now — storage, history, and context are all cheap — so deletion pressure has to be supplied deliberately or it doesn't exist.
+
+**AI-era entropy vs deliberate deletion pressure:** agent-heavy repos accrete one-line micro-churn PRs, sprawling roadmaps, and docs that outgrow the code. The counterweight is scheduled deletion: `cocoon` lands explicit `cut:` commits (e.g. `59b34ee`: fold repeated closures, drop derivable state), and `strands-box` runs a `test-critic` that undoes each diff hunk and rejects tests that stay green.
 
 ## When to actually add a new abstraction
 

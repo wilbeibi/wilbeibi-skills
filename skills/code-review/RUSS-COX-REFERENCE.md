@@ -2,7 +2,7 @@
 
 Full philosophy behind the passes and audit dimensions in `SKILL.md`. Load this to justify a finding, decide an edge case, or explain a principle to the author.
 
-Exemplars cite golang.org/x/oscar (the Go team's contributor agent). Oscar is evidence, not a standard: each exemplar is one Go-shaped instantiation of a portable principle, and most codebases will differ in language, scale, and shape. When writing a finding, extract the spirit and demand its local translation — "panic for bugs" means fail fast on impossible states in whatever form the language gives you; "txtar fixtures" means any diffable, hand-editable fixture format; "doc.go architecture tour" means one living document that explains the design and records its doubts, wherever that lives. If a principle costs more than it buys in this codebase, say so and move on.
+Exemplars cite `golang.org/x/oscar` (the Go team's contributor agent) alongside systems/infra codebases (`cocoon`, `celld`, `slatedb`, `strands-box`, `vitastor`, `layerfs`, `cellule`). Each exemplar is evidence, not a standard: one concrete instantiation of a portable principle, and most codebases will differ in language, scale, and shape. When writing a finding, extract the spirit and demand its local translation — "panic for bugs" means fail fast on impossible states in whatever form the language gives you; "txtar fixtures" means any diffable, hand-editable fixture format; "doc.go architecture tour" means one living document that explains the design and records its doubts, wherever that lives. If a principle costs more than it buys in this codebase, say so and move on.
 
 ## Core philosophy
 
@@ -56,9 +56,15 @@ Every dependency brings its own tree; you maintain all of it.
 
 Gaby defines its *own* minimal interface for everything it needs from the environment — `storage.DB`, `llm.Embedder`, `secret.DB`, `queue.Queue` — with multiple implementations (in-memory, disk, GCP), so it runs "from a Raspberry Pi to a hosted cloud". Interfaces stay minimal on purpose: `storage.DB` is Get/Set/Scan/Delete/Batch/Lock, "avoiding, for example, a requirement on SQL, to admit as many implementations as possible." Structure you need (ordering, timestamps) is built *on top of* the seam, not demanded from it. Core packages never import the heavy implementations.
 
+- **Systems exemplars:** `celld`'s `crates/logic` is a pure `on_event(&mut State, Event) -> Vec<Effect>` core with no external deps, walled off by a `clippy.toml` that bans clocks, randomness, `std::fs`, and `tokio::select!`. `slatedb-txn-obj` extracts sequenced CAS, epoch fencing, and GC watermarks as a domain-free seam reused unchanged by two stores.
+- **Counter-exemplars:** `layerfs-history` is a trait+DTO crate justified by "a second provider could be added later" while only SQLite exists; `layerfs-api` spreads one thin layer across dozens of pass-through files.
+
 ### Composition payoff
 
 A design metric, not an aesthetic: oscar's embeddocs package "has very little to it, given the abstractions of a document store with incremental scanning, an LLM embedder, and a vector database." When a new unit is nearly trivial, the abstractions below it are right. Corollary: judge refactors by what they delete — one oscar refactor's headline benefit was deleting four packages.
+
+- **Deletion & asymmetric-backend exemplars:** `cocoon` shares lifecycle code through a concrete embedded `*hypervisor.Backend` plus small per-verb `*Spec` hooks, and puts capabilities only some VMMs have (live migration) behind narrow interfaces with compile-time assertions (`_ hypervisor.Migrator = (*CloudHypervisor)(nil)`) instead of one wide driver trait full of `ErrNotSupported`. `celld` ported Litestream's `leaser.rs`, then deleted it because its epoch-fenced ownership record already fenced writers, and dropped its restore seal after the TLA+ checker showed it could turn a recoverable ordering error into data loss.
+- **Counter-exemplars:** `slatedb`'s accumulated pluggability grew `builder.rs` into thousands of lines of `with_*` methods; `cellule` split a tiny types crate off at the edge while fusing fleet reconcilers and app primitives into one giant runtime crate — the seam is in the wrong place.
 
 Control flow as representation: explicit state is sometimes accidental machinery. A `state` field, iterator stack, pending queue, or state machine may only be simulating the program counter or call stack. In that case, prefer a direct loop, recursion, callback traversal, generator/coroutine, or small adapter that lets the natural control flow carry the state. Keep state as data when it must be serialized, inspected externally, persisted, shared across processes, or updated by unpredictable events.
 
@@ -109,6 +115,7 @@ Choose by *whose bug it is*:
 - **Conformance suites**: a new implementation of a shared interface runs the shared test suite.
 - **Coverage as a review tool, not a vanity number**: list untested lines; untested error paths get tests or a justified `// Unreachable` / `// Untested` marker.
 - **Determinism**: no dependence on timing or the race detector.
+- **Systems verification exemplars:** `cocoon`'s `ForcedRetry` store wrapper makes every `Update` closure roll back once before committing, proving retry purity mechanically. `slatedb-dst` runs seeded single-threaded Tokio and has a meta-test asserting that the same seed reproduces bit-exact randomness and clock readings.
 
 ### Docs & style
 
@@ -134,7 +141,7 @@ Choose by *whose bug it is*:
   Contract, example, and the performance escape hatch — all where the reader's cursor already is.
 - Inline comments are *why*-only: `w = w[:len(v)] // make "i in range for v" imply "i in range for w" to remove bounds check`.
 - TODOs are signed and argued — a considered tradeoff, not a vague wish: `TODO(rsc): float64 is slightly higher precision... may not be worth the type conversions`.
-- **Admit uncertainty in writing**: "It remains to be seen whether this decision is kept." Design docs that only assert are lying about confidence.
+- **Admit uncertainty in writing**: "It remains to be seen whether this decision is kept." Design docs that only assert are lying about confidence. Negative-boundary docs — `cocoon/docs/known-issues.md`, `strands-box/docs/design/limitations.md` — state what the system cannot prevent, and reverts of changes that measured worse stay in git history with the numbers, so nobody re-introduces them.
 
 ### Commit/PR messages (when polish includes history or PR text)
 

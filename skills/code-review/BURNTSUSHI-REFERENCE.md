@@ -44,6 +44,8 @@ def parse_log_line(line: str) -> Event:
 
 > **Rust note:** `String`/`&str` carry a UTF-8 guarantee callers must provide. If input is bytes from an external source, consider `&[u8]` and validate before converting. Check that newtypes (`NonEmpty<T>`, `ValidPath`) have constructors that enforce the invariant.
 
+> **Systems exemplars:** `strands-box`'s `ApprovedPath` has a private constructor and splits `.as_path()` (what the kernel touches) from `.reported()` (what policy displays), so validation and execution cannot diverge. **Counter-exemplar:** `thundersnap`'s `mcp.go` confines paths with `openat(O_NOFOLLOW)` while sibling `sftpfs.go` uses lexical `filepath.Join` (symlink escape) — when the diff guards one entrypoint, check every sibling that reaches the same resource.
+
 ---
 
 ### Axis 3 — Error vs. bug boundary
@@ -71,6 +73,8 @@ let re = Regex::new(r"^[a-z0-9_-]+$").unwrap();
 › *"the key to ergonomic error handling is reducing the amount of explicit case analysis the programmer has to do while keeping code composable"*
 
 **Skill rule:** Panic for bugs (violated programmer expectations). `Result` with structured context for runtime/environment/user failures. Errors should carry enough information that callers can react, not just report.
+
+> **Systems exemplars:** `slatedb` collapses its internal error variants into a few public `ErrorKind`s named by recovery action (`Transaction`, `Closed`, `Unavailable`, `Invalid`, `Data`, `Internal`), so callers branch on what to do next, not on internals. `strands-box` refuses, at startup, isolation modes the platform cannot enforce instead of silently weakening protection.
 
 ---
 
@@ -140,6 +144,8 @@ for root, dirs, files in os.walk("."):
 
 **Skill rule:** Defaults encode correct intent for the common case. Surprising behaviors are opt-in. APIs that make the wrong thing easy are design bugs, not usage bugs.
 
+> **Systems exemplars:** `celld` deleted the env vars that disabled its output gate and storage probe, so operators cannot switch correctness off. `strands-box` forces `Accept-Encoding: identity` on credentialed egress so a compressed response cannot slip past leak-back scrubbing.
+
 ---
 
 ### Axis 7 — Testability across strategies
@@ -186,6 +192,8 @@ if (is_ascii(haystack)) {
 
 **Skill rule:** Every fast path needs a semantic oracle. Heuristics must be named as heuristics. Performance claims must name what they measure and what they don't.
 
+> **Systems exemplars:** `cocoon` enables userspace sparse copying only on FUSE/NFS, after measuring it slower on ext4. `firnflow` benchmarks approximate vector search against an exact brute-force oracle and reports where recall plateaus instead of hiding it.
+
 ---
 
 ### Axis 9 — Complexity containment
@@ -203,6 +211,8 @@ pub struct Searcher<E: Engine, S: Strategy, B: Buffer> { ... }
 **Comment:** Every caller who stores or passes a `Searcher` now carries three type parameters. If a concrete type could cover the common cases — possibly with runtime dispatch for the exotic ones — the complexity stays inside the library instead of infecting calling code.
 
 **Skill rule:** Generics and traits must justify their cost: do they enable concrete multiple use cases today, or only theoretical future ones? When a concrete type serves the common case, prefer it. Open extension points that infect call sites are design debt.
+
+> **Systems exemplars:** `strands-box` keeps a sealed `Backend` enum behind a private `mod` plus `#![warn(unreachable_pub)]` instead of exposing a generic `SecretSource` trait. **Counter-exemplar:** `slatedb`'s stacked `ObjectStore` decorators erase errors into `object_store::Error::Generic`, so `error.rs` must walk error chains and downcast just to classify failures.
 
 ---
 

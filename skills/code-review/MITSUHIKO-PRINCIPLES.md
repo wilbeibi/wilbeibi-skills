@@ -31,6 +31,11 @@ The full philosophy behind the checklists in `SKILL.md`. Load this when you need
 
 **Compatibility pledge**: *"I'd rather skip a feature than break existing code."* Stability builds trust and ecosystem.
 
+### Real-world product-vs-library contrasts
+
+- **Two standards inside one repo (`strands-box`):** Box Core (frozen config schema, two verbs, `#![warn(unreachable_pub)]`) is held to library discipline; the `box` CLI iterates fast on UX and reaches Core only through `strands_box::run()`. The warning sign: without pruning pressure, the CLI grew larger than all of Core combined.
+- **Product-shaped daemon vs general library:** `celld` stays flat (three crates, one output gate) because its runtime is opinionated; `slatedb` buys flexibility for many embedders at the cost of a sprawling builder. `cellule` paid multi-crate lockstep ceremony while still pre-production — library discipline before there were library users.
+
 ## Dependency management — "build it yourself"
 
 Each dependency brings transitive deps, security risks, and endless upgrade churn.
