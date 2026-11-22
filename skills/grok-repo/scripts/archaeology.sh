@@ -92,7 +92,8 @@ section "LONGEST FIX/PERF BODIES (failure-mode corpus — read in full, group by
 # Fix commits as above plus perf subjects (perf: prefix, or speed up/faster/optimize/performance).
 # Ranks by prose, not raw length: indented code, fences, stack frames, mostly-symbol lines (pasted
 # logs) and trailers do not count. In a squash merge only the first "* " commit counts; later
-# entries are usually review rounds. What remains are the post-mortems, not the typo fixes.
+# entries are usually review rounds. Docs/CI/refactor/feat/release subjects are skipped even when
+# a body keyword made them fix commits above. What remains are the post-mortems, not the typo fixes.
 git log --no-merges --date=short --format='%H%x1f%s%x1f%h %ad %s%x1f%b%x1e' \
   | awk '
       BEGIN { RS = "\x1e"; FS = "\x1f" }
@@ -100,6 +101,8 @@ git log --no-merges --date=short --format='%H%x1f%s%x1f%h %ad %s%x1f%b%x1e' \
         sha = $1; gsub(/[[:space:]]/, "", sha)
         if (sha == "") next
         subject = tolower($2)
+        if (subject ~ /^(docs|ci|chore|style|build|refactor|feat|release)(\([^)]*\))?!?:/ ||
+            subject ~ /^(release|bump|introduce|implement|initial)([^[:alnum:]_]|$)/) next
         perf = subject ~ /^perf(\([^)]*\))?!?:/ ||
                subject ~ /(^|[^[:alnum:]_])(speed(s)? up|faster|optimi[sz](e|es|ed|ing)|performance)([^[:alnum:]_]|$)/
         n = split($4, line, "\n"); prose = 0; bullets = 0

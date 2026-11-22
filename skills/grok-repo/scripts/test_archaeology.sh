@@ -76,6 +76,11 @@ git -C "$fixture_dir" add pool.txt
 git -C "$fixture_dir" commit -q -m 'fix: move slot setup to the blocking pool (#12)' \
   -m "$(printf '* fix: run slot setup on the blocking pool\n\nSlot setup used blocking syscalls on async workers; a burst stalled the runtime.\n\n* test: cover the lease\n')"
 
+printf 'notes\n' >"$fixture_dir/notes.txt"
+git -C "$fixture_dir" add notes.txt
+git -C "$fixture_dir" commit -q -m 'docs: correct claims contradicted by the code' \
+  -m 'The guide said writes were durable before fsync; the code has never promised that, and the root cause was copied prose.'
+
 git -C "$fixture_dir" rm -q deleted.txt
 git -C "$fixture_dir" commit -qm 'Remove temporary file'
 git -C "$fixture_dir" commit --allow-empty -qm 'Revert broken direction'
@@ -153,6 +158,7 @@ assert_contains "$pitfalls" 'perf(cache): skip publish-time rehash'
 assert_contains "$pitfalls" 'Speed up index lookup'
 assert_omits "$pitfalls" 'Add a list endpoint'
 assert_contains "$pitfalls" 'fix: move slot setup to the blocking pool'
+assert_omits "$pitfalls" 'docs: correct claims'
 assert_omits "$pitfalls" 'fix: data race in cancel'
 assert_omits "$pitfalls" 'fix: squashed review rounds'
 assert_omits "$pitfalls" 'fix: repair current behavior'

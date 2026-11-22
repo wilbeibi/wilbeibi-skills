@@ -250,7 +250,7 @@
         },
         {
           "path": "scripts/archaeology.sh",
-          "sha256": "daf220c3ef15a1803f207615b4f733a52db978899e57ecc78a0c4c7d8c7850d3",
+          "sha256": "47ead2a0962725dca4f6b5d8c507ca07e71b605660a113c62b5e7d2d30eb0307",
           "executable": true
         },
         {
@@ -260,7 +260,7 @@
         },
         {
           "path": "scripts/test_archaeology.sh",
-          "sha256": "e091174c0e78ea676241800b8ab779974fd1dabad95e37e33c5dcf0de3cc9230",
+          "sha256": "9e3fc5c40c04221ee8a264798888e98c0bef3f02bbc4e3104abac35ae246a2de",
           "executable": true
         }
       ]
