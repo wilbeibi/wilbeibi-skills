@@ -36,7 +36,19 @@ METRIC = re.compile(r"^\s*= (.+)$")
 LIZ_FUNC = re.compile(r"^\s*(\d+)\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\S+?)@(\d+)-(\d+)@(.+)$")
 LIZ_DUP = re.compile(r"^(.+?):(\d+) ~ (\d+)$")
 CC_THRESHOLD = 10
+TEST_DIRS = {"test", "tests", "__tests__", "testdata", "fixtures", "spec", "specs"}
 CONFIG = []  # temp scb-check config path, set once in main
+
+
+def is_test(path):
+    parts = [p.lower() for p in os.path.normpath(path).split(os.sep)]
+    if any(p in TEST_DIRS for p in parts[:-1]):
+        return True
+    stem = os.path.splitext(parts[-1])[0]
+    raw_stem = os.path.splitext(os.path.basename(path))[0]
+    return (stem.startswith("test_")
+            or stem.endswith(("_test", "_spec", ".test", ".spec"))
+            or raw_stem.endswith(("Test", "Tests", "Spec")))
 
 
 def die(msg):
@@ -338,6 +350,15 @@ def print_metrics(label, b, h):
           f"   verbosity: {b.get('verbosity', 0):.2f} -> {h['verbosity']:.2f}")
 
 
+def report_metrics(label, subset, metrics, base):
+    prod = [f for f in subset if not is_test(f)]
+    tests = [f for f in subset if is_test(f)]
+    groups = ([f"{label}, prod", prod], [f"{label}, tests", tests]) if (prod and tests) else (
+        ([f"{label}, tests", tests],) if tests else ([label, prod],))
+    for tag, group in groups:
+        print_metrics(tag, metrics(group, base), metrics(group, None))
+
+
 def main(argv):
     base, scope, show_all = parse_args(argv)
     if not shutil.which("uvx"):
@@ -373,7 +394,7 @@ def run(base, scope, show_all):
         return
     findings = []
     for label, subset, metrics, find in backends:
-        print_metrics(label, metrics(subset, base), metrics(subset, None))
+        report_metrics(label, subset, metrics, base)
         findings += find(subset, scope)
 
     hits, skipped = format_hits(findings, ranges, show_all)
