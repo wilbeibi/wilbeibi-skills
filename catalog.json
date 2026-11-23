@@ -86,7 +86,7 @@
       "files": [
         {
           "path": "BURNTSUSHI-REFERENCE.md",
-          "sha256": "ee6281df5f2d1f377496e7e463de504e23422241f6217c59d319c59141ab5fe2",
+          "sha256": "edd29c691c8a5cf5d6357cf37be9c23181b581efc3df98f5fdebbd8e5ef0b4c6",
           "executable": false
         },
         {
@@ -96,7 +96,7 @@
         },
         {
           "path": "COMPLEXITY-REFERENCE.md",
-          "sha256": "91fc3562d5d726a98ed7e12466afb7fac8956b73b53c38582e5a36713705563c",
+          "sha256": "0d819d417920323fe4292641bac3c760f61a26c023943969f6a2284c7dce1afd",
           "executable": false
         },
         {
@@ -106,7 +106,7 @@
         },
         {
           "path": "MITSUHIKO-PRINCIPLES.md",
-          "sha256": "874fcaac3b5b2875cc8f4196e6da50a8d321f394ad2bda6c6ad15ee65fcc4da2",
+          "sha256": "7f21576c5f9623ecc874242c380def9111abf2726d1a3f990c982a2048e9f88c",
           "executable": false
         },
         {
@@ -121,22 +121,22 @@
         },
         {
           "path": "RUSS-COX-REFERENCE.md",
-          "sha256": "e1bcd76ec8f3e9d245df6e562d8bee451e9c708e9d24e5708eaf52c1b40b5260",
+          "sha256": "b0ba13c8b3f0399e7f0917ef5ac675309b182028136b8afe537377d110b744b6",
           "executable": false
         },
         {
           "path": "RUSS-COX.md",
-          "sha256": "4484ea8eeadae51f54f61b6ca5ae42ef1675105613c759ab9e4d917277d0e145",
+          "sha256": "b23c48ccf2ad332564882fb56cbe5367776da8c7385f147553a48811b427853a",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "597be66532846051794590dd07ff277bb28e7aaff983222a71b1a937074d7793",
+          "sha256": "dc2db4d460c05924eeca725285ed3a9c43a6b05a410d885e5a167862abad8d0f",
           "executable": false
         },
         {
           "path": "scripts/slop.py",
-          "sha256": "cb6e31af3b4bd945318c45c0aa530684522b47704c8b930d00a01735348c10ab",
+          "sha256": "dffe1fb1378dd4d825d10f3714bd4be066ed20383b4fc2fe8dd464937afb85d0",
           "executable": false
         }
       ]
@@ -527,12 +527,12 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "46901b384573665f3e07f470ae1b4d45d366055e1049e3d71bc05a747627f897",
+          "sha256": "091cb005b18973c6755dfb75d62631b136412457bfd8a1e48433f74d9d914ac3",
           "executable": false
         },
         {
           "path": "scripts/paper_search.py",
-          "sha256": "963af9ac839dca9af1fc9ffc1223d6e8e60375686c9a5f8752797c9e81690179",
+          "sha256": "4a464a8cfcb512f6bd810240b49393cf96416c2c2893c1c573f07f2cd125d98a",
           "executable": true
         }
       ]
