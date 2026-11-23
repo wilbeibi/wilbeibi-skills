@@ -114,7 +114,14 @@ def get(url, tries=3, raw=False):
             req = urllib.request.Request(url, headers={"User-Agent": "paper-search/1.0"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 return r.read() if raw else json.loads(r.read())
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
+        except urllib.error.HTTPError as e:
+            if attempt == tries - 1 or e.code not in (429, 500, 502, 503, 504):
+                raise
+            retry_after = e.headers.get("Retry-After") if e.headers else None
+            wait = float(retry_after) if (retry_after and retry_after.isdigit()) else max(delay, 3.0 if e.code == 429 else delay)
+            time.sleep(min(wait, 15.0))
+            delay *= 2
+        except (urllib.error.URLError, TimeoutError):
             if attempt == tries - 1:
                 raise
             time.sleep(delay)
@@ -199,6 +206,7 @@ def from_openalex(w):
                      if k.get("display_name") and (k.get("score") or 0) >= 0.5][:5],
         "categories": [],
         "query_hits": [],
+        "seed_hits": [],
         "best_query_rank": 10**9,
         "pdf": (w.get("best_oa_location") or {}).get("pdf_url") or "",
         "fwci": w.get("fwci"),
@@ -237,6 +245,7 @@ def from_arxiv(entry, ns):
         "categories": [c.get("term") for c in entry.findall("a:category", ns)
                        if c.get("term")],
         "query_hits": [],
+        "seed_hits": [],
         "best_query_rank": 10**9,
         "pdf": f"https://arxiv.org/pdf/{aid}",
         "fwci": None,
@@ -312,45 +321,60 @@ def scope_filters(institutions=None, institution_type=None, venues=None, topics=
     return filters, resolved
 
 
-def resolve(seed):
-    """seed (arXiv:2307.03172 | DOI:10.x | 10.x | Wxxx) -> OpenAlex work ids.
+def resolve_seed(seed):
+    """seed (arXiv:2307.03172 | DOI:10.x | 10.x | Wxxx) -> (OpenAlex work ids, label).
 
     Returns BOTH the preprint and published records when they exist: OpenAlex keeps them
     as separate works (Lost-in-the-Middle has 972 citations on the TACL record and 61 on
     the arXiv one) and citers point at either, so using one loses half the frontier.
     """
     s = seed.strip()
-    if re.fullmatch(r"W\d+", s):
-        return [s]
-    if s.lower().startswith("arxiv:"):
-        doi = f"10.48550/arXiv.{s.split(':', 1)[1]}"
-    elif s.lower().startswith("doi:"):
-        doi = s.split(":", 1)[1]
-    elif s.startswith("10."):
-        doi = s
+    if re.fullmatch(r"W\d+", s, re.I):
+        wid = s.upper()
+        try:
+            w = get(f"{OPENALEX}/{wid}?"
+                    + urllib.parse.urlencode({"select": "id,title", "mailto": MAILTO}))
+            title = w.get("title") or wid
+        except Exception:
+            return [wid], wid
+        ids = [wid]
     else:
-        return []
-    try:
-        w = get(f"{OPENALEX}/doi:{doi}?"
-                + urllib.parse.urlencode({"select": "id,title", "mailto": MAILTO}))
-    except Exception:
-        return []
-    ids, title = [w["id"].rsplit("/", 1)[-1]], w.get("title") or ""
+        if s.lower().startswith("arxiv:"):
+            doi = f"10.48550/arXiv.{s.split(':', 1)[1]}"
+        elif s.lower().startswith("doi:"):
+            doi = s.split(":", 1)[1]
+        elif s.startswith("10."):
+            doi = s
+        else:
+            return [], s
+        try:
+            w = get(f"{OPENALEX}/doi:{doi}?"
+                    + urllib.parse.urlencode({"select": "id,title", "mailto": MAILTO}))
+        except Exception:
+            return [], s
+        ids, title = [w["id"].rsplit("/", 1)[-1]], w.get("title") or ""
+    label = (title.split(":", 1)[0].strip() if ":" in title and len(title.split(":", 1)[0]) <= 28
+             else (title[:28].strip() + "…" if len(title) > 28 else title or s))
     if not title:
-        return ids
+        return ids, label
     try:
         twins = oa({"filter": f"title.search:{title}", "select": "id,title"})
     except Exception:
-        return ids
+        return ids, label
     for t in twins.get("results") or []:
         wid = t["id"].rsplit("/", 1)[-1]
         if norm_title(t.get("title")) == norm_title(title) and wid not in ids:
             ids.append(wid)
-    return ids
+    return ids, label
 
 
-def citing(seed, since=None, field="cs", scope_filters=None):
-    """Top-cited papers that CITE the seed — the frontier that built on a landmark.
+def resolve(seed):
+    return resolve_seed(seed)[0]
+
+
+def graph_neighbors(seed, mode="cites", since=None, field="cs", scope_filters=None):
+    """Papers that CITE the seed (`cites`, i.e. --after) or that the seed CITES
+    (`cited_by`, i.e. --before).
 
     Sorting server-side is the whole game: a landmark has thousands of citers and the
     few that matter are not the ones the API hands back first.
@@ -358,8 +382,14 @@ def citing(seed, since=None, field="cs", scope_filters=None):
     per id.)
     """
     out = []
-    for wid in resolve(seed):
-        filters = [f"cites:{wid}"]
+    wids, label = resolve_seed(seed)
+    if not wids:
+        print(f"warning: could not resolve seed {seed!r} in OpenAlex", file=sys.stderr)
+        return out
+    prefix = "+" if mode == "cites" else "-"
+    tag = f"{prefix}{label}"
+    for wid in wids:
+        filters = [f"{mode}:{wid}"]
         if field == "cs":
             filters.append(CS_FIELD)
         if since:
@@ -369,10 +399,23 @@ def citing(seed, since=None, field="cs", scope_filters=None):
         try:
             r = oa({"filter": ",".join(filters), "sort": "cited_by_count:desc",
                     "per-page": 50, "select": WORK_FIELDS})
-            out += [from_openalex(w) for w in r.get("results") or []]
-        except Exception:
+            for rank_no, w in enumerate(r.get("results") or [], 1):
+                p = from_openalex(w)
+                p["seed_hits"] = [tag]
+                p["best_query_rank"] = rank_no
+                out.append(p)
+        except Exception as e:
+            print(f"warning: OpenAlex {mode}:{wid} failed ({e})", file=sys.stderr)
             continue
     return out
+
+
+def citing(seed, since=None, field="cs", scope_filters=None):
+    return graph_neighbors(seed, "cites", since, field, scope_filters)
+
+
+def references(seed, since=None, field="cs", scope_filters=None):
+    return graph_neighbors(seed, "cited_by", since, field, scope_filters)
 
 
 def arxiv_query(query, categories=None):
@@ -525,7 +568,7 @@ def dedupe(papers):
                   "affil", "topic"):
             if not keep.get(f) and other.get(f):
                 keep[f] = other[f]
-        for f in ("topics", "keywords", "categories", "query_hits"):
+        for f in ("topics", "keywords", "categories", "query_hits", "seed_hits"):
             keep[f] = list(dict.fromkeys((keep.get(f) or []) + (other.get(f) or [])))
         keep["best_query_rank"] = min(keep.get("best_query_rank", 10**9),
                                       other.get("best_query_rank", 10**9))
@@ -549,11 +592,20 @@ def dedupe(papers):
 def rank(papers):
     vels = sorted(p["velocity"] for p in papers if p["velocity"] is not None)
     median = vels[len(vels) // 2] if vels else 0.0
+    multi_seed = any(len(p.get("seed_hits") or []) > 1 for p in papers)
     for p in papers:
         p["verdict"] = verdict(p, median)
-    papers.sort(key=lambda p: (ORDER[p["verdict"]], -len(p.get("query_hits") or []),
-                               p.get("best_query_rank", 10**9), -(p["fwci"] or 0),
-                               -(p["velocity"] or 0), -p["cites"]))
+    # When multiple seeds are passed, papers connecting 2+ seeds (co-citing or co-cited)
+    # are the structural bridge of the graph — surface them ahead of single-seed landmarks.
+    papers.sort(key=lambda p: (
+        -(len(p.get("seed_hits") or []) if multi_seed and not p["retracted"] else 0),
+        ORDER[p["verdict"]],
+        -len(p.get("seed_hits") or []),
+        -len(p.get("query_hits") or []),
+        p.get("best_query_rank", 10**9),
+        -(p["fwci"] or 0),
+        -(p["velocity"] or 0),
+        -p["cites"]))
     return papers, median
 
 
@@ -565,9 +617,12 @@ def render(papers, median, query):
     print(f"(median velocity in this result set: {median:.1f} cites/mo)\n")
     last = None
     for p in papers:
-        if p["verdict"] != last:
-            last = p["verdict"]
-            print(f"── {last}  ({NOTE[last]})")
+        seeds = p.get("seed_hits") or []
+        hdr = f"{p['verdict']} · {len(seeds)} seeds" if len(seeds) > 1 else p["verdict"]
+        if hdr != last:
+            last = hdr
+            note = "connected to multiple seeds — graph intersection" if len(seeds) > 1 else NOTE[p["verdict"]]
+            print(f"── {hdr}  ({note})")
         age = f"{p['age_mo']:.0f}mo" if p["age_mo"] else "?"
         fp = p.get("first_posted")
         if fp and fp != p["date"]:
@@ -583,6 +638,15 @@ def render(papers, median, query):
         print(f"    {p['date']}  ({age})  {p['cites']} cites ({vel})  {fw}"
               f"  [{p['tier']}] {p['venue'][:34]}")
         print(f"    {who}")
+        if seeds:
+            cites_s = [s[1:] for s in seeds if s.startswith("+")]
+            ref_s = [s[1:] for s in seeds if s.startswith("-")]
+            parts = []
+            if cites_s:
+                parts.append("cites: " + ", ".join(cites_s))
+            if ref_s:
+                parts.append("cited by: " + ", ".join(ref_s))
+            print(f"    ☍ {'  |  '.join(parts)}")
         labels = (([p["topic"]] if p.get("topic") else p.get("categories") or []) +
                   (p.get("keywords") or [])[:3])
         if labels:
@@ -649,9 +713,19 @@ def selftest():
     p2 = from_openalex({"title": "One paper", "cited_by_count": 2})
     p1["query_hits"], p1["best_query_rank"] = ["agent runtime"], 4
     p2["query_hits"], p2["best_query_rank"] = ["AI agent systems"], 2
+    p1["seed_hits"], p2["seed_hits"] = ["+TrEnv"], ["+DeltaBox"]
     merged = dedupe([p1, p2])[0]
     assert merged["query_hits"] == ["AI agent systems", "agent runtime"]
+    assert merged["seed_hits"] == ["+DeltaBox", "+TrEnv"]
     assert merged["best_query_rank"] == 2
+    s_single = from_openalex({"title": "Landmark single", "cited_by_count": 600,
+                              "publication_date": "2023-01-01", "fwci": 30.0})
+    s_single["seed_hits"] = ["+TrEnv"]
+    s_bridge = from_openalex({"title": "Bridge paper", "cited_by_count": 5,
+                              "publication_date": "2026-06-01"})
+    s_bridge["seed_hits"] = ["+TrEnv", "+DeltaBox"]
+    ranked, _ = rank([s_single, s_bridge])
+    assert ranked[0]["title"] == "Bridge paper"
     assert VENUE_ALIASES["fast"] == "File and Storage Technologies"
     filters, _ = scope_filters(["I1"], "company", ["S2"], ["T3"])
     assert filters == ["authorships.institutions.lineage:I1",
@@ -670,11 +744,18 @@ def main():
     ap.add_argument("--since", help="YYYY-MM-DD or YYYY — only papers after this")
     ap.add_argument("--fresh", type=int, metavar="DAYS",
                     help="also pull arXiv preprints from the last N days")
-    ap.add_argument("--after", metavar="ID",
-                    help="papers CITING this seed (arXiv:2307.03172, DOI:..., Wxxx)")
+    ap.add_argument("--after", action="append", default=[], metavar="ID",
+                    help="papers CITING this seed (arXiv:2307.03172, DOI:..., Wxxx); "
+                         "repeat for multi-seed citation intersection")
+    ap.add_argument("--before", action="append", default=[], metavar="ID",
+                    help="papers CITED BY this seed (its foundation/references); "
+                         "repeat to find shared prior art across seeds")
+    ap.add_argument("--min-seeds", type=int, default=1, metavar="N",
+                    help="keep only papers connected to at least N seeds (use 2 for "
+                         "strict graph intersection)")
     ap.add_argument("--about", metavar="TEXT",
-                    help="keep only --after results matching these words (a landmark is "
-                         "cited by every field; this keeps the frontier on topic)")
+                    help="keep only --after/--before results matching these words (a landmark "
+                         "is cited by every field; this keeps the frontier on topic)")
     ap.add_argument("--min-cites", type=int)
     ap.add_argument("--field", default="cs", choices=["cs", "any"],
                     help="restrict to Computer Science (default) or search all fields")
@@ -696,8 +777,8 @@ def main():
     if a.selftest:
         return selftest()
     queries = ([a.query] if a.query else []) + a.query_variants
-    if not (queries or a.after):
-        ap.error("need a query or --after")
+    if not (queries or a.after or a.before):
+        ap.error("need a query, --after, or --before")
 
     filters, resolved = scope_filters(a.institution, a.institution_type, a.venue, a.topic)
     for kind in ("institutions", "venues", "topics"):
@@ -710,17 +791,33 @@ def main():
         print("warning: skipping arXiv --fresh results because arXiv cannot enforce "
               "the requested OpenAlex scope filters", file=sys.stderr)
     papers = []
-    if a.after:
-        papers += citing(a.after, a.since, a.field, filters)
-    for query in queries:
-        hits = search(query, a.since, a.min_cites, a.field, filters)
-        papers += relevance(hits, query)
+    for seed in a.after:
+        papers += citing(seed, a.since, a.field, filters)
+    for seed in a.before:
+        papers += references(seed, a.since, a.field, filters)
+    for idx, query in enumerate(queries):
+        try:
+            hits = search(query, a.since, a.min_cites, a.field, filters)
+            papers += relevance(hits, query)
+        except Exception as e:
+            if not papers and idx == len(queries) - 1 and not a.fresh:
+                raise
+            print(f"warning: OpenAlex query {query!r} failed ({e})", file=sys.stderr)
         if a.fresh and not filters:
-            papers += relevance(search_arxiv(query, a.fresh, a.category), query)
+            if idx > 0:
+                time.sleep(1.0)
+            try:
+                papers += relevance(search_arxiv(query, a.fresh, a.category), query)
+            except Exception as e:
+                if not papers and idx == len(queries) - 1:
+                    raise
+                print(f"warning: arXiv --fresh for {query!r} failed ({e})", file=sys.stderr)
 
     if a.about:
         papers = relevance(papers, a.about, floor=0.34)
     papers = dedupe(papers)
+    if a.min_seeds > 1:
+        papers = [p for p in papers if len(p.get("seed_hits") or []) >= a.min_seeds]
     enrich_authors(papers)  # must precede rank(): the buckets use h-index
     papers, median = rank(papers)
 
@@ -733,12 +830,15 @@ def main():
     else:
         papers = papers[: a.limit]
 
+    label_parts = (queries
+                   + [f"after:{s}" for s in a.after]
+                   + [f"before:{s}" for s in a.before])
     if a.json:
-        print(json.dumps({"query": queries or a.after, "scope": resolved,
+        print(json.dumps({"query": label_parts, "scope": resolved,
                           "median_velocity": median,
                           "papers": papers}, indent=2))
     else:
-        render(papers, median, " | ".join(queries) if queries else a.after)
+        render(papers, median, " | ".join(label_parts))
     return 0
 
 

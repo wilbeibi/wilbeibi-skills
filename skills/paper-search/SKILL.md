@@ -14,14 +14,19 @@ python3 scripts/paper_search.py "distributed storage" --institution Alibaba
 python3 scripts/paper_search.py "crash consistency" --venue FAST
 python3 scripts/paper_search.py "agent memory" --fresh 60 --category cs.AI
 python3 scripts/paper_search.py --after arXiv:2307.03172 --about "position bias"
+python3 scripts/paper_search.py --after DOI:10.1145/3694715.3695967 --after arXiv:2605.22781
+python3 scripts/paper_search.py --before arXiv:2605.22781 --before arXiv:2605.10913 --min-seeds 2
 python3 scripts/paper_search.py --selftest
 ```
 
 Repeat `-q` for alternate terminology; papers matching several variants rank higher within
 their quality bucket. `--institution` resolves a lab/company and includes its descendants;
 `--institution-type company` searches industry broadly. Venue aliases include FAST, OSDI,
-SOSP, NSDI, MLSys, NeurIPS, ICML, ICLR, VLDB, and SIGMOD. `--after` takes `arXiv:ID`,
-`DOI:x`, or an OpenAlex `Wxxx`. Feed a useful displayed topic back through `--topic`.
+SOSP, NSDI, MLSys, NeurIPS, ICML, ICLR, VLDB, and SIGMOD. `--after` (papers citing the seed)
+and `--before` (papers cited by the seed) take `arXiv:ID`, `DOI:x`, or an OpenAlex `Wxxx`
+and can be repeated across 2–4 seeds: papers connected to multiple seeds are surfaced
+first with a `☍` provenance line showing which seeds they link (`--min-seeds 2` keeps only
+the intersection). Feed a useful displayed topic back through `--topic`.
 Use `--json` for machine output and `--help` for all flags.
 
 ## Reading the output
