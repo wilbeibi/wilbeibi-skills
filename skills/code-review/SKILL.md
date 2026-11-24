@@ -42,6 +42,14 @@ Reading the output:
 - Clone hits are the mechanical form of the "existing primitive" search above. The finding is the pair that will diverge, named on both sides.
 - Slop accumulates across sessions because each agent run, reviewer included, starts without memory of the last. The base-to-head counts are the only view of that drift you get; when a package's numbers only ever rise, say so in the summary even if no single hit is a finding.
 
+The script measures local properties only. Whether a boundary holds is a question of who knows what, and for that there is no cross-language tool, so count it with `rg` in audit mode or when a diff adds a type or module that others will call:
+
+- **Field knowledge.** For a type with methods of its own, count the places outside those methods that write, borrow, index, or call a method on one of its fields, directly or through a getter or setter. Reading a copy does not count. Report "N places in M modules" once per field.
+- **Depth.** Of a module's working functions (wrappers and forwarders excluded), count how many code outside it calls, against how many it keeps to itself. A module that shows as many as it hides costs callers as much to learn as to read.
+- **Circles.** Two sibling modules, or two types, that each name the other have no order to be read in. Name both directions as `file:line`.
+
+These counts survive renaming, moved `impl` blocks, and re-exports, which is why they can stand as evidence. Several leaks from one type are one finding: ask why outsiders need those fields and what operation they are assembling from them, then name the operation the type should own.
+
 Not this skill: writing the commit or PR message (use `write-docs`), building your own understanding of an unfamiliar codebase (use `grok-repo`), or turning a confirmed `Failure` line into the regression that pins it (use `test-writing`).
 
 ## Output contract — all lenses
@@ -66,6 +74,7 @@ Each finding is one block, most-consequential first:
 - Report only what you found. Never pad toward a count, per axis, per dimension, or per section — a short review of a clean change is the correct output.
 - Never emit a numeric quality score or grade, under any lens. Scores are where a model judge is least reliable, and once fed back to the author they become the target.
 - A finding must survive renaming every identifier in the diff. If it would vanish, it was about vocabulary, not structure — drop it. (Newcomer is the exception; its subject is names and context.)
+- The `Instead:` line must survive the cheapest move that would silence the finding. A getter over the leaked field, a forwarding method, a function split at the threshold, or two files merged into one clears the report and leaves every caller knowing what it knew before. State what callers stop needing to know after the change; if the answer is nothing, it is a mechanical move, not a fix.
 - A measurement (complexity, clone size, line count) may appear only in the `Failure` line as evidence. The claim names the tangle or divergence the number points at. "Complexity 18" is not a finding; "three branches each re-derive `refresh`, so changing one silently leaves two behind" is. This is what keeps a threshold from being gamed by splitting a function into fragments that share the same knot.
 
 ## Accepting a compromise — all lenses

@@ -96,7 +96,7 @@
         },
         {
           "path": "COMPLEXITY-REFERENCE.md",
-          "sha256": "0d819d417920323fe4292641bac3c760f61a26c023943969f6a2284c7dce1afd",
+          "sha256": "0fbc4c3468adb9340b4d9f7a7efe69347edfa5455655f49287892fd8dc58e4d0",
           "executable": false
         },
         {
@@ -126,12 +126,12 @@
         },
         {
           "path": "RUSS-COX.md",
-          "sha256": "b23c48ccf2ad332564882fb56cbe5367776da8c7385f147553a48811b427853a",
+          "sha256": "b647e222b91c089ca5ab55212de72cc00607a4d201950fc8a539d3b55530c1e5",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "dc2db4d460c05924eeca725285ed3a9c43a6b05a410d885e5a167862abad8d0f",
+          "sha256": "e2e43cd7f866127143ac7674c46958056323c751d42638ff86dfceec2d1c9a7b",
           "executable": false
         },
         {
