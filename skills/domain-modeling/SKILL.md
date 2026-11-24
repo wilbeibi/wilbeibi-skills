@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. Use when a term, status, or field means two things, when naming a new concept or state, or when editing a glossary, GLOSSARY.md, or ADR. Do NOT use to interview the user about a plan (use grill-me) or to write a design doc.
+description: Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. Use when a term, status, or field means two things, when naming a new concept or state, or when editing a glossary, GLOSSARY.md, or ADR. Do NOT use to interview the user about a plan (use grill-me) or to write a design doc, or for systems-design trigger checks (use design-principles).
 ---
 
 # domain-modeling

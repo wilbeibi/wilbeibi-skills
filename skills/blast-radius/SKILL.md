@@ -1,6 +1,6 @@
 ---
 name: blast-radius
-description: Trace what a change could break beyond its diff and verify the assumptions its safety depends on. Use for "blast radius", "what could this break", or indirect compatibility and lifecycle risks. Use code-review for a general diff review.
+description: Trace what a change could break beyond its diff and verify the assumptions its safety depends on. Use for "blast radius", "what could this break", or indirect compatibility and lifecycle risks. Use code-review for a general diff review, and design-principles for systems-design trigger checks.
 ---
 
 # blast-radius

@@ -41,7 +41,7 @@
     },
     {
       "name": "blast-radius",
-      "description": "Trace what a change could break beyond its diff and verify the assumptions its safety depends on. Use for \"blast radius\", \"what could this break\", or indirect compatibility and lifecycle risks. Use code-review for a general diff review.",
+      "description": "Trace what a change could break beyond its diff and verify the assumptions its safety depends on. Use for \"blast radius\", \"what could this break\", or indirect compatibility and lifecycle risks. Use code-review for a general diff review, and design-principles for systems-design trigger checks.",
       "compatibility": "",
       "agents": [],
       "path": "skills/blast-radius",
@@ -53,7 +53,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "c0e05f96ba9c91e91ca604108421cdaac715f5fccac52ef8b704e30f6d1cde6a",
+          "sha256": "0d3934cdb8dccfcf9c2a35b7f608d0f90d1e2739f36eedabf42b3f3ab885e84c",
           "executable": false
         }
       ]
@@ -199,8 +199,27 @@
       ]
     },
     {
+      "name": "design-principles",
+      "description": "Runs named systems-design checks (single writer, never reuse a name, converge on rerun, survive the rollout, implicit state machines) when a change adds state or a mechanism, touches lifecycle, delete, GC, lock, or migration code, changes a shape another process reads, or patches the same function twice. Use when the user says \"triggers\", \"check single writer\", or another principle name, or for design and lifecycle review. Do NOT use for a general diff review (use code-review), tracing what a change breaks (use blast-radius), or naming and glossary work (use domain-modeling).",
+      "compatibility": "",
+      "agents": [],
+      "path": "skills/design-principles",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "758cf2bbf2d9e88a1dce2427e0cf34e0176a2033eba6790c2d9573dd4fcbd18a",
+          "executable": false
+        },
+        {
+          "path": "references/principles.md",
+          "sha256": "187500464bc5cbd973fb02bc43fa144940747b0ee0a5ceb3097c866372321092",
+          "executable": false
+        }
+      ]
+    },
+    {
       "name": "domain-modeling",
-      "description": "Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. Use when a term, status, or field means two things, when naming a new concept or state, or when editing a glossary, GLOSSARY.md, or ADR. Do NOT use to interview the user about a plan (use grill-me) or to write a design doc.",
+      "description": "Keeps a project's vocabulary and decision records honest by challenging overloaded terms against the code and recording canonical terms and hard-to-reverse decisions where the repo already keeps them. Use when a term, status, or field means two things, when naming a new concept or state, or when editing a glossary, GLOSSARY.md, or ADR. Do NOT use to interview the user about a plan (use grill-me) or to write a design doc, or for systems-design trigger checks (use design-principles).",
       "compatibility": "",
       "agents": [],
       "path": "skills/domain-modeling",
@@ -217,7 +236,7 @@
         },
         {
           "path": "SKILL.md",
-          "sha256": "ffd315d2e001d76bc900e63e12213bf7ebced40708bf7587ec43933ace8bbd25",
+          "sha256": "9aca3de0e51971f538e18703fbaa9909fb5bde416c39977313678e53f0efe591",
           "executable": false
         }
       ]
