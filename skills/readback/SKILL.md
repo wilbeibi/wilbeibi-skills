@@ -1,7 +1,7 @@
 ---
 name: readback
 description: Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when your answer is too long to review in a terminal, when the user wants to mark up or annotate a document, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions or to interview the user one question at a time (use grill-me).
-compatibility: Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can hold a foreground command open.
+compatibility: Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can keep a command running until the reader is done.
 ---
 
 # readback
@@ -39,7 +39,7 @@ Shared flags: `--format markdown|transcript` (inferred from `.md`/`.json`, requi
 
 ## Delivery
 
-Run `review` in the foreground and wait using whatever your harness supports. Status checks may yield, but do not kill or restart a review because it is taking a while — a human is reading, and there is no timeout on that.
+A human is reading, and there is no timeout on that. Where your harness can run a command in the background and wake you when it exits, start `review` that way, tell the user the page is open, and end your turn; otherwise hold it in the foreground. Backgrounded, you are not blocked, so the rule is yours to keep: until the command exits, do not act on the document under review, and do not kill or restart the review because it is taking a while.
 
 | Exit | Meaning |
 |---|---|
@@ -47,7 +47,7 @@ Run `review` in the foreground and wait using whatever your harness supports. St
 | 1 | Operational failure (port, unwritable directory). |
 | 2 | Invalid CLI or input (malformed transcript, empty document, `--out-dir` already holding a review). |
 | 3 | The user cancelled. No prompt, no feedback. |
-| 130 | Interrupted. |
+| 130, 143 | Interrupted or killed (128 + signal) before a confirm; the page tells the reader it can no longer send. |
 
 The prompt is the reader's draft, not a read-out: they can edit it before confirming, and `result.json` records `promptEdited` when they did. So take the text on stdout as what they meant to send, even where a sentence answers to no annotation — do not reconcile it against a count.
 
@@ -58,6 +58,7 @@ On exit 0, treat the quoted passages as references and the user's comments as th
 ## When it fails
 
 - **Process died after the user confirmed:** the prompt is already on disk. Read `<review-dir>/followup.md` (the exact confirmed text) and `result.json` (outcome and submission id). Never ask the user to write the feedback again.
+- **Killed or timed out while the reader was still reading:** their notes live in the tab that is still open, which now offers the prompt to copy. Ask them to paste it. A re-run serves a new address and starts without those notes.
 - **Harness cannot hold a running command:** `build` the artifact instead, give the user the path, and take the prompt back through copy/download. Say plainly that delivery is manual — do not claim the review was delivered.
 - **Browser did not open:** the URL is already on stderr; ask the user to open it, or re-run with `--no-open`.
 - **`--out-dir` refused:** it already contains a review. Choose an empty directory rather than replacing earlier feedback.

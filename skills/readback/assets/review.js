@@ -47,6 +47,10 @@ let activeId = null;
 let pendingSel = null;               // selection captured for the menu
 let sent = false;
 let cancelled = false;
+let gone = false;          // the command stopped answering, or another tab settled the review
+let sending = false;
+let misses = 0;
+let pollTimer = 0;
 let submissionId = null;
 let storageOK = true;
 let matches = [];
@@ -1131,7 +1135,7 @@ function renderReadback() {
   state.className = "muted";
   if (sent) { state.textContent = "Sent. This prompt is final."; return; }
   if (cancelled) { state.textContent = "Review cancelled."; return; }
-  $("send").hidden = !LIVE;
+  $("send").hidden = !LIVE || gone;
   if (promptEdited) {
     state.className = "edited";
     state.textContent = "Edited by hand — this exact text is what will be sent, and further " +
@@ -1172,7 +1176,12 @@ async function postJSON(path, body) {
   return { status: res.status, data: data };
 }
 async function send() {
-  if (sent || cancelled) return;
+  if (sending) return;
+  sending = true;
+  try { await sendNow(); } finally { sending = false; }
+}
+async function sendNow() {
+  if (sent || cancelled || gone) return;
   const text = promptText();
   if (!text.trim()) { say("Nothing to send — the prompt is empty.", "err"); return; }
   if (!submissionId) submissionId = newSubmissionId();
@@ -1218,8 +1227,52 @@ async function checkStatus() {
     return data && data.status ? data.status : "open";
   } catch (e) { return null; }
 }
+/* ---- presence ---------------------------------------------------------
+   The page outlives the command: a harness timeout or a kill leaves a tab that
+   still looks ready and delivers nowhere. Ask while an answer is still possible
+   and say so when it is not. One loopback GET every few seconds; it stops for
+   good once the review is sent, cancelled or gone, because the command exits on
+   purpose after each of those and silence would then mean nothing. */
+const POLL_MS = 5000;
+function commandGone(why) {
+  gone = true;
+  clearInterval(pollTimer);
+  $("send").hidden = true;
+  $("cancel-review").hidden = true;
+  const msg = (why === "accepted" ? "This review was already sent from another tab."
+    : why === "cancelled" ? "This review was cancelled from another tab."
+    : "The review command stopped waiting.") +
+    " This page can no longer send. Your notes are still here: copy the prompt and paste it to the agent yourself.";
+  $("gone-text").textContent = msg;
+  $("gone").hidden = false;
+  say(msg, "err");
+  renderReadback();
+}
+async function pollStatus() {
+  const settled = function () { return sent || cancelled || gone; };
+  if (settled()) { clearInterval(pollTimer); return; }
+  if (sending) return;                      /* send() resolves its own uncertainty */
+  let data = null;
+  try {
+    const res = await fetch("status", { cache: "no-store" });
+    data = await res.json();
+  } catch (e) { data = null; }
+  if (settled() || sending) return;         /* decided while the request was out */
+  if (!data || !data.status) {
+    misses += 1;
+    if (misses < 2) { setTimeout(pollStatus, 1000); return; }   /* one miss may be a wake from sleep */
+    commandGone("closed");
+    return;
+  }
+  misses = 0;
+  if (data.status === "open") return;
+  if (data.status === "accepted" && submissionId && data.submissionId === submissionId) {
+    markSent(null); save(); return;         /* our own send, whose ack was lost */
+  }
+  commandGone(data.status);
+}
 async function cancelReview() {
-  if (sent || cancelled) return;
+  if (sent || cancelled || gone) return;
   if (!window.confirm("Cancel this review? The agent gets no feedback, and this page can no longer send.")) return;
   try {
     await postJSON("cancel", { reason: "user cancelled" });
@@ -1250,9 +1303,11 @@ async function copyText(text, box, label) {
   try {
     await navigator.clipboard.writeText(text);
     say(label + " copied to the clipboard.", "ok");
+    return true;
   } catch (e) {
     if (box && box.select) { box.focus(); box.select(); }
     say("Clipboard blocked here. Download the prompt instead.", "err");
+    return false;
   }
 }
 
@@ -1588,6 +1643,8 @@ function boot() {
     if (!sent) {
       $("cancel-review").hidden = false;
       say("The review command is waiting. Nothing reaches the agent until you press Confirm & send.");
+      pollTimer = setInterval(pollStatus, POLL_MS);
+      document.addEventListener("visibilitychange", function () { if (!document.hidden) pollStatus(); });
     }
   } else {
     say("Offline copy: no agent is listening. Use Copy or Download .md to hand the prompt back.");
@@ -1662,6 +1719,10 @@ function boot() {
     $("prompt-preview").focus();
   };
   $("copy").onclick = function () { copyText(promptText(), null, "Prompt"); };
+  $("gone-copy").onclick = async function () {
+    const ok = await copyText(promptText(), $("prompt-preview"), "Prompt");
+    this.textContent = ok ? "Copied" : "Copy blocked — use Download below";
+  };
   $("download").onclick = function () {
     download("followup.md", promptText(), "text/markdown");
     say("Prompt downloaded as followup.md.", "");

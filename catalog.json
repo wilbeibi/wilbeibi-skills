@@ -559,28 +559,28 @@
     {
       "name": "readback",
       "description": "Put a long reply of your own - or a plan, document, or session transcript - on an HTML page the user reads, highlights, and comments on, returning their notes as a follow-up prompt through a waiting local command. Use when your answer is too long to review in a terminal, when the user wants to mark up or annotate a document, or when you want line-level feedback on a plan before implementing it. Do NOT use to collect answers to specific open decisions or to interview the user one question at a time (use grill-me).",
-      "compatibility": "Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can hold a foreground command open.",
+      "compatibility": "Python 3.10+, stdlib only. Live delivery needs a browser on the same machine and a harness that can keep a command running until the reader is done.",
       "agents": [],
       "path": "skills/readback",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "c35c9b8f5d4032cfdde2de0ceab882292deaa0cd1351400b89966ccc221dab68",
+          "sha256": "672b42964c45816bc9670b0e1ee95e7723f30567d86c364903e5e8d422f8ed8a",
           "executable": false
         },
         {
           "path": "assets/review.css",
-          "sha256": "0d2926e3f129210e07a0b4ecd41ebf5367325aaf1c2fec241a9897e054b521da",
+          "sha256": "8302eea75f2eb06c4de848eb49b19d47491b680e32c71e3061a15a8421ee40f0",
           "executable": false
         },
         {
           "path": "assets/review.html",
-          "sha256": "3d11f5a464c56e70b4e54d507710d326f51436447b0d356a017621f5c92e22b8",
+          "sha256": "cfde497ab8b9a93120e17fbbfcaf8842ab288d9f977d788edb203cacd9ddd8ed",
           "executable": false
         },
         {
           "path": "assets/review.js",
-          "sha256": "36c71caa456ecda666d529dcc4b394c3f67b5b2268ff80153e353bd0b95d7bd0",
+          "sha256": "c422ae4bb32ff3691e0d8145e63ca76bdce4ae7f27594e17a6a791135af4e4da",
           "executable": false
         },
         {
@@ -610,12 +610,12 @@
         },
         {
           "path": "scripts/readback.py",
-          "sha256": "b2fd2ea8fdc26102aa7280ba1892b63d813eb444378b228b1d1c97432e117c5a",
+          "sha256": "7bff3491a521756e69f44da37502cc1c51a72b19875336163bdc436e077e17be",
           "executable": false
         },
         {
           "path": "scripts/test_readback.py",
-          "sha256": "71e7507bb82a63e96a8d22b9899dfb644b39797818b1a5bcb8ad1f8e21463de3",
+          "sha256": "02c12670fd9ed6e699a10b489a43c1865fdf8a28f83052c996fb3bda16626115",
           "executable": false
         },
         {

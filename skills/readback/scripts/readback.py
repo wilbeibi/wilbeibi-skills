@@ -21,6 +21,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import signal
 import sys
 import tempfile
 import threading
@@ -367,6 +368,15 @@ class ReviewState:
         self.done.set()
         return dict(self.ack)
 
+    def close(self) -> str:
+        """The command is leaving: an open review stops taking answers, a settled one keeps its outcome.
+
+        Takes `lock` itself, unlike accept() and cancel(), whose callers hold it."""
+        with self.lock:
+            if self.status == "open":
+                self.status = "closed"
+            return self.status
+
     def cancel(self) -> dict:
         result = {"schema": SCHEMA, "status": "cancelled", "reviewId": self.review_id,
                   "fingerprint": self.document["fingerprint"],
@@ -513,6 +523,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if state.status == "cancelled":
                 self._json(409, {"error": "this review was cancelled; nothing was sent"})
                 return
+            if state.status == "closed":
+                self._json(409, {"error": "the review command stopped waiting; nothing was sent"})
+                return
             if state.status == "accepted":
                 if hmac.compare_digest(state.ack["submissionId"], submission_id) \
                         and state.prompt == prompt:
@@ -539,6 +552,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 return
             if state.status == "cancelled":
                 self._json(200, {"status": "cancelled"})
+                return
+            if state.status == "closed":
+                self._json(409, {"error": "the review command already stopped waiting"})
                 return
             try:
                 body = state.cancel()
@@ -600,40 +616,54 @@ def cmd_review(args: argparse.Namespace) -> int:
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
 
-    count = len(document["entries"])
-    log(f"readback: {document['title']!r} · {count} {'entry' if count == 1 else 'entries'} "
-        f"· sha256 {document['fingerprint'][:16]}")
-    log(f"readback: review at {url}")
-    log(f"readback: artifact {review_dir / 'review.html'} (opens offline, cannot send)")
-    log("readback: waiting for Confirm & send in the browser; nothing arrives until then")
-    if not args.no_open:
-        threading.Thread(target=open_browser, args=(url,), daemon=True).start()
+    # A signal only records itself; the outcome is settled below, on this thread, so a
+    # prompt confirmed just before the kill is still delivered. The handler must not
+    # touch `state.done`: it can run while this thread is inside done.wait() holding the
+    # event's own lock, and set() would then wait on that lock forever.
+    stopped: list[int] = []
 
+    def on_signal(signum, _frame):
+        stopped.append(signum)
+
+    previous = {}
+    if threading.current_thread() is threading.main_thread():
+        for name in ("SIGINT", "SIGTERM", "SIGHUP"):
+            if hasattr(signal, name):
+                previous[getattr(signal, name)] = signal.signal(getattr(signal, name), on_signal)
     try:
-        while not state.done.wait(0.5):
+        count = len(document["entries"])
+        log(f"readback: {document['title']!r} · {count} {'entry' if count == 1 else 'entries'} "
+            f"· sha256 {document['fingerprint'][:16]}")
+        log(f"readback: review at {url}")
+        log(f"readback: artifact {review_dir / 'review.html'} (opens offline, cannot send)")
+        log("readback: waiting for Confirm & send in the browser; nothing arrives until then")
+        if not args.no_open:
+            threading.Thread(target=open_browser, args=(url,), daemon=True).start()
+        while not stopped and not state.done.wait(0.25):
             pass
-    except KeyboardInterrupt:
-        with state.lock:
-            interrupted_status = state.status
-        if interrupted_status != "accepted":
-            server.shutdown()
-            log(f"readback: interrupted; no feedback was sent. Artifact: {review_dir / 'review.html'}")
-            return EXIT_INTERRUPT
-
-    if state.status == "accepted":
-        deadline = time.monotonic() + ACK_WINDOW
-        while time.monotonic() < deadline:      # bounded window for a lost ack and its retry
-            time.sleep(0.1)
+        outcome = state.close()             # from here a late submit is refused, not half-delivered
+        if outcome == "accepted":
+            deadline = time.monotonic() + ACK_WINDOW
+            while time.monotonic() < deadline and not stopped:   # a lost ack and its retry
+                time.sleep(0.1)
         server.shutdown()
+    finally:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
+
+    if outcome == "accepted":
         log(f"readback: confirmed · saved {review_dir / 'followup.md'}")
         sys.stdout.write(state.prompt)
         sys.stdout.flush()
         return EXIT_OK
-
-    server.shutdown()
-    log(f"readback: cancelled by the user; no feedback was sent. "
-        f"Notes remain in {review_dir / 'review.html'}")
-    return EXIT_CANCELLED
+    if outcome == "cancelled":
+        log(f"readback: cancelled by the user; no feedback was sent. "
+            f"Notes remain in {review_dir / 'review.html'}")
+        return EXIT_CANCELLED
+    signum = stopped[0]
+    how = "interrupted" if signum == signal.SIGINT else f"terminated ({signal.Signals(signum).name})"
+    log(f"readback: {how}; no feedback was sent. Artifact: {review_dir / 'review.html'}")
+    return 128 + signum
 
 
 def open_browser(url: str) -> None:

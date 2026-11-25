@@ -9,7 +9,10 @@ import json
 import os
 from pathlib import Path
 import re
+import signal
 import stat
+import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -520,6 +523,20 @@ class Protocol(unittest.TestCase):
         result = json.loads((self.dir / "result.json").read_text(encoding="utf-8"))
         self.assertEqual(result["status"], "submitted")
 
+    def test_a_closed_review_refuses_late_answers_and_records_none(self):
+        self.assertEqual(self.state.close(), "closed")
+        status, body = self.submit(submission_id="late", prompt="too late")
+        self.assertEqual(status, 409)
+        self.assertIn("stopped waiting", body)
+        self.assertEqual(self.request("POST", f"{self.base}/cancel", "{}")[0], 409)
+        self.assertEqual(json.loads(self.request("GET", f"{self.base}/status")[1])["status"], "closed")
+        self.assertEqual(list(self.dir.iterdir()), [])        # no prompt, and no outcome that was never chosen
+
+    def test_closing_keeps_an_outcome_that_was_already_reached(self):
+        self.submit(submission_id="s1", prompt="kept")
+        self.assertEqual(self.state.close(), "accepted")
+        self.assertEqual(self.submit(submission_id="s1", prompt="kept")[0], 200)   # the retry still acks
+
     def test_status_lets_a_browser_resolve_an_uncertain_send(self):
         status, body = self.request("GET", f"{self.base}/status")
         self.assertEqual((status, json.loads(body)["status"]), (200, "open"))
@@ -631,6 +648,59 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(out.getvalue(), "")
         self.assertFalse((review_dir / "followup.md").exists())
         self.assertIn("no feedback was sent", err.getvalue())
+
+
+class Signals(unittest.TestCase):
+    """A kill is not an answer, and it must not swallow one. Real process, real signals."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.dir = Path(self.temp.name) / "review"
+
+    def start(self):
+        proc = subprocess.Popen(
+            [sys.executable, str(Path(__file__).with_name("readback.py")), "review",
+             str(FIXTURES / "plan.md"), "--out-dir", str(self.dir), "--no-open"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8")
+        self.addCleanup(proc.kill)
+        seen = ""
+        while "waiting for Confirm" not in seen:               # the last line before the wait
+            line = proc.stderr.readline()
+            if not line:
+                raise AssertionError(f"review exited early: {seen!r}")
+            seen += line
+        return proc, re.search(r"http://127\.0\.0\.1:\d+/r/[\w-]+/", seen).group(0)
+
+    def finish(self, proc, signum):
+        proc.send_signal(signum)
+        out, err = proc.communicate(timeout=10)
+        proc.stdout.close()
+        proc.stderr.close()
+        return proc.returncode, out, err
+
+    def test_a_kill_before_any_answer_exits_as_the_signal_and_says_so(self):
+        for signum, word in ((signal.SIGTERM, "terminated (SIGTERM)"), (signal.SIGINT, "interrupted")):
+            with self.subTest(signal=signum.name):
+                self.temp.cleanup()
+                proc, _ = self.start()
+                code, out, err = self.finish(proc, signum)
+                self.assertEqual(code, 128 + signum)
+                self.assertEqual(out, "")
+                self.assertIn(f"{word}; no feedback was sent", err)
+                self.assertEqual(sorted(p.name for p in self.dir.iterdir()),
+                                 ["review.html", "source.json"])
+
+    def test_a_kill_after_the_reader_confirmed_still_delivers_the_prompt(self):
+        proc, url = self.start()
+        status, _ = EndToEnd.post(self, url, "submit", {"submission_id": "s1", "prompt": "do the thing",
+                                                        "annotation_count": 1})
+        self.assertEqual(status, 200)
+        began = time.monotonic()
+        code, out, err = self.finish(proc, signal.SIGTERM)     # lands inside the ack window
+        self.assertEqual((code, out), (rb.EXIT_OK, "do the thing"))
+        self.assertIn("confirmed", err)
+        self.assertLess(time.monotonic() - began, rb.ACK_WINDOW - 1)   # the kill is not made to wait it out
 
 
 if __name__ == "__main__":
