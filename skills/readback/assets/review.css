@@ -243,6 +243,20 @@ summary .caret{display:inline-block;transition:transform 120ms}
 /* an author-origin `display` outranks the UA `[hidden]{display:none}` whatever the
    specificity, so `hidden` is inert here unless it is restated. */
 #sel-menu[hidden]{display:none}
+#sel-menu{flex-wrap:wrap;max-width:calc(100vw - 16px)}
+#sel-menu button.mark{font-weight:400;border-style:dashed}
+.sel-hint{margin-top:6px;font-size:.72rem;color:var(--muted);text-align:right}
+
+/* ---- keyboard list ----------------------------------------------------- */
+#keys{border:1px solid var(--edge);border-radius:12px;background:var(--card);color:var(--ink);
+  padding:16px 18px;max-width:min(460px,calc(100vw - 32px));font-size:.88rem}
+#keys::backdrop{background:rgba(0,0,0,.35)}
+#keys h2{font-size:1rem;margin:0 0 10px}
+#keys dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 14px}
+#keys dt{white-space:nowrap}
+#keys dd{margin:0;color:var(--muted)}
+kbd{font:inherit;font-size:.8rem;border:1px solid var(--edge);border-bottom-width:2px;border-radius:5px;
+  padding:0 5px;background:var(--bg)}
 
 /* ---- marginalia and read-back ---------------------------------------- */
 #marginalia{position:fixed;inset:0;z-index:10;pointer-events:none}

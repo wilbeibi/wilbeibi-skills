@@ -570,17 +570,17 @@
         },
         {
           "path": "assets/review.css",
-          "sha256": "8302eea75f2eb06c4de848eb49b19d47491b680e32c71e3061a15a8421ee40f0",
+          "sha256": "5fcd052fa35a91ee70cd041f0a406457f3d452469c3ce434e4ae2b5f68430d00",
           "executable": false
         },
         {
           "path": "assets/review.html",
-          "sha256": "cfde497ab8b9a93120e17fbbfcaf8842ab288d9f977d788edb203cacd9ddd8ed",
+          "sha256": "28d9bdbb5be7cfdd88baf6b7ebaabb894df61e7116455173cb330a0d24c56c91",
           "executable": false
         },
         {
           "path": "assets/review.js",
-          "sha256": "c422ae4bb32ff3691e0d8145e63ca76bdce4ae7f27594e17a6a791135af4e4da",
+          "sha256": "adac59ba3529475fc8d8666221c02d961a03bd8053eb5703c9313b88ded310ad",
           "executable": false
         },
         {
@@ -615,7 +615,7 @@
         },
         {
           "path": "scripts/test_readback.py",
-          "sha256": "02c12670fd9ed6e699a10b489a43c1865fdf8a28f83052c996fb3bda16626115",
+          "sha256": "f4f36090ec47fcda1266505bb4342d38ee8da5b2612a3bd9e50db1c7bad2a0a6",
           "executable": false
         },
         {

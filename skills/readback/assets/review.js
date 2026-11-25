@@ -24,11 +24,32 @@ const ASKS = /^(why|what|how|where|when|who|which)\b/i;
 /* and the openers that announce context. Without these, "Note: this matches
    what shipped in #330" comes back to the agent as a change to apply. */
 const TELLS = /^(note|notes|fyi|context|background|aside|observation|for (context|reference|the record)|heads[ -]?up|just (noting|flagging|recording))\b[:,]?/i;
+/* Chinese marks a question at the end of the sentence or in the middle of it,
+   has no word boundary to test, and is often typed without the question mark:
+   "这里为什么是 12h". So: the closing particle, the words that only ask, and a
+   few openers. 是否/如何 count only as openers -- "检查是否为空" is an order.
+   A tell needs its colon unless the word cannot begin anything else: 注册 is not 注. */
+const ASKS_ZH = /[吗呢么][。.!！…~\s]*$|为什么|为何|为啥|怎么|是不是|能不能|有没有|^(是否|如何|能否|可否|哪|谁|什么|多少)/;
+const TELLS_ZH = /^(备注|附注|仅供参考|供参考)|^(注|背景|说明|上下文)\s*[:：]/;
 function inferIntent(text) {
   const t = String(text || "").trim();
   if (!t) return "note";
-  if (t.endsWith("?") || ASKS.test(t)) return "question";
-  return TELLS.test(t) ? "note" : "change";
+  if (/[?？]$/.test(t) || ASKS.test(t) || ASKS_ZH.test(t)) return "question";
+  return TELLS.test(t) || TELLS_ZH.test(t) ? "note" : "change";
+}
+/* One click for the three things said most often about a passage. Each is an
+   ordinary note: its words are the comment the agent reads, and the reader can
+   still edit them in the margin. */
+const MARKS = [
+  { label: "Unclear", intent: "question",
+    text: "I don't follow this. What does it mean? Say it more plainly, with a concrete example." },
+  { label: "Verify", intent: "question",
+    text: "Is this verified? Say what it rests on (a file, a test, command output), or call it an assumption." },
+  { label: "Remove", intent: "change", text: "Remove this." },
+];
+const MOD = /Mac|iPhone|iPad/.test(navigator.platform || "") ? "\u2318" : "Ctrl";
+function modEnter(ev) {
+  return ev.key === "Enter" && (ev.ctrlKey || ev.metaKey) && !ev.isComposing;
 }
 function intentOf(a) {
   return INTENTS.indexOf(a.intent) < 0 ? inferIntent(a.comment) : a.intent;
@@ -45,6 +66,7 @@ const indexes = new Map();           // entry id -> canonical text index
 const entryEls = new Map();          // entry id -> [data-entry] element
 let activeId = null;
 let pendingSel = null;               // selection captured for the menu
+let pendingRect = null;              // and where it was, for an editor opened from the keyboard
 let sent = false;
 let cancelled = false;
 let gone = false;          // the command stopped answering, or another tab settled the review
@@ -748,6 +770,9 @@ function renderAnnotations() {
       saveSoon();
       requestAnimationFrame(layoutMarginalia);
     };
+    input.onkeydown = function (ev) {      /* the note is already saved; this hands the keys back */
+      if (modEnter(ev) && !ev.shiftKey) { ev.preventDefault(); input.blur(); }
+    };
     li.appendChild(input);
     requestAnimationFrame(function () { grow(input); });
     if (UNRESOLVED.has(a.id)) {
@@ -840,6 +865,21 @@ function jumpTo(a) {
   activeId = a.id;
   paint();
   renderAnnotations();
+}
+
+function stepNote(dir) {
+  const items = ordered();
+  if (!items.length) return;
+  const at = items.findIndex(function (a) { return a.id === activeId; });
+  const next = items[at < 0 ? (dir > 0 ? 0 : items.length - 1) : (at + dir + items.length) % items.length];
+  if (next.scope === "document") { activeId = next.id; paint(); renderAnnotations(); }
+  else jumpTo(next);
+  if (next.scope === "document" || narrowLayout()) {
+    requestAnimationFrame(function () {
+      const card = document.querySelector('[data-ann="' + next.id + '"]');
+      if (card) card.scrollIntoView({ block: "nearest", behavior: "auto" });
+    });
+  }
 }
 
 function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
@@ -938,7 +978,10 @@ function placeMenu(menu, rect) {
   menu.style.left = left + "px";
   menu.style.top = top + "px";
 }
-function openSelectionEditor(sel, rect) {
+/* `typing` means a key is on its way down right now: focus has to move before the
+   browser delivers it, so that the character -- or an input method's whole
+   composition -- lands in the box instead of being swallowed and replayed. */
+function openSelectionEditor(sel, rect, typing) {
   const menu = $("sel-menu");
   pendingSel = sel;
   menu.className = "editor";
@@ -960,17 +1003,24 @@ function openSelectionEditor(sel, rect) {
   cancel.onclick = function () { consumeSelection(); hideMenu(); };
   const save = el("button", "primary", "Add comment");
   save.type = "button";
+  save.title = MOD + "+Enter";
   save.onclick = function () {
     addFromSelection(sel, input.value, draft);
     consumeSelection(); hideMenu(); afterChange();
   };
+  /* both chords add the comment: a draft is never saved and sent by one keystroke */
+  input.onkeydown = function (ev) {
+    if (modEnter(ev)) { ev.preventDefault(); ev.stopPropagation(); save.onclick(); }
+  };
   actions.appendChild(cancel);
   actions.appendChild(save);
   menu.appendChild(actions);
+  menu.appendChild(el("div", "sel-hint", MOD + "+Enter adds it \u00b7 Esc closes"));
   menu.hidden = false;
+  if (typing) input.focus({ preventScroll: true });
   requestAnimationFrame(function () {
     placeMenu(menu, selectionRect(rect));
-    input.focus();
+    if (!typing) input.focus();
   });
 }
 function showMenu(fromKeyboard) {
@@ -991,6 +1041,7 @@ function showMenu(fromKeyboard) {
   } else {
     menu.className = "";
     pendingSel = sel;
+    pendingRect = rect;
     const highlight = el("button", null, "Highlight");
     highlight.type = "button";
     highlight.onclick = function () {
@@ -1000,8 +1051,19 @@ function showMenu(fromKeyboard) {
     const comment = el("button", "primary", "Comment");
     comment.type = "button";
     comment.onclick = function () { openSelectionEditor(sel, rect); };
+    comment.title = "Or just start typing";
     menu.appendChild(highlight);
     menu.appendChild(comment);
+    MARKS.forEach(function (m) {
+      const b = el("button", "mark", m.label);
+      b.type = "button";
+      b.title = INTENT_TEXT[m.intent] + ": " + m.text;
+      b.onclick = function () {
+        addFromSelection(sel, m.text, { intent: m.intent, intentAuto: false });
+        consumeSelection(); hideMenu(); afterChange();
+      };
+      menu.appendChild(b);
+    });
     first = highlight;
   }
   menu.hidden = false;
@@ -1125,7 +1187,26 @@ function composePrompt() {
   return out.join("\n").replace(/\n+$/, "\n");
 }
 function promptText() { return promptEdited ? promptDraft : composePrompt(); }
+/* The bottom button sits under the prompt it sends. This one is a screen or ten
+   away from it, next to buttons that do harmless things, so it asks first. */
+function renderSendTop() {
+  const b = $("send-top");
+  b.hidden = !LIVE || cancelled || gone;
+  b.disabled = sent;
+  b.textContent = sent ? "Sent" : "Send \u00b7 " + (anns.length ? count(anns.length, "note", "notes") : "no notes");
+}
+function sendFromAnywhere() {
+  if (!LIVE || sent || cancelled || gone || sending) return;
+  const what = promptEdited ? "Send your edited prompt to the agent?"
+    : anns.length ? "Send " + mix(ordered(), false) + " to the agent?"
+    : "Send with no notes? That tells the agent you read it all and want nothing changed.";
+  if (!window.confirm(what + " This ends the review.")) return;
+  send().then(function () {                /* a failure is explained next to the prompt */
+    if (!sent) $("followup").scrollIntoView({ block: "start", behavior: "auto" });
+  });
+}
 function renderReadback() {
+  renderSendTop();
   const state = $("prompt-state");
   const box = $("prompt-preview");
   if (promptEdited) { if (box.value !== promptDraft) box.value = promptDraft; }
@@ -1652,7 +1733,7 @@ function boot() {
 
   /* events */
   const inChrome = function (node) {
-    return node instanceof Element && !!node.closest("#sel-menu,#marginalia,#nav,.top,.notice,.followup");
+    return node instanceof Element && !!node.closest("#sel-menu,#marginalia,#nav,.top,.notice,.followup,#keys");
   };
   document.addEventListener("mouseup", function (ev) {
     if (inChrome(ev.target)) return;
@@ -1672,11 +1753,29 @@ function boot() {
   }, true);
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape") { hideMenu(); return; }
+    if (modEnter(ev) && ev.shiftKey) { ev.preventDefault(); sendFromAnywhere(); return; }
     const inField = /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || ev.target.isContentEditable;
-    if (ev.key === "/" && !inField && !ev.metaKey && !ev.ctrlKey) {
+    if (inField || ev.metaKey || ev.ctrlKey || ev.altKey || $("keys").open) return;
+    /* a passage is selected and the small menu is up: typing is the comment. 229 and
+       "Process" are an input method taking the key, which is how Chinese starts. */
+    const menu = $("sel-menu");
+    const composing = ev.key === "Process" || ev.keyCode === 229;
+    if (pendingSel && !menu.hidden && menu.className === "" &&
+        (composing || (ev.key.length === 1 && ev.key !== " "))) {
+      openSelectionEditor(pendingSel, pendingRect, true);
+      return;                              /* not prevented: the key itself lands in the box */
+    }
+    if (composing) return;
+    if (ev.key === "/") {
       ev.preventDefault();
       $("search-input").focus();
       $("search-input").select();
+    } else if (ev.key === "n" || ev.key === "N") {
+      ev.preventDefault();
+      stepNote(ev.shiftKey ? -1 : 1);
+    } else if (ev.key === "?") {
+      ev.preventDefault();
+      $("keys").showModal();
     }
   });
 
@@ -1704,6 +1803,11 @@ function boot() {
   $("doc-note").onclick = addDocumentNote;
   $("go-followup").onclick = function () { $("followup").scrollIntoView({ block: "start", behavior: "smooth" }); };
   $("send").onclick = send;
+  $("send-top").onclick = sendFromAnywhere;
+  $("send-top").title = "Confirm & send (" + MOD + "+Shift+Enter). Asks first.";
+  $("show-keys").onclick = function () { $("keys").showModal(); };
+  $("keys-close").onclick = function () { $("keys").close(); };
+  document.querySelectorAll("#keys .mod").forEach(function (k) { k.textContent = MOD; });
   $("cancel-review").onclick = cancelReview;
   $("prompt-preview").addEventListener("input", function (ev) {
     promptEdited = true;

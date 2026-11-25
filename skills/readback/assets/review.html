@@ -28,6 +28,8 @@
     <button id="toggle-nav" type="button" aria-expanded="true">Contents</button>
     <button id="doc-note" type="button" title="A note about the whole thing, not tied to one passage">Overall note</button>
     <button id="go-followup" type="button">Follow-up</button>
+    <button id="show-keys" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button>
+    <button id="send-top" class="primary" type="button" hidden>Send</button>
   </div>
 </header>
 
@@ -69,6 +71,19 @@
 <div id="minimap" aria-hidden="true"><div id="mm-track"></div><div id="mm-view"></div></div>
 <div id="mm-label" aria-hidden="true" hidden></div>
 <div id="sel-menu" role="group" aria-label="Selection actions" aria-live="polite" hidden></div>
+<dialog id="keys" aria-labelledby="keys-title">
+  <h2 id="keys-title">Keyboard</h2>
+  <dl>
+    <dt>select, then type</dt><dd>Comment on the passage</dd>
+    <dt><kbd class="mod">Ctrl</kbd> <kbd>Enter</kbd></dt><dd>Add the comment; leave a note you are editing</dd>
+    <dt><kbd>Esc</kbd></dt><dd>Close the comment box</dd>
+    <dt><kbd>n</kbd> / <kbd>Shift</kbd> <kbd>N</kbd></dt><dd>Next / previous note</dd>
+    <dt><kbd>/</kbd></dt><dd>Find in text</dd>
+    <dt><kbd class="mod">Ctrl</kbd> <kbd>Shift</kbd> <kbd>Enter</kbd></dt><dd>Confirm &amp; send, from anywhere (asks first)</dd>
+    <dt><kbd>?</kbd></dt><dd>This list</dd>
+  </dl>
+  <button id="keys-close" type="button">Close</button>
+</dialog>
 
 <script>window.RB_PAYLOAD={{PAYLOAD}};window.RB_LIVE={{LIVE}};</script>
 <script>{{VENDOR}}</script>

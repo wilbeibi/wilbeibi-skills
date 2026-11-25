@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import signal
 import stat
 import subprocess
@@ -648,6 +649,34 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(out.getvalue(), "")
         self.assertFalse((review_dir / "followup.md").exists())
         self.assertIn("no feedback was sent", err.getvalue())
+
+
+@unittest.skipUnless(shutil.which("node"), "needs node to run the page's own function")
+class Intents(unittest.TestCase):
+    """The guess decides whether the agent answers or edits, so it is tested as shipped."""
+
+    CASES = {
+        "question": ["why 12h", "is this right?", "Note: is this the same as #330?",
+                     "这样可以吗", "为什么不用 24h？", "这里为什么是 12h", "这个怎么回滚",
+                     "是否需要迁移", "还有超时的情况呢。", "有没有并发问题"],
+        "change": ["should be 12h", "改成 12h", "删掉这一段",
+                   "检查是否为空",            # 是否 only asks when it opens the sentence
+                   "注册流程要改"],           # 注 only tells with its colon
+        "note": ["", "Note: matches what shipped in #330", "FYI this shipped",
+                 "备注：和线上一致", "注：仅记录", "仅供参考"],
+    }
+
+    def test_english_and_chinese_comments_get_the_intent_a_reader_meant(self):
+        script = (ASSETS / "review.js").read_text(encoding="utf-8")
+        block = script[script.index("const ASKS ="):script.index("/* One click for the three things")]
+        program = block + "\nprocess.stdout.write(JSON.stringify(JSON.parse(process.argv[1]).map(inferIntent)));"
+        comments = [c for group in self.CASES.values() for c in group]
+        done = subprocess.run(["node", "-e", program, json.dumps(comments)],
+                              capture_output=True, text=True, encoding="utf-8", timeout=30)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        guessed = dict(zip(comments, json.loads(done.stdout)))
+        wanted = {c: intent for intent, group in self.CASES.items() for c in group}
+        self.assertEqual(guessed, wanted)
 
 
 class Signals(unittest.TestCase):
