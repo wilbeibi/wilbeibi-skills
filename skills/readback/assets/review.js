@@ -872,14 +872,15 @@ function stepNote(dir) {
   if (!items.length) return;
   const at = items.findIndex(function (a) { return a.id === activeId; });
   const next = items[at < 0 ? (dir > 0 ? 0 : items.length - 1) : (at + dir + items.length) % items.length];
-  if (next.scope === "document") { activeId = next.id; paint(); renderAnnotations(); }
-  else jumpTo(next);
-  if (next.scope === "document" || narrowLayout()) {
-    requestAnimationFrame(function () {
-      const card = document.querySelector('[data-ann="' + next.id + '"]');
-      if (card) card.scrollIntoView({ block: "nearest", behavior: "auto" });
-    });
-  }
+  /* a note on a passage shows the passage, as its jump link does; on a narrow page its
+     card is a screen away and cannot be shown too. A note on the whole document has
+     no passage, so its card is the place. */
+  if (next.scope !== "document") { jumpTo(next); return; }
+  activeId = next.id; paint(); renderAnnotations();
+  requestAnimationFrame(function () {
+    const card = document.querySelector('[data-ann="' + next.id + '"]');
+    if (card) card.scrollIntoView({ block: "nearest", behavior: "auto" });
+  });
 }
 
 function narrowLayout() { return window.matchMedia("(max-width:1080px)").matches; }
@@ -1808,6 +1809,7 @@ function boot() {
   $("show-keys").onclick = function () { $("keys").showModal(); };
   $("keys-close").onclick = function () { $("keys").close(); };
   document.querySelectorAll("#keys .mod").forEach(function (k) { k.textContent = MOD; });
+  document.querySelectorAll("#keys .live").forEach(function (row) { row.hidden = !LIVE; });
   $("cancel-review").onclick = cancelReview;
   $("prompt-preview").addEventListener("input", function (ev) {
     promptEdited = true;
