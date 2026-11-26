@@ -19,11 +19,11 @@
 | Parses, means nothing | SANY clean, TLC config/runtime error | run TLC every layer |
 | Tautological property | green whatever you change | step 5 mutants |
 | Dead model | few distinct states, action never fired | `VACUITY` flags |
-| Scenario unreachable | green, every action fires, the question's case never arises | `~Scenario` witness trace |
+| Scenario unreachable | green, every action fires, the question's case never arises | `NoX == ~Scenario` witness trace |
 | Textbook protocol instead of the code | trace validation fails; reviewers can't map actions | event→action table with file:line |
 | Atomicity too coarse | race never appears; a PlusCal label is missing | split read/write where others can interleave |
 | Bug assumed away | new guard with no code check behind it | guard cites file:line, or user sign-off |
-| Timing modeled literally | clock or sleep counters; state space explodes | sleeps, retries, randomness as nondeterminism |
+| Timing modeled literally | clock or sleep counters; state space explodes | sleeps, backoff, randomness as nondeterminism |
 | Fairness hides a bug | adding `SF` turns it green | mechanism comment per fairness term |
 | `CONSTRAINT` hides a bug | green only under bounds | list constraints as assumptions; widen the matrix |
 | Small-model overreach | "2 nodes pass, so correct" | report states the bounds; parametric claims need proof |

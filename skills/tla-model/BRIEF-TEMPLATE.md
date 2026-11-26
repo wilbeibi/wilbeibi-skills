@@ -32,7 +32,7 @@ Group by mechanism, not by file. Also list deviations from the reference algorit
 | Code field or resource | TLA+ variable | Abstraction and why | Observable from logs? |
 |---|---|---|---|
 
-Sleeps, retries, backoff, and random choices become nondeterminism (an action that may fire, an `\E` choice), not clock or counter variables. Model time explicitly only when the question depends on it, such as lease expiry under clock skew.
+Sleeps, backoff delays, and random choices become nondeterminism (an action that may fire, an `\E` choice), not clock variables; counters that bound faults are still fine. Model time explicitly only when the question depends on it, such as lease expiry under clock skew.
 
 ## Events → actions (REQUIRED, from the code, cite file:line)
 | Implementation event | file:line | TLA+ action | Atomic in code? What can interleave inside it? |

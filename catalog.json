@@ -835,7 +835,7 @@
       "files": [
         {
           "path": "BRIEF-TEMPLATE.md",
-          "sha256": "08aeeb59697179a8ed66ccefb53780be4ec4bee25f759f053539e0c953da89fd",
+          "sha256": "c16ca57a0ecbf55edbce35a8ba600c0f8e6f9eb991bc5a7f384fde2902ac5314",
           "executable": false
         },
         {
@@ -845,12 +845,12 @@
         },
         {
           "path": "REFERENCE.md",
-          "sha256": "fa5e3aa960e3a6f865e0c83d712e146bad200cf9f0b6251acad8de2187933513",
+          "sha256": "9c1290ac6cb6d02f5b9ae45bfb3ed1c83595fb201044c000c39185f5b815e2b2",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "5526eb86ab10c1862a95ab583b0444905f90d561d9fadd7c9bbd7ef135802d36",
+          "sha256": "a07b2da49be911c93f78d1f9f896fbed332680b4312491e438ff355c1b7140a1",
           "executable": false
         },
         {
