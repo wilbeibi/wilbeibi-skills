@@ -835,22 +835,22 @@
       "files": [
         {
           "path": "BRIEF-TEMPLATE.md",
-          "sha256": "38142bae40095df751d040f5d35ee58041261e0b9e0f395495282f14e5f1a596",
+          "sha256": "08aeeb59697179a8ed66ccefb53780be4ec4bee25f759f053539e0c953da89fd",
           "executable": false
         },
         {
           "path": "CEX-TEMPLATE.md",
-          "sha256": "83798c7f377a39c3ce5375dc9c47a3f2593670f1b0ca477078499f78fcbff525",
+          "sha256": "39a6c2162a6f144cc5ab0926ab1fd28b61d898ce1a9a310d1a883cad4edeaf4a",
           "executable": false
         },
         {
           "path": "REFERENCE.md",
-          "sha256": "1c8e81e9583157cb1ca9eec2f0a619ac2836406e9fad1238f6a972dad5d51be3",
+          "sha256": "fa5e3aa960e3a6f865e0c83d712e146bad200cf9f0b6251acad8de2187933513",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "da19ccafdf730e796fe162e34c2bcfeb003057682398e22c6502991f5de43b67",
+          "sha256": "5526eb86ab10c1862a95ab583b0444905f90d561d9fadd7c9bbd7ef135802d36",
           "executable": false
         },
         {

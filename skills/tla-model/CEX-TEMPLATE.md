@@ -11,6 +11,7 @@ Step <i>, action `<Action>(<args>)`. Variables that changed and why that is wron
 ## Reachable in the real system?
 Map every step to a code event (file:line) and a fault the brief allows.
 If any step needs a behavior the code or environment cannot produce, the model is too permissive: the class is spec or assumption, not design.
+First search this path, and the git history of its files, for a lock, CAS, version or etag check, or lease that the model lacks. Specs derived from code often leave these out, and a missing one makes the class spec.
 
 ## Class (pick one)
 - [ ] design: the real system can do this; the code or protocol must change

@@ -6,6 +6,9 @@
 - Plausible and wrong: SysMoBench found models that restate textbook Raft/ZAB instead of etcd/ZooKeeper's real action split. They allow states the code cannot reach and merge steps the code does interleave [10].
 - Agent specs contain their own bugs. In one K8s device-plugin report, TLC found a real lease-authorization gap *and* two bugs in the spec the agent had just written [16].
 - Modeling is not automatically useful. In a 160-run Zstd rewrite experiment, agents built a TLA+ model 159 times and no model finding ever changed the Rust code: agents model where it is easy, not where bugs live [17]. Hence the brief's question slot and the event→action table.
+- Agents fix violations by assuming the bug away. Asked to fix a race, Claude 3.7 suggested declaring races acceptable or adding a constraint that they never happen. The fix is to specify the mechanism that prevents them [20].
+- Specs derived from code leave out coordination mechanisms. In one Azure Storage spec an agent wrote from code, human review found a missing etag check and git history found a missing pessimistic lock [21].
+- Asked to "fix my spec" after a mutual-exclusion violation, ChatGPT swapped the design for textbook Peterson's algorithm and dropped two PlusCal labels [23].
 - Counterexamples can be artifacts of the abstraction. Deciding whether a trace is reachable in the real system is the hard part [18].
 - Invariant mutation is the cheapest guard against tautologies. TLA-Prover counts a property as meaningful only if a mutated property is caught [14].
 
@@ -16,8 +19,11 @@
 | Parses, means nothing | SANY clean, TLC config/runtime error | run TLC every layer |
 | Tautological property | green whatever you change | step 5 mutants |
 | Dead model | few distinct states, action never fired | `VACUITY` flags |
+| Scenario unreachable | green, every action fires, the question's case never arises | `~Scenario` witness trace |
 | Textbook protocol instead of the code | trace validation fails; reviewers can't map actions | event→action table with file:line |
-| Atomicity too coarse | race never appears | split read/write where others can interleave |
+| Atomicity too coarse | race never appears; a PlusCal label is missing | split read/write where others can interleave |
+| Bug assumed away | new guard with no code check behind it | guard cites file:line, or user sign-off |
+| Timing modeled literally | clock or sleep counters; state space explodes | sleeps, retries, randomness as nondeterminism |
 | Fairness hides a bug | adding `SF` turns it green | mechanism comment per fairness term |
 | `CONSTRAINT` hides a bug | green only under bounds | list constraints as assumptions; widen the matrix |
 | Small-model overreach | "2 nodes pass, so correct" | report states the bounds; parametric claims need proof |
@@ -70,23 +76,25 @@ Steps that exist only in the detailed spec must stutter on the abstract variable
 
 In the reports covered, this found spec–implementation divergence in all 7 systems [7]. A passing trace shows only that the observed runs are allowed. It cannot rule out states the spec allows that the code never reaches, which the event→action review has to catch.
 
+**Model-based testing** goes the other way: sample behaviors from the spec, replay each against the implementation, and compare state after every step. It is easier to build than trace validation, but it tests only the values and sizes the model's bounds allow [22].
+
 **Code-level repro.** Replay a design counterexample as a deterministic test or fault-injection run before fixing the code. This follows the Specula pipeline: code analysis → spec → harness → validation → bug confirmation [13].
 
 ## Review checklist
 
 Give the reviewer the brief, the spec, the cfgs, and the report, with no authoring context. They answer each item with evidence:
 
-1. Does every action match an event at the cited file:line? Can anything interleave inside an action?
+1. Does every action match an event at the cited file:line? Can anything interleave inside an action? Does any guard read state the acting process cannot see at that step?
 2. Can the code do something that no action allows?
 3. Does every requirement have a property, and would each property fail on the plain-words violation in the brief?
 4. Is every fairness term backed by a real mechanism? What breaks if it is removed?
 5. Which behaviors are removed by bounds, `CONSTRAINT`, or exclusions? Do any of them matter for the question?
 6. Does any report sentence claim more than the bounds support?
-7. Was any property weakened, or any fairness or constraint added, in the same round as a model fix?
+7. Was any property weakened, or any fairness, constraint, or uncited guard added, in the same round as a model fix?
 
 ## Prior art and deliberate differences
 
-- **tlaplus/AgentSkills** [12] (read 2026-09-23): `from-source`, `add-variable`, `split-action`. Useful edit recipes: a new variable must reach `Init`, `vars`, `TypeOK`, and every `UNCHANGED`; a split action adds a `pc` state and keeps the original destination. It proposes properties but has no mutation, vacuity, or counterexample-classification gate.
+- **tlaplus/AgentSkills** [12] (read 2026-09-23; rechecked 2026-11-26, no commits since 2026-02-04): `from-source`, `add-variable`, `split-action`. Useful edit recipes: a new variable must reach `Init`, `vars`, `TypeOK`, and every `UNCHANGED`; a split action adds a `pc` state and keeps the original destination. It proposes properties but has no mutation, vacuity, or counterexample-classification gate.
 - **Specula** [13] (read 2026-09-23): the model for bug archaeology, counter-bounded faults, one hunting cfg per scenario, and mandatory executed repros. It revises invariants autonomously; this skill requires sign-off for property changes instead, because an agent weakening a property is the failure it most needs to prevent. Its gotcha that `~>` passes without fairness is wrong; see above.
 
 ## Worked example
@@ -95,7 +103,7 @@ Give the reviewer the brief, the spec, the cfgs, and the report, with no authori
 
 ## Sources
 
-Collected 2026-09 through Hermes research; [12] and [13] were read directly. The X posts are practitioner self-reports without published specs or reproductions.
+Collected 2026-09 through Hermes research; [12] and [13] were read directly, and [20]–[23] on 2026-11-26. The X posts and [20]–[22] are practitioner reports without published specs or reproductions, and [22] is a vendor interview; [23] is a demo on a textbook problem.
 
 [1] TLC model checker — https://docs.tlapl.us/using:tlc:start
 [2] TLC config files — https://docs.tlapl.us/using:tlc:config_file
@@ -116,3 +124,7 @@ Collected 2026-09 through Hermes research; [12] and [13] were read directly. The
 [17] Dan Luu, agentic testing (Zstd rewrite experiment) — https://danluu.com/agentic-testing/
 [18] @thegeeknarrator on counterexample realism — https://x.com/thegeeknarrator/status/2087255820077523443
 [19] Vanlightly, Continuity.tla with modeling notes — https://github.com/Vanlightly/s3-wal-collection/blob/main/cursor/Continuity.tla
+[20] Wayne, AI is a gamechanger for TLA+ users (2025-06) — https://buttondown.com/hillelwayne/archive/ai-is-a-gamechanger-for-tla-users/
+[21] Huang, The Coming AI Revolution in Distributed Systems (2025-05) — https://zfhuang99.github.io/github%20copilot/formal%20verification/tla+/2025/05/24/ai-revolution-in-distributed-systems.html
+[22] Moreira (Quint) on the Stack Overflow Podcast, AI says you're right, formal methods say you're wrong (2026-10) — https://stackoverflow.blog/2026/10/16/formal-methods-say-you-re-wrong/
+[23] Roohitavaf, Genefication (2025-01) — https://www.mydistributed.systems/2025/01/genefication.html

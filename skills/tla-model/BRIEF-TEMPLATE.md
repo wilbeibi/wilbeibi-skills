@@ -32,6 +32,8 @@ Group by mechanism, not by file. Also list deviations from the reference algorit
 | Code field or resource | TLA+ variable | Abstraction and why | Observable from logs? |
 |---|---|---|---|
 
+Sleeps, retries, backoff, and random choices become nondeterminism (an action that may fire, an `\E` choice), not clock or counter variables. Model time explicitly only when the question depends on it, such as lease expiry under clock skew.
+
 ## Events → actions (REQUIRED, from the code, cite file:line)
 | Implementation event | file:line | TLA+ action | Atomic in code? What can interleave inside it? |
 |---|---|---|---|
@@ -56,4 +58,5 @@ What is deliberately not modeled, and why that is safe for this question.
 | wide | 3 nodes, 2 values, queue ≤ 2 | crash ×1, dup | quorum overlap |
 
 ## Open questions for the user
+List every case the code leaves undefined that the spec must decide, such as an event arriving in an unexpected state or an error with no handler. Each one is a finding, so ask the user instead of choosing a behavior.
 - …
