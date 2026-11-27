@@ -52,7 +52,7 @@
 - Model values and strings have no portable `<`; map identifiers to integers when order matters.
 - Action substitution (`A <- MCA`) needs matching arity; otherwise define `MCNext`/`MCSpec` in a wrapper module.
 - Without fairness, `P ~> Q` fails by stuttering; it does not pass vacuously (checked on TLC 2.19).
-- The release jar `tlc.py fetch` downloads (TLC 2.19) rejects `ALIAS` in a cfg: "It was expecting a keyword". Set `TLA2TOOLS_JAR` to the nightly jar (https://nightly.tlapl.us/dist/tla2tools.jar; on 2026-11-26, rev 1138302 passed `scripts/test_tlc.sh` and ran a neon `ALIAS` cfg clean), or delete the line in a copy.
+- `ALIAS` in a cfg needs tla2tools v1.8.0. The last stable release, v1.7.4 (TLC 2.19, 2024-08), rejects it: "It was expecting a keyword". `tlc.py fetch` downloads the v1.8.0 pre-release, which upstream rebuilds in place. On 2026-11-26, rev 1138302 passed `scripts/test_tlc.sh` and ran a neon `ALIAS` cfg clean. Record the `tlc:` line `check` prints, because the jar changes.
 
 ## Beyond TLC
 

@@ -36,6 +36,7 @@ if ! "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" >"$work/out" 2>&1; th
 fi
 
 expect 0 'result: clean' 'clean safety run' -- "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg"
+expect 0 '^tlc: .*rev' 'TLC version reported' -- "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg"
 expect 0 'result: clean' 'clean liveness run' -- "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLockLive.cfg"
 expect 0 'KILLED' 'guard mutant kills Mutex' -- "$tlc" mutant "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" \
   --replace $'            /\\ lock = None\n' '' --expect Mutex

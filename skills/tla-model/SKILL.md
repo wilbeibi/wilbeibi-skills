@@ -12,7 +12,7 @@ The deliverable is a checked argument, not a `.tla` file: every property traces 
 
 ```bash
 scripts/tlc.py check examples/MiniLock.tla -c examples/MiniLock.cfg   # expect "result: clean", exit 0
-scripts/tlc.py fetch            # if tla2tools.jar is missing; or set TLA2TOOLS_JAR
+scripts/tlc.py fetch            # if tla2tools.jar is missing: the v1.8.0 pre-release; or set TLA2TOOLS_JAR
 ```
 
 Missing Java: ask the user to install a JRE 11+; do not download one. `scripts/test_tlc.sh` self-tests the helper. Run TLC only through `tlc.py`; raw TLC flags go after `--tlc-args`. PlusCal: everything between two labels is one atomic step, so put a label wherever another process can interleave; run `scripts/tlc.py translate Spec.tla` before every check.

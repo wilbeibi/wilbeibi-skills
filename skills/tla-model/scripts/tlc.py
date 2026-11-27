@@ -29,7 +29,9 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-JAR_URL = "https://github.com/tlaplus/tlaplus/releases/latest/download/tla2tools.jar"
+# The v1.8.0 pre-release, which upstream rebuilds in place. releases/latest skips pre-releases and
+# serves v1.7.4 (2024-08), which rejects ALIAS in a cfg. The jar moves, so check prints its version.
+JAR_URL = "https://github.com/tlaplus/tlaplus/releases/download/v1.8.0/tla2tools.jar"
 CACHE = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "tla-model"
 MSG = re.compile(r"@!@!@STARTMSG (\d+):(\d) @!@!@\n(.*?)@!@!@ENDMSG \1 @!@!@", re.S)
 COVER = re.compile(r"^<(\w+) line (\d+).*?>: (\d+):(\d+)$")
@@ -124,7 +126,7 @@ def run_tlc(spec, cfg, workers, extra):
 
 def parse(out, code):
     msgs = [(int(c), int(sev), body.strip()) for c, sev, body in MSG.findall(out)]
-    r = {"exit": code, "kind": None, "violated": None, "errors": [], "trace": [], "simulated": False,
+    r = {"exit": code, "kind": None, "violated": None, "errors": [], "trace": [], "simulated": False, "version": None,
          "coverage": {}, "generated": None, "distinct": None, "left": None, "depth": None,
          "modules": {Path(p).name for p in re.findall(r"^Parsing file (.+\.tla)$", out, re.M)}}
     codes = {c for c, _, _ in msgs}
@@ -139,6 +141,8 @@ def parse(out, code):
             m = STATS.search(body)
             if m:
                 r["generated"], r["distinct"], r["left"] = (int(x.replace(",", "")) for x in m.groups())
+        elif c == 2262:  # "TLC2 Version 2026.11.26.020825 (rev: 1138302)"
+            r["version"] = body.removeprefix("TLC2 Version ")
         elif c == 2194:
             m = DEPTH.search(body)
             r["depth"] = int(m[1]) if m else None
@@ -169,6 +173,8 @@ def summarize(r, cfg, min_distinct):
     status = r["kind"] or ("clean (simulation, not exhaustive)" if r["simulated"] else "clean")
     target = f" ({r['violated']})" if r["violated"] else ""
     print(f"result: {status}{target}   cfg: {cfg.name}   exit: {r['exit']}")
+    if r["version"]:
+        print(f"tlc: {r['version']}")
     if r["distinct"] is not None:
         print(f"states: {r['generated']} generated, {r['distinct']} distinct, {r['left']} left on queue"
               + (f", depth {r['depth']}" if r["depth"] is not None else ""))
