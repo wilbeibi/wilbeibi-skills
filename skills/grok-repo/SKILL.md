@@ -1,6 +1,6 @@
 ---
 name: grok-repo
-description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, design tradeoffs, how something works, where a value comes from, or why a feature changed. Not for repo health (use repo-eval).
+description: Explain an unfamiliar codebase through a repository briefing, dataflow trace, or reconstruction of why and how a change was made. Use when asked for a repo tour, design tradeoffs, how something works, where a value comes from, why a feature changed, or how a project evolved. Not for repo health (use repo-eval).
 ---
 
 # grok-repo
@@ -10,6 +10,7 @@ Pick one mode by the question; keep claims traceable to code and first-party sou
 
 - **Scoped question** ("how does X work?", "where does Y come from?") → a **dataflow trace**.
 - **Change question** ("why was X added?", "how did this feature evolve?") → **change archaeology**.
+- **Project-arc question** ("how did this project evolve?", "the authors' journey") → the **evolution pass**.
 - **Whole-repo question** ("explain this codebase", "give me a tour") → the **full briefing**.
 
 ## DeepWiki for open-source repositories
@@ -46,7 +47,7 @@ Follow one datum — request, message, config value, file — from entry to effe
 
 ## Change archaeology (history mode)
 
-Reconstruct one feature or decision, not the repository's entire chronology:
+Reconstruct one feature or decision; for the whole project's arc, use the evolution pass:
 
 1. **Anchor the current concept** — find present symbols, paths, config names, tests, and user
    vocabulary. State what it does now before explaining how it arrived.
@@ -85,6 +86,30 @@ Lead with **before → pressure/evidence → introduction → corrections/revers
 Cite SHA + path per stage in the notes, dates and PR numbers for the human; close with supported rationale, rejected alternatives, unresolved
 context, and history limits. Never turn commit order into causality or invent motivation.
 
+## Evolution pass (project arc)
+
+1. **Get history** — if `git rev-parse --is-shallow-repository` says true, run
+   `git fetch --unshallow --tags` (no blob filter; on `blob:none`, `-S`, `-G` and `show` fetch
+   blobs one at a time).
+2. **Cut 3-6 eras by what changed** — a goal rewritten, a design doc or RFC landed or rejected, a
+   subsystem replaced, a long pause, a new main author (merge one person's identities first).
+   Commits per month and releases (tags, else `release:` subjects) only date the cuts; frequent
+   tags or steady growth show no boundary.
+3. **Per era** — the constraint then (usually inferred: say so), what the authors optimised, what
+   ended the era. Diff the first non-empty README (or the README at the first tag) and any vision
+   doc against today's for goals kept, changed and dropped; `git log -S'<claim>'` dates when a
+   claim flipped.
+4. **Find the authors' account** — commit bodies; PR and issue threads via `gh` (squash merges
+   leave bodies empty); design docs and RFC status lines, dated by when they were added; design
+   docs later deleted (`git log --no-renames --diff-filter=D --name-only -- '*.md'`);
+   the authors' own posts and talks, found from their profiles rather than the project name
+   (commands in Change archaeology and Git archaeology). Say whether each reason was
+   written at the time, recalled later, or inferred; "not recorded" is an answer.
+
+A dropped design is the strongest rationale: what it promised, and what its replacement gave up.
+Look for it in rejected RFCs, flipped claims, and deleted subsystems or docs (check for renames);
+it is often replaced in place rather than deleted.
+
 ## Reading order (full briefing)
 
 Work top-down. Pin the repository revision and sample representative components on large
@@ -115,6 +140,7 @@ repos; say what you sampled.
    squashed, imported, generated, or vendor-heavy; weak history produces clues, not rationale,
    and pushes the *why* into the issue tracker, or, when that is barely used, into PR review
    threads and commit bodies. The digest's HISTORY, BODIES and TRACKER lines say which.
+   With real history, run the evolution pass for the eras.
 5. **Explain decisions and pick highlights** last. For consequential findings, connect
    constraint → mechanism → code/history evidence → benefit → cost or failure condition →
    reusable lesson. Look for a counterexample or reversal that could change the judgment;
