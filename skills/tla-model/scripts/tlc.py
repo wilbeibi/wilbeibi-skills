@@ -12,6 +12,9 @@
       OLD must occur once across the modules Spec.tla loads, so an MC wrapper can mutate its
       base module. The unmutated copy must be clean on the same cfg first.
 
+A cfg that switches features off names their actions on a `\\* disabled: Crash, Requeue` line;
+check then accepts them as unfired and flags any of them that fires or does not exist.
+
 Exit: 0 clean (check) or killed (mutant); 1 violation (check) or survived (mutant);
 2 vacuity, ambiguous, or inconclusive result; 3 setup, parse, or TLC error, or a failing baseline.
 """
@@ -100,6 +103,12 @@ def cfg_properties(cfg):
     return props
 
 
+def cfg_disabled(cfg):
+    """Actions a cfg switches off on purpose, from `\\* disabled: Crash, Requeue` comment lines."""
+    lines = re.findall(r"^\s*\\\*\s*disabled:(.*)$", Path(cfg).read_text(), re.M)
+    return {n for line in lines for n in re.split(r"[\s,]+", line) if n}
+
+
 def run_tlc(spec, cfg, workers, extra):
     spec = Path(spec).resolve()
     cfg = Path(cfg).resolve() if cfg else spec.with_suffix(".cfg")
@@ -163,10 +172,12 @@ def summarize(r, cfg, min_distinct):
     if r["distinct"] is not None:
         print(f"states: {r['generated']} generated, {r['distinct']} distinct, {r['left']} left on queue"
               + (f", depth {r['depth']}" if r["depth"] is not None else ""))
+    off = cfg_disabled(cfg)
     if r["coverage"]:
         print("coverage (action: new distinct / times fired):")
         for (name, _), (d, t) in r["coverage"].items():
-            print(f"  {name:<24} {d}:{t}" + ("   <- NEVER FIRED" if t == 0 else ""))
+            mark = "" if t else "   (disabled in cfg)" if name in off else "   <- NEVER FIRED"
+            print(f"  {name:<24} {d}:{t}{mark}")
     for e in r["errors"]:
         print("error: " + e)
     if r["trace"]:
@@ -175,9 +186,15 @@ def summarize(r, cfg, min_distinct):
             print(s)
     flags = []
     if r["kind"] is None:
-        dead = [n for (n, _), (_, t) in r["coverage"].items() if t == 0]
+        dead = [n for (n, _), (_, t) in r["coverage"].items() if t == 0 and n not in off]
         if dead:
             flags.append(f"actions never fired: {', '.join(dead)}")
+        fired = {n for (n, _), (_, t) in r["coverage"].items() if t}
+        if off & fired:
+            flags.append(f"{cfg.name} declares disabled, but these fired: {', '.join(sorted(off & fired))}")
+        unknown = off - {n for n, _ in r["coverage"]}
+        if unknown and r["coverage"]:
+            flags.append(f"{cfg.name} declares disabled, but no such action: {', '.join(sorted(unknown))}")
         if r["distinct"] is not None and r["distinct"] < min_distinct:
             flags.append(f"only {r['distinct']} distinct states (< --min-distinct {min_distinct})")
         if r["left"]:

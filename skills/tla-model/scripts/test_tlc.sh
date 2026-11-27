@@ -82,6 +82,17 @@ open(p, "w").write(s)
 PY
 expect 2 'NEVER FIRED' 'dead action flagged as vacuity' -- "$tlc" check "$work/MiniLock.tla" -c "$work/MiniLock.cfg"
 
+# A cfg may declare an action off on purpose; a declared action that fires, or does not exist, is flagged.
+off() { { printf '\\* disabled: %s\n' "$1"; cat "$work/MiniLock.cfg"; } >"$work/Off.cfg"; }
+off 'Steal'
+expect 0 'Steal .*\(disabled in cfg\)' 'declared disabled action accepted' -- "$tlc" check "$work/MiniLock.tla" -c "$work/Off.cfg"
+off 'Steal, Release'
+expect 2 'declares disabled, but these fired: Release' 'declared action that fires is flagged' -- \
+  "$tlc" check "$work/MiniLock.tla" -c "$work/Off.cfg"
+off 'Steal Stael'
+expect 2 'declares disabled, but no such action: Stael' 'misspelled disabled action is flagged' -- \
+  "$tlc" check "$work/MiniLock.tla" -c "$work/Off.cfg"
+
 # Removing Release deadlocks the system.
 # -i.bak, not bare -i: BSD sed (macOS) takes the next argument as the backup suffix.
 sed -i.bak 's|^Next == .*|Next == \\E c \\in Clients : Request(c) \\/ Grant(c)|' "$work/MiniLock.tla" && rm -f "$work/MiniLock.tla.bak"

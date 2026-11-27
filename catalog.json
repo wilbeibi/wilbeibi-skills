@@ -845,12 +845,12 @@
         },
         {
           "path": "REFERENCE.md",
-          "sha256": "b0a95d720f60fd6a8fc64d19fb34d09e1e5252482b98f44cacb45af407af91ab",
+          "sha256": "005a334aa73a72513dc5d64440ecb1479341489f5cf804e4445a49d508ee41f1",
           "executable": false
         },
         {
           "path": "SKILL.md",
-          "sha256": "16abf450db7c08216c8ccb4c8a9d734e0688ce50ccafda66df02438c82a1cd9d",
+          "sha256": "01ae02d855fe268ded91a5c3279e9aca119ef48b6f2a460075b5a3503685c9d4",
           "executable": false
         },
         {
@@ -870,12 +870,12 @@
         },
         {
           "path": "scripts/test_tlc.sh",
-          "sha256": "1683ca9028d89b986e3d1ee70b9163ddd7e95bd853db2ac8e5d97f6c9decd5a1",
+          "sha256": "546aaa6eb04f5f420731f81b4405795889b9867a8a1e5bfc076b3fd821bcdfa2",
           "executable": true
         },
         {
           "path": "scripts/tlc.py",
-          "sha256": "3e74427a95b7d4d2a87eece30caa2ed6dbdb656252d2ba8721df0d2aed5323b8",
+          "sha256": "dd8c7057b3bfa646b1064cd35c5a18235056615baacf249d527f4d352694d19a",
           "executable": true
         }
       ]
