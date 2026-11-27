@@ -52,7 +52,7 @@
 - Model values and strings have no portable `<`; map identifiers to integers when order matters.
 - Action substitution (`A <- MCA`) needs matching arity; otherwise define `MCNext`/`MCSpec` in a wrapper module.
 - Without fairness, `P ~> Q` fails by stuttering; it does not pass vacuously (checked on TLC 2.19).
-- The release jar `tlc.py fetch` downloads (TLC 2.19) rejects `ALIAS` in a cfg: "It was expecting a keyword". Set `TLA2TOOLS_JAR` to the nightly jar (https://nightly.tlapl.us/dist/tla2tools.jar, which ran a neon `ALIAS` cfg clean on 2026-11-26), or delete the line in a copy.
+- The release jar `tlc.py fetch` downloads (TLC 2.19) rejects `ALIAS` in a cfg: "It was expecting a keyword". Set `TLA2TOOLS_JAR` to the nightly jar (https://nightly.tlapl.us/dist/tla2tools.jar; on 2026-11-26, rev 1138302 passed `scripts/test_tlc.sh` and ran a neon `ALIAS` cfg clean), or delete the line in a copy.
 
 ## Beyond TLC
 
@@ -100,7 +100,7 @@ Give the reviewer the brief, the spec, the cfgs, and the report, with no authori
 - **tlaplus/AgentSkills** [12] (read 2026-09-23; rechecked 2026-11-26, no commits since 2026-02-04): `from-source`, `add-variable`, `split-action`. Useful edit recipes: a new variable must reach `Init`, `vars`, `TypeOK`, and every `UNCHANGED`; a split action adds a `pc` state and keeps the original destination. It proposes properties but has no mutation, vacuity, or counterexample-classification gate.
 - **Specula** [13] (read 2026-09-23): the model for bug archaeology, counter-bounded faults, one hunting cfg per scenario, and mandatory executed repros. It revises invariants autonomously; this skill requires sign-off for property changes instead, because an agent weakening a property is the failure it most needs to prevent. Its gotcha that `~>` passes without fairness is wrong; see above.
 - **kv9** [24] (95a126c, read 2026-11-26, not run): a fail-closed runner. A clean result needs TLC's completion message, an empty queue, and every action covered. Each negative control has a baseline, one isolated change, and the counterexample it must produce, checked against the final bad-outcome property. Witnesses keep the safety invariants, so a model that refuses every write fails. Adopted: the baseline before each mutant, the completion check, and the success-path witness.
-- **Skipper** [25] (1519918; all 13 cfgs run through `tlc.py check` on 2026-11-26, each matching its `\* expect:` line): calibration cfgs switch a shipped fix off with a constant and must reproduce the historical violation (`pr12_regression` → `RunningIsDriven`). Adopted as step 5's bug-history mutants. Its feature-gated cfgs leave up to 14 actions unfired, which is why a cfg can declare them `disabled`.
+- **Skipper** [25] (1519918; all 13 cfgs run through `tlc.py check` on 2026-11-26, each matching its `\* expect:` line): calibration cfgs switch a shipped fix off with a constant and must reproduce the historical violation (`pr12_regression` → `RunningIsDriven`). Adopted as step 5's bug-history mutants. Its clean cfgs switch features off with constants, leaving 12–14 actions unfired in each of the four checked, which is why a cfg can declare them `disabled`.
 - **Neon safekeeper** [26] (fa50421): MC wrapper modules with cfgs in `models/`. `mutant` was checked on this layout: swapping `FormsQuorum` for neon's own `FormsBadQuorum` in `BecomeLeader` is `KILLED` by `ElectionSafetyFull`.
 
 ## Worked example

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Self-test for tlc.py against examples/MiniLock. Needs java and tla2tools.jar (see tlc.py);
-# exits 0 with SKIP when either is missing.
+# Self-test for tlc.py against examples/MiniLock. Parser cases need only uv; the rest need java
+# and tla2tools.jar (see tlc.py) and print SKIP when either is missing. Exits 1 on any FAIL.
 set -uo pipefail
 
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -64,7 +64,7 @@ expect 0 'KILLED' 'mutant edits the base module of an MC wrapper' -- "$tlc" muta
   -c "$work/mc/models/MC.cfg" --replace $'            /\\ lock = None\n' '' --expect Mutex
 # A sibling the root never loads must not take the edit, or the mutant "survives" unchanged.
 printf -- '---- MODULE Other ----\nOtherGuard == TRUE\n====\n' >"$work/mc/Other.tla"
-expect 3 'modules MCMiniLock.tla loads; matched nowhere' 'mutant ignores modules the root does not load' -- \
+expect 3 'matched nowhere \(also in Other.tla, which it does not load\)' 'mutant ignores modules the root does not load' -- \
   "$tlc" mutant "$work/mc/MCMiniLock.tla" -c "$work/mc/models/MC.cfg" --replace 'OtherGuard == TRUE' 'OtherGuard == FALSE' --expect Mutex
 
 # Simulation explores random behaviors, so its clean result must not read as exhaustive.

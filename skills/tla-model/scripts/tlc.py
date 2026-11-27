@@ -243,10 +243,12 @@ def mutant(a):
                 print("error: " + e)
             sys.exit(3)
         # Only modules TLC parsed count: an edit to a sibling the root never loads changes nothing.
+        unloaded = [f.name for f, _ in hits if f.name not in base["modules"]]
         hits = [(f, n) for f, n in hits if f.name in base["modules"]]
         if sum(n for _, n in hits) != 1:
             found = ", ".join(f"{f.name} x{n}" for f, n in hits) or "nowhere"
-            die(f"--replace OLD must match exactly once in the modules {src.name} loads; matched {found}")
+            die(f"--replace OLD must match exactly once in the modules {src.name} loads; matched {found}"
+                + (f" (also in {', '.join(unloaded)}, which it does not load)" if unloaded else ""))
         target = hits[0][0]
         (work / target.name).write_text(target.read_text().replace(a.old, a.new))
         r, _ = run_tlc(work / src.name, wcfg, a.workers, a.tlc_args)

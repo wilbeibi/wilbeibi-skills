@@ -845,7 +845,7 @@
         },
         {
           "path": "REFERENCE.md",
-          "sha256": "005a334aa73a72513dc5d64440ecb1479341489f5cf804e4445a49d508ee41f1",
+          "sha256": "891b626c536aa37b8e76fbcbabafb1b12f7b89b97deb0d95b87e9f939282fc64",
           "executable": false
         },
         {
@@ -870,12 +870,12 @@
         },
         {
           "path": "scripts/test_tlc.sh",
-          "sha256": "546aaa6eb04f5f420731f81b4405795889b9867a8a1e5bfc076b3fd821bcdfa2",
+          "sha256": "94deecb6ef21745f213525450f083ac5c9b5636dfbc2dae7b6d55a45df86ead5",
           "executable": true
         },
         {
           "path": "scripts/tlc.py",
-          "sha256": "dd8c7057b3bfa646b1064cd35c5a18235056615baacf249d527f4d352694d19a",
+          "sha256": "b85dbcda3dae2cb4bbfa224ef538d786fbb1112ef26c983d3b2d61b6695b5ef0",
           "executable": true
         }
       ]
