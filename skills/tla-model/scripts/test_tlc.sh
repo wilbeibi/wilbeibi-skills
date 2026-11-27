@@ -9,12 +9,6 @@ ex="$here/../examples"
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 
-if ! "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" >"$work/out" 2>&1; then
-  if grep -qE 'java not found|tla2tools.jar not found' "$work/out"; then
-    echo "SKIP: $(cat "$work/out")"; exit 0
-  fi
-fi
-
 fail=0
 expect() { # expect <exit> <grep pattern> <label> -- cmd...
   local want=$1 pat=$2 label=$3; shift 4
@@ -25,6 +19,21 @@ expect() { # expect <exit> <grep pattern> <label> -- cmd...
     echo "ok   $label"
   fi
 }
+
+# Parser checks need no java. A zero exit without TLC's verdict (truncated output, a broken java
+# wrapper) is not clean; coverage repeats every minute on long runs, and only the last report counts.
+parse() { uv run -q --no-project --python '>=3.10' python -c \
+  "import runpy, sys; p = runpy.run_path(sys.argv[1])['parse']; out = sys.argv[2]; $1" "$tlc" "$2"; }
+cov='@!@!@STARTMSG 2772:0 @!@!@\n<A line 3, col 1 to line 4, col 2 of module M>: %s\n@!@!@ENDMSG 2772 @!@!@\n'
+expect 0 '^incomplete$' 'zero exit without a verdict is incomplete' -- parse "print(p(out, 0)['kind'])" ''
+expect 0 "^\{\('A', 3\): \(5, 9\)\}$" 'repeated coverage keeps the last report' -- \
+  parse "print(p(out, 0)['coverage'])" "$(printf "$cov" 0:0 5:9)"
+
+if ! "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" >"$work/out" 2>&1; then
+  if grep -qE 'java not found|tla2tools.jar not found' "$work/out"; then
+    echo "SKIP: $(cat "$work/out")"; exit $fail
+  fi
+fi
 
 expect 0 'result: clean' 'clean safety run' -- "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg"
 expect 0 'result: clean' 'clean liveness run' -- "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLockLive.cfg"
@@ -44,6 +53,24 @@ mkdir "$work/junk"; cp "$ex"/MiniLock.* "$work/junk/"; mkdir "$work/junk/node_mo
 expect 0 'KILLED' 'mutant ignores non-spec files' -- "$tlc" mutant "$work/junk/MiniLock.tla" -c "$work/junk/MiniLock.cfg" \
   --replace $'            /\\ lock = None\n' '' --expect Mutex
 
+# TLC stops at Mutex, listed first, so Consistency was never checked on every state.
+expect 2 'INCONCLUSIVE' 'mutant stopped by another invariant is inconclusive' -- "$tlc" mutant "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" \
+  --replace $'            /\\ lock = None\n' '' --expect Consistency
+
+# An MC wrapper runs the base module, so the edit lands in MiniLock.tla; the cfg sits in models/.
+mkdir -p "$work/mc/models"; cp "$ex/MiniLock.tla" "$work/mc/"; cp "$ex/MiniLock.cfg" "$work/mc/models/MC.cfg"
+printf -- '---- MODULE MCMiniLock ----\nEXTENDS MiniLock\n====\n' >"$work/mc/MCMiniLock.tla"
+expect 0 'KILLED' 'mutant edits the base module of an MC wrapper' -- "$tlc" mutant "$work/mc/MCMiniLock.tla" \
+  -c "$work/mc/models/MC.cfg" --replace $'            /\\ lock = None\n' '' --expect Mutex
+# A sibling the root never loads must not take the edit, or the mutant "survives" unchanged.
+printf -- '---- MODULE Other ----\nOtherGuard == TRUE\n====\n' >"$work/mc/Other.tla"
+expect 3 'modules MCMiniLock.tla loads; matched nowhere' 'mutant ignores modules the root does not load' -- \
+  "$tlc" mutant "$work/mc/MCMiniLock.tla" -c "$work/mc/models/MC.cfg" --replace 'OtherGuard == TRUE' 'OtherGuard == FALSE' --expect Mutex
+
+# Simulation explores random behaviors, so its clean result must not read as exhaustive.
+expect 0 'result: clean \(simulation, not exhaustive\)' 'simulation is not reported as exhaustive' -- \
+  "$tlc" check "$ex/MiniLock.tla" -c "$ex/MiniLock.cfg" --tlc-args -simulate num=50 -depth 20
+
 # A dead action must be flagged even though every invariant holds.
 cp "$ex"/MiniLock.* "$work/"
 python3 - "$work/MiniLock.tla" <<'PY'
@@ -59,5 +86,9 @@ expect 2 'NEVER FIRED' 'dead action flagged as vacuity' -- "$tlc" check "$work/M
 # -i.bak, not bare -i: BSD sed (macOS) takes the next argument as the backup suffix.
 sed -i.bak 's|^Next == .*|Next == \\E c \\in Clients : Request(c) \\/ Grant(c)|' "$work/MiniLock.tla" && rm -f "$work/MiniLock.tla.bak"
 expect 1 'result: deadlock' 'deadlock reported with trace' -- "$tlc" check "$work/MiniLock.tla" -c "$work/MiniLock.cfg"
+
+# A spec that already fails its cfg cannot show that a mutant is caught.
+expect 3 'BASELINE NOT CLEAN' 'mutant refuses a failing baseline' -- "$tlc" mutant "$work/MiniLock.tla" -c "$work/MiniLock.cfg" \
+  --replace $'            /\\ lock = None\n' '' --expect Mutex
 
 exit $fail

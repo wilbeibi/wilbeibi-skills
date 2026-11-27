@@ -20,6 +20,8 @@
 | Tautological property | green whatever you change | step 5 mutants |
 | Dead model | few distinct states, action never fired | `VACUITY` flags |
 | Scenario unreachable | green, every action fires, the question's case never arises | `NoX == ~Scenario` witness trace |
+| Safe by refusing work | every invariant green; nothing ever commits | success-path witness |
+| Blind to known bugs | still green with a historical fix reverted | step 5 bug-history mutants |
 | Textbook protocol instead of the code | trace validation fails; reviewers can't map actions | event→action table with file:line |
 | Atomicity too coarse | race never appears; a PlusCal label is missing | split read/write where others can interleave |
 | Bug assumed away | new guard with no code check behind it | guard cites file:line, or user sign-off |
@@ -50,6 +52,7 @@
 - Model values and strings have no portable `<`; map identifiers to integers when order matters.
 - Action substitution (`A <- MCA`) needs matching arity; otherwise define `MCNext`/`MCSpec` in a wrapper module.
 - Without fairness, `P ~> Q` fails by stuttering; it does not pass vacuously (checked on TLC 2.19).
+- The release jar `tlc.py fetch` downloads (TLC 2.19) rejects `ALIAS` in a cfg: "It was expecting a keyword". Set `TLA2TOOLS_JAR` to the nightly jar (https://nightly.tlapl.us/dist/tla2tools.jar, which ran a neon `ALIAS` cfg clean on 2026-11-26), or delete the line in a copy.
 
 ## Beyond TLC
 
@@ -96,14 +99,17 @@ Give the reviewer the brief, the spec, the cfgs, and the report, with no authori
 
 - **tlaplus/AgentSkills** [12] (read 2026-09-23; rechecked 2026-11-26, no commits since 2026-02-04): `from-source`, `add-variable`, `split-action`. Useful edit recipes: a new variable must reach `Init`, `vars`, `TypeOK`, and every `UNCHANGED`; a split action adds a `pc` state and keeps the original destination. It proposes properties but has no mutation, vacuity, or counterexample-classification gate.
 - **Specula** [13] (read 2026-09-23): the model for bug archaeology, counter-bounded faults, one hunting cfg per scenario, and mandatory executed repros. It revises invariants autonomously; this skill requires sign-off for property changes instead, because an agent weakening a property is the failure it most needs to prevent. Its gotcha that `~>` passes without fairness is wrong; see above.
+- **kv9** [24] (95a126c, read 2026-11-26, not run): a fail-closed runner. A clean result needs TLC's completion message, an empty queue, and every action covered. Each negative control has a baseline, one isolated change, and the counterexample it must produce, checked against the final bad-outcome property. Witnesses keep the safety invariants, so a model that refuses every write fails. Adopted: the baseline before each mutant, the completion check, and the success-path witness.
+- **Skipper** [25] (1519918; all 13 cfgs run through `tlc.py check` on 2026-11-26, each matching its `\* expect:` line): calibration cfgs switch a shipped fix off with a constant and must reproduce the historical violation (`pr12_regression` → `RunningIsDriven`). Adopted as step 5's bug-history mutants.
+- **Neon safekeeper** [26] (fa50421): MC wrapper modules with cfgs in `models/`. `mutant` was checked on this layout: swapping `FormsQuorum` for neon's own `FormsBadQuorum` in `BecomeLeader` is `KILLED` by `ElectionSafetyFull`.
 
 ## Worked example
 
-`examples/MiniLock.tla` has comments mapping actions to events, properties to requirements, and fairness to mechanisms. It comes with separate safety (`MiniLock.cfg`) and liveness (`MiniLockLive.cfg`) configs. `scripts/test_tlc.sh` checks both configs and kills a guard mutant (Mutex) and a fairness mutant (StarvationFree). It also shows that a weakened Mutex is not caught by Consistency, and that a dead action is flagged.
+`examples/MiniLock.tla` has comments mapping actions to events, properties to requirements, and fairness to mechanisms. It comes with separate safety (`MiniLock.cfg`) and liveness (`MiniLockLive.cfg`) configs. `scripts/test_tlc.sh` checks both configs and kills a guard mutant (Mutex) and a fairness mutant (StarvationFree). It also shows that a weakened Mutex is not caught by Consistency, that a dead action is flagged, and that `mutant` refuses a failing baseline and calls a mutant stopped by another invariant inconclusive.
 
 ## Sources
 
-Collected 2026-09 through Hermes research; [12] and [13] were read directly, and [20]–[23] on 2026-11-26. The X posts and [20]–[22] are practitioner reports without published specs or reproductions, and [22] is a vendor interview; [23] is a demo on a textbook problem.
+Collected 2026-09 through Hermes research; [12] and [13] were read directly, [20]–[23] on 2026-11-26, and [24]–[26] from local clones on 2026-11-26. The X posts and [20]–[22] are practitioner reports without published specs or reproductions, and [22] is a vendor interview; [23] is a demo on a textbook problem.
 
 [1] TLC model checker — https://docs.tlapl.us/using:tlc:start
 [2] TLC config files — https://docs.tlapl.us/using:tlc:config_file
@@ -128,3 +134,6 @@ Collected 2026-09 through Hermes research; [12] and [13] were read directly, and
 [21] Huang, The Coming AI Revolution in Distributed Systems (2025-05) — https://zfhuang99.github.io/github%20copilot/formal%20verification/tla+/2025/05/24/ai-revolution-in-distributed-systems.html
 [22] Moreira (Quint) on the Stack Overflow Podcast, AI says you're right, formal methods say you're wrong (2026-10) — https://stackoverflow.blog/2026/10/16/formal-methods-say-you-re-wrong/
 [23] Roohitavaf, Genefication (2025-01) — https://www.mydistributed.systems/2025/01/genefication.html
+[24] Huang, kv9 — https://github.com/c4pt0r/kv9
+[25] Airbnb, Skipper formal models (`formal/tla`) — https://github.com/airbnb/skipper
+[26] Neon safekeeper spec (`safekeeper/spec`) — https://github.com/neondatabase/neon

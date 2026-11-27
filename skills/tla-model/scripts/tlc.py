@@ -9,9 +9,11 @@
   tlc.py translate Spec.tla                 translate PlusCal in place (pcal.trans)
   tlc.py check Spec.tla [-c Model.cfg]      model-check; print summary, trace, dead actions
   tlc.py mutant Spec.tla -c Model.cfg --replace OLD NEW --expect Mutex|deadlock|<Property>
+      OLD must occur once across the modules Spec.tla loads, so an MC wrapper can mutate its
+      base module. The unmutated copy must be clean on the same cfg first.
 
 Exit: 0 clean (check) or killed (mutant); 1 violation (check) or survived (mutant);
-2 vacuity or ambiguous result; 3 setup, parse, or TLC error.
+2 vacuity, ambiguous, or inconclusive result; 3 setup, parse, or TLC error, or a failing baseline.
 """
 import argparse
 import functools
@@ -113,13 +115,15 @@ def run_tlc(spec, cfg, workers, extra):
 
 def parse(out, code):
     msgs = [(int(c), int(sev), body.strip()) for c, sev, body in MSG.findall(out)]
-    r = {"exit": code, "kind": None, "violated": None, "errors": [], "trace": [],
-         "coverage": [], "generated": None, "distinct": None, "left": None, "depth": None}
+    r = {"exit": code, "kind": None, "violated": None, "errors": [], "trace": [], "simulated": False,
+         "coverage": {}, "generated": None, "distinct": None, "left": None, "depth": None,
+         "modules": {Path(p).name for p in re.findall(r"^Parsing file (.+\.tla)$", out, re.M)}}
+    codes = {c for c, _, _ in msgs}
     for c, sev, body in msgs:
         if c == 2772:  # per-action coverage: <Action line N ...>: distinct:total
             m = COVER.match(body)
-            if m:
-                r["coverage"].append((m[1], int(m[2]), int(m[3]), int(m[4])))
+            if m:  # TLC repeats the report every -coverage interval; the last one is final
+                r["coverage"][(m[1], int(m[2]))] = (int(m[3]), int(m[4]))
         elif c in (2217, 2218):
             r["trace"].append(body)
         elif c in (2199, 2200):
@@ -143,11 +147,17 @@ def parse(out, code):
         if code == 150 or not r["errors"]:  # SANY parse errors print outside tool messages
             r["errors"].append("\n".join(l for l in out.splitlines()
                                          if l and not l.startswith(("@!@!@", "Parsing file", "Semantic processing")))[-3000:])
+    elif r["kind"] is None and 2193 not in codes:  # 2193: "Model checking completed. No error has been found."
+        if 2209 in codes and 2186 in codes:  # -simulate: progress and "Finished", but no verdict
+            r["simulated"] = True
+        else:
+            r["kind"] = "incomplete"
+            r["errors"].append("TLC exited 0 without reporting a finished check; nothing was verified")
     return r
 
 
 def summarize(r, cfg, min_distinct):
-    status = r["kind"] or "clean"
+    status = r["kind"] or ("clean (simulation, not exhaustive)" if r["simulated"] else "clean")
     target = f" ({r['violated']})" if r["violated"] else ""
     print(f"result: {status}{target}   cfg: {cfg.name}   exit: {r['exit']}")
     if r["distinct"] is not None:
@@ -155,7 +165,7 @@ def summarize(r, cfg, min_distinct):
               + (f", depth {r['depth']}" if r["depth"] is not None else ""))
     if r["coverage"]:
         print("coverage (action: new distinct / times fired):")
-        for name, _, d, t in r["coverage"]:
+        for (name, _), (d, t) in r["coverage"].items():
             print(f"  {name:<24} {d}:{t}" + ("   <- NEVER FIRED" if t == 0 else ""))
     for e in r["errors"]:
         print("error: " + e)
@@ -165,7 +175,7 @@ def summarize(r, cfg, min_distinct):
             print(s)
     flags = []
     if r["kind"] is None:
-        dead = [n for n, _, _, t in r["coverage"] if t == 0]
+        dead = [n for (n, _), (_, t) in r["coverage"].items() if t == 0]
         if dead:
             flags.append(f"actions never fired: {', '.join(dead)}")
         if r["distinct"] is not None and r["distinct"] < min_distinct:
@@ -193,44 +203,59 @@ def check(a):
 
 def mutant(a):
     src = Path(a.spec).resolve()
-    text = src.read_text()
-    n = text.count(a.old)
-    if n != 1:
-        die(f"--replace OLD must match exactly once in {src.name}; matched {n} times")
+    hits = [(f, n) for f in sorted(src.parent.glob("*.tla")) if (n := f.read_text().count(a.old))]
+    if not hits:
+        die(f"--replace OLD must match exactly once in the modules {src.name} loads; matched nowhere")
     cfg = Path(a.config).resolve()
     with tempfile.TemporaryDirectory(prefix="tla-mutant-") as tmp:
         work = Path(tmp) / "m"
         work.mkdir()
         for f in [*src.parent.glob("*.tla"), *src.parent.glob("*.cfg")]:  # all TLC needs; avoid copying a repo
             shutil.copy2(f, work)
-        (work / src.name).write_text(text.replace(a.old, a.new))
-        wcfg = work / cfg.relative_to(src.parent) if cfg.is_relative_to(src.parent) else cfg
+        wcfg = cfg
+        if cfg.is_relative_to(src.parent):  # keep a cfg in a subdirectory (models/x.cfg) at its relative path
+            wcfg = work / cfg.relative_to(src.parent)
+            wcfg.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(cfg, wcfg)
+        base, _ = run_tlc(work / src.name, wcfg, a.workers, a.tlc_args)
+        if base["kind"]:
+            print(f"BASELINE NOT CLEAN: the unmutated spec gives {base['kind']}"
+                  + (f" ({base['violated']})" if base["violated"] else "")
+                  + f" on {cfg.name}, so a kill would prove nothing. Fix that or pick a clean cfg first.")
+            for e in base["errors"]:
+                print("error: " + e)
+            sys.exit(3)
+        # Only modules TLC parsed count: an edit to a sibling the root never loads changes nothing.
+        hits = [(f, n) for f, n in hits if f.name in base["modules"]]
+        if sum(n for _, n in hits) != 1:
+            found = ", ".join(f"{f.name} x{n}" for f, n in hits) or "nowhere"
+            die(f"--replace OLD must match exactly once in the modules {src.name} loads; matched {found}")
+        target = hits[0][0]
+        (work / target.name).write_text(target.read_text().replace(a.old, a.new))
         r, _ = run_tlc(work / src.name, wcfg, a.workers, a.tlc_args)
     exp = a.expect
-    print(f"mutant: {a.old!r} -> {a.new!r}   expect: {exp}")
+    print(f"mutant: {target.name}: {a.old!r} -> {a.new!r}   expect: {exp}")
+    print("baseline: clean" + (f", {base['distinct']} distinct states" if base["distinct"] is not None else ""))
     print(f"TLC: {r['kind'] or 'clean'}" + (f" ({r['violated']})" if r["violated"] else ""))
-    if r["kind"] in ("parse", "error"):
+    if r["kind"] in ("parse", "error", "incomplete"):
         print("MUTANT INVALID: mutant does not parse or TLC errored; pick a mutation that stays well-formed")
         for e in r["errors"]:
             print("error: " + e)
         sys.exit(3)
-    if r["kind"] == "safety" and r["violated"] == exp:
+    props = cfg_properties(cfg)
+    if (r["kind"] == "safety" and r["violated"] == exp) or (r["kind"] == "deadlock" and exp == "deadlock"):
         verdict = "KILLED"
-    elif r["kind"] == "deadlock" and exp == "deadlock":
-        verdict = "KILLED"
-    elif r["kind"] == "liveness":
-        props = cfg_properties(cfg)
-        if props == [exp]:
-            verdict = "KILLED"
-        elif exp in props:
+    elif r["kind"] == "liveness" and exp in props:
+        if props != [exp]:
             print(f"AMBIGUOUS: temporal violation, but {cfg.name} checks {props}; TLC cannot say which failed")
             sys.exit(2)
-        else:
-            verdict = "SURVIVED"
-    else:
+        verdict = "KILLED"
+    elif r["kind"] is None:
         verdict = "SURVIVED"
-    if verdict == "SURVIVED" and r["kind"]:
-        print(f"note: mutant failed a different check than {exp}; the targeted property did not catch it")
+    else:  # TLC stops at the first violation, so exp was never checked on the remaining states
+        print(f"INCONCLUSIVE: TLC stopped at {r['violated'] or r['kind']} before checking {exp} on every state. "
+              f"Rerun with a cfg whose only check is {exp}, with CHECK_DEADLOCK FALSE unless {exp} is deadlock.")
+        sys.exit(2)
     if r["trace"] and a.trace:
         print("\n".join(r["trace"]))
     print(verdict)
